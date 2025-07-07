@@ -1,0 +1,49 @@
+Jul 06 21:08:09.346 HYPERVISOR: Release 0.2.17-x86/Windows (tag 2017072410)
+Jul 06 21:08:09.346 HYPERVISOR: Started on IP = localhost, TCP port = 50743.
+Jul 06 21:08:09.796 HYPERVISOR: exec_cmd: hypervisor version 
+Jul 06 21:08:09.800 HYPERVISOR: exec_cmd: hypervisor working_dir C:\Users\cismembrane\GNS3\projects\5-Router-EIGRP\project-files\dynamips 
+Jul 06 21:08:09.802 GENERAL: working_dir=C:\Users\cismembrane\GNS3\projects\5-Router-EIGRP\project-files\dynamips
+Jul 06 21:08:09.802 HYPERVISOR: exec_cmd: hypervisor working_dir C:\Users\cismembrane\GNS3\projects\5-Router-EIGRP\project-files\dynamips\c5995ad6-a8ba-4552-b25f-29ca20288b6b 
+Jul 06 21:08:09.806 GENERAL: working_dir=C:\Users\cismembrane\GNS3\projects\5-Router-EIGRP\project-files\dynamips\c5995ad6-a8ba-4552-b25f-29ca20288b6b
+Jul 06 21:08:09.806 HYPERVISOR: exec_cmd: vm create R3 3 c3600 
+Jul 06 21:08:09.808 VM: VM R3 created.
+Jul 06 21:08:09.821 HYPERVISOR: exec_cmd: vm set_con_tcp_port R3 5002 
+Jul 06 21:08:09.822 HYPERVISOR: exec_cmd: c3600 get_mac_addr R3 
+Jul 06 21:08:09.822 HYPERVISOR: exec_cmd: c3600 set_chassis R3 3660 
+Jul 06 21:08:09.832 HYPERVISOR: exec_cmd: vm set_ios R3 C:/Users/cismembrane/GNS3/images/IOS/c3660-a3jk9s-mz.124-15.T14.image 
+Jul 06 21:08:09.834 HYPERVISOR: exec_cmd: vm get_status R3 
+Jul 06 21:08:09.836 HYPERVISOR: exec_cmd: vm set_idle_pc R3 0x6076e0b4 
+Jul 06 21:08:09.842 HYPERVISOR: exec_cmd: vm set_exec_area R3 64 
+Jul 06 21:08:09.846 HYPERVISOR: exec_cmd: vm set_ram R3 192 
+Jul 06 21:08:09.850 HYPERVISOR: exec_cmd: vm set_nvram R3 256 
+Jul 06 21:08:09.854 HYPERVISOR: exec_cmd: vm get_status R3 
+Jul 06 21:08:09.854 HYPERVISOR: exec_cmd: vm slot_add_binding R3 1 0 NM-4E 
+Jul 06 21:08:09.978 HYPERVISOR: exec_cmd: vm set_ios R3 C:/Users/cismembrane/GNS3/images/IOS/c3660-a3jk9s-mz.124-15.T14.image 
+Jul 06 21:08:13.449 HYPERVISOR: exec_cmd: vm set_ios R3 C:/Users/cismembrane/GNS3/images/IOS/c3660-a3jk9s-mz.124-15.T14.image 
+Jul 06 21:08:17.000 HYPERVISOR: exec_cmd: vm set_ios R3 C:/Users/cismembrane/GNS3/images/IOS/c3660-a3jk9s-mz.124-15.T14.image 
+Jul 06 21:09:47.855 HYPERVISOR: exec_cmd: vm get_status R3 
+Jul 06 21:09:47.855 HYPERVISOR: exec_cmd: vm slot_remove_binding R3 1 0 
+Jul 06 21:09:47.864 HYPERVISOR: exec_cmd: vm get_status R3 
+Jul 06 21:09:47.864 HYPERVISOR: exec_cmd: vm slot_add_binding R3 1 0 NM-1FE-TX 
+Jul 06 21:09:47.866 HYPERVISOR: exec_cmd: vm get_status R3 
+Jul 06 21:09:47.868 HYPERVISOR: exec_cmd: vm slot_add_binding R3 2 0 NM-1FE-TX 
+Jul 06 21:10:39.891 HYPERVISOR: exec_cmd: nio create_udp udp-8552b26c-7ef6-4286-86b2-8716e7821b67 10010 127.0.0.1 10011 
+Jul 06 21:10:40.785 HYPERVISOR: exec_cmd: vm slot_add_nio_binding R3 0 0 udp-8552b26c-7ef6-4286-86b2-8716e7821b67 
+Jul 06 21:10:40.789 HYPERVISOR: exec_cmd: vm get_status R3 
+Jul 06 21:11:13.834 HYPERVISOR: exec_cmd: nio create_udp udp-0426dbab-7fb5-47bc-ad8a-0bfeab2728aa 10022 127.0.0.1 10023 
+Jul 06 21:11:13.847 HYPERVISOR: exec_cmd: vm slot_add_nio_binding R3 0 1 udp-0426dbab-7fb5-47bc-ad8a-0bfeab2728aa 
+Jul 06 21:11:13.847 HYPERVISOR: exec_cmd: vm get_status R3 
+Jul 06 21:11:25.304 HYPERVISOR: exec_cmd: nio create_udp udp-85c2bc62-50fc-44c5-a44e-900e7105a63e 10028 127.0.0.1 10029 
+Jul 06 21:11:25.308 HYPERVISOR: exec_cmd: vm slot_add_nio_binding R3 1 0 udp-85c2bc62-50fc-44c5-a44e-900e7105a63e 
+Jul 06 21:11:25.311 HYPERVISOR: exec_cmd: vm get_status R3 
+Jul 06 21:12:03.038 HYPERVISOR: exec_cmd: nio create_udp udp-0437cc03-2346-40f9-be06-d0616268e759 10038 127.0.0.1 10039 
+Jul 06 21:12:03.046 HYPERVISOR: exec_cmd: vm slot_add_nio_binding R3 2 0 udp-0437cc03-2346-40f9-be06-d0616268e759 
+Jul 06 21:12:03.046 HYPERVISOR: exec_cmd: vm get_status R3 
+Jul 06 21:12:25.555 HYPERVISOR: exec_cmd: vm set_ghost_status R3 2 
+Jul 06 21:12:25.557 HYPERVISOR: exec_cmd: vm set_ghost_file R3 C:\Users\cismembrane\GNS3\projects\5-Router-EIGRP\project-files\dynamips\c3660-a3jk9s-mz.124-15.T14.image-192.ghost 
+Jul 06 21:12:25.559 HYPERVISOR: exec_cmd: vm get_status R3 
+Jul 06 21:12:25.573 HYPERVISOR: exec_cmd: vm set_config R3 configs\i3_startup-config.cfg 
+Jul 06 21:12:25.573 HYPERVISOR: exec_cmd: vm start R3 
+Jul 06 21:12:32.884 HYPERVISOR: exec_cmd: vm set_ios R3 C:/Users/cismembrane/GNS3/images/IOS/c3660-a3jk9s-mz.124-15.T14.image 
+Jul 06 21:12:33.983 HYPERVISOR: exec_cmd: vm set_ios R3 C:/Users/cismembrane/GNS3/images/IOS/c3660-a3jk9s-mz.124-15.T14.image 
+Jul 06 21:13:03.018 HYPERVISOR: exec_cmd: vm extract_config R3 

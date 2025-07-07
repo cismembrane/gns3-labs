@@ -1,0 +1,59 @@
+Jul 06 21:08:03.511 HYPERVISOR: Release 0.2.17-x86/Windows (tag 2017072410)
+Jul 06 21:08:03.514 HYPERVISOR: Started on IP = localhost, TCP port = 50729.
+Jul 06 21:08:03.663 HYPERVISOR: exec_cmd: hypervisor version 
+Jul 06 21:08:03.668 HYPERVISOR: exec_cmd: hypervisor working_dir C:\Users\cismembrane\GNS3\projects\5-Router-EIGRP\project-files\dynamips 
+Jul 06 21:08:03.673 GENERAL: working_dir=C:\Users\cismembrane\GNS3\projects\5-Router-EIGRP\project-files\dynamips
+Jul 06 21:08:03.673 HYPERVISOR: exec_cmd: hypervisor working_dir C:\Users\cismembrane\GNS3\projects\5-Router-EIGRP\project-files\dynamips\09d81ebf-5307-4e99-a2da-78465b393645 
+Jul 06 21:08:03.673 GENERAL: working_dir=C:\Users\cismembrane\GNS3\projects\5-Router-EIGRP\project-files\dynamips\09d81ebf-5307-4e99-a2da-78465b393645
+Jul 06 21:08:03.673 HYPERVISOR: exec_cmd: vm create R1 1 c3600 
+Jul 06 21:08:03.673 VM: VM R1 created.
+Jul 06 21:08:03.673 HYPERVISOR: exec_cmd: vm set_con_tcp_port R1 5000 
+Jul 06 21:08:03.685 HYPERVISOR: exec_cmd: c3600 get_mac_addr R1 
+Jul 06 21:08:03.685 HYPERVISOR: exec_cmd: c3600 set_chassis R1 3660 
+Jul 06 21:08:03.687 HYPERVISOR: exec_cmd: vm set_ios R1 C:/Users/cismembrane/GNS3/images/IOS/c3660-a3jk9s-mz.124-15.T14.image 
+Jul 06 21:08:03.689 HYPERVISOR: exec_cmd: vm get_status R1 
+Jul 06 21:08:03.689 HYPERVISOR: exec_cmd: vm set_idle_pc R1 0x6076e0b4 
+Jul 06 21:08:03.691 HYPERVISOR: exec_cmd: vm set_exec_area R1 64 
+Jul 06 21:08:03.693 HYPERVISOR: exec_cmd: vm set_ram R1 192 
+Jul 06 21:08:03.693 HYPERVISOR: exec_cmd: vm set_nvram R1 256 
+Jul 06 21:08:03.697 HYPERVISOR: exec_cmd: vm get_status R1 
+Jul 06 21:08:03.697 HYPERVISOR: exec_cmd: vm slot_add_binding R1 1 0 NM-4E 
+Jul 06 21:08:03.852 HYPERVISOR: exec_cmd: vm set_ios R1 C:/Users/cismembrane/GNS3/images/IOS/c3660-a3jk9s-mz.124-15.T14.image 
+Jul 06 21:08:14.659 HYPERVISOR: exec_cmd: vm set_ios R1 C:/Users/cismembrane/GNS3/images/IOS/c3660-a3jk9s-mz.124-15.T14.image 
+Jul 06 21:08:39.877 HYPERVISOR: exec_cmd: vm set_ios R1 C:/Users/cismembrane/GNS3/images/IOS/c3660-a3jk9s-mz.124-15.T14.image 
+Jul 06 21:09:25.376 HYPERVISOR: exec_cmd: vm get_status R1 
+Jul 06 21:09:25.376 HYPERVISOR: exec_cmd: vm slot_remove_binding R1 1 0 
+Jul 06 21:09:25.376 HYPERVISOR: exec_cmd: vm get_status R1 
+Jul 06 21:09:25.376 HYPERVISOR: exec_cmd: vm slot_add_binding R1 1 0 NM-1FE-TX 
+Jul 06 21:09:25.385 HYPERVISOR: exec_cmd: vm get_status R1 
+Jul 06 21:09:25.387 HYPERVISOR: exec_cmd: vm slot_add_binding R1 2 0 NM-1FE-TX 
+Jul 06 21:10:20.339 HYPERVISOR: exec_cmd: nio create_udp udp-12be671e-d088-4f3f-a801-0def5a05712c 10002 127.0.0.1 10003 
+Jul 06 21:10:20.967 HYPERVISOR: exec_cmd: vm slot_add_nio_binding R1 0 0 udp-12be671e-d088-4f3f-a801-0def5a05712c 
+Jul 06 21:10:20.970 HYPERVISOR: exec_cmd: vm get_status R1 
+Jul 06 21:10:39.867 HYPERVISOR: exec_cmd: nio create_udp udp-934378d4-1f82-4d3e-b41c-01afeee02a11 10008 127.0.0.1 10009 
+Jul 06 21:10:39.877 HYPERVISOR: exec_cmd: vm slot_add_nio_binding R1 0 1 udp-934378d4-1f82-4d3e-b41c-01afeee02a11 
+Jul 06 21:10:39.877 HYPERVISOR: exec_cmd: vm get_status R1 
+Jul 06 21:10:57.177 HYPERVISOR: exec_cmd: nio create_udp udp-ea5f8241-f75e-4264-8dac-2929fe9d7f0b 10014 127.0.0.1 10015 
+Jul 06 21:10:57.185 HYPERVISOR: exec_cmd: vm slot_add_nio_binding R1 1 0 udp-ea5f8241-f75e-4264-8dac-2929fe9d7f0b 
+Jul 06 21:10:57.186 HYPERVISOR: exec_cmd: vm get_status R1 
+Jul 06 21:12:21.876 HYPERVISOR: exec_cmd: vm create Ghost 0 c3600 
+Jul 06 21:12:21.884 VM: VM Ghost created.
+Jul 06 21:12:21.888 HYPERVISOR: exec_cmd: vm set_ios Ghost C:/Users/cismembrane/GNS3/images/IOS/c3660-a3jk9s-mz.124-15.T14.image 
+Jul 06 21:12:21.888 HYPERVISOR: exec_cmd: vm set_ghost_status Ghost 1 
+Jul 06 21:12:21.893 HYPERVISOR: exec_cmd: vm set_ghost_file Ghost C:\Users\cismembrane\GNS3\projects\5-Router-EIGRP\project-files\dynamips\c3660-a3jk9s-mz.124-15.T14.image-192.ghost 
+Jul 06 21:12:21.898 HYPERVISOR: exec_cmd: vm set_ram Ghost 192 
+Jul 06 21:12:21.900 HYPERVISOR: exec_cmd: vm get_status Ghost 
+Jul 06 21:12:21.900 HYPERVISOR: exec_cmd: vm set_config Ghost configs\i0_startup-config.cfg 
+Jul 06 21:12:21.902 HYPERVISOR: exec_cmd: vm start Ghost 
+Jul 06 21:12:22.900 HYPERVISOR: exec_cmd: vm get_status Ghost 
+Jul 06 21:12:22.904 HYPERVISOR: exec_cmd: vm stop Ghost 
+Jul 06 21:12:22.990 VM: VM Ghost shutdown.
+Jul 06 21:12:22.998 HYPERVISOR: exec_cmd: vm extract_config Ghost 
+Jul 06 21:12:23.000 HYPERVISOR: exec_cmd: vm clean_delete Ghost 
+Jul 06 21:12:23.000 VM: VM Ghost destroyed.
+Jul 06 21:12:23.070 HYPERVISOR: exec_cmd: vm set_ghost_status R1 2 
+Jul 06 21:12:23.072 HYPERVISOR: exec_cmd: vm set_ghost_file R1 C:\Users\cismembrane\GNS3\projects\5-Router-EIGRP\project-files\dynamips\c3660-a3jk9s-mz.124-15.T14.image-192.ghost 
+Jul 06 21:12:23.074 HYPERVISOR: exec_cmd: vm get_status R1 
+Jul 06 21:12:23.092 HYPERVISOR: exec_cmd: vm set_config R1 configs\i1_startup-config.cfg 
+Jul 06 21:12:23.096 HYPERVISOR: exec_cmd: vm start R1 
+Jul 06 21:12:53.589 HYPERVISOR: exec_cmd: vm extract_config R1 
