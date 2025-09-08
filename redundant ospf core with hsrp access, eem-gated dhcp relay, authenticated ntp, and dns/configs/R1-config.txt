@@ -1,0 +1,132 @@
+!
+! Last configuration change at 01:52:52 UTC Fri Sep 5 2025
+!
+version 12.4
+service timestamps debug datetime msec
+service timestamps log datetime msec
+service password-encryption
+service sequence-numbers
+!
+hostname R1
+!
+boot-start-marker
+boot-end-marker
+!
+logging buffered 65536 informational
+enable secret 5 $1$c7zR$L3cUvux4qUVZ/Hr2hiBMJ1
+!
+no aaa new-model
+memory-size iomem 5
+no ip icmp rate-limit unreachable
+!
+!
+ip cef
+no ip domain lookup
+ip domain name test.com
+ip host r1 10.255.255.1
+ip host r2 10.255.255.2
+ip host r3 10.255.255.3
+ip host r4 10.255.255.4
+ip host r1.test.com 10.255.255.1
+ip host r2.test.com 10.255.255.2
+ip host r3.test.com 10.255.255.3
+ip host r4.test.com 10.255.255.4
+!
+!
+multilink bundle-name authenticated
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+username admin secret 5 $1$THCe$f.XQSSYsxA76GHNAU.QT41
+archive
+ log config
+  hidekeys
+!
+!
+!
+!
+ip tcp synwait-time 5
+ip ssh authentication-retries 2
+ip ssh version 2
+!
+!
+!
+!
+interface Loopback0
+ ip address 10.255.255.1 255.255.255.255
+!
+interface FastEthernet0/0
+ no ip address
+ shutdown
+ duplex auto
+ speed auto
+!
+interface FastEthernet0/1
+ no ip address
+ shutdown
+ duplex auto
+ speed auto
+!
+interface FastEthernet1/0
+ ip address 203.0.113.1 255.255.255.252
+ duplex auto
+ speed auto
+!
+!
+no ip http server
+no ip http secure-server
+ip forward-protocol nd
+ip route 0.0.0.0 0.0.0.0 203.0.113.2
+!
+ip dns server
+!
+!
+no cdp log mismatch duplex
+!
+!
+!
+!
+control-plane
+!
+!
+!
+!
+!
+!
+!
+!
+!
+line con 0
+ exec-timeout 0 0
+ privilege level 15
+ logging synchronous
+line aux 0
+ exec-timeout 0 0
+ privilege level 15
+ logging synchronous
+line vty 0 4
+ exec-timeout 15 0
+ login local
+ transport input ssh
+line vty 5 15
+ exec-timeout 15 0
+ login local
+ transport input ssh
+!
+ntp authentication-key 1 md5 09584B1A0D 7
+ntp authenticate
+ntp trusted-key 1
+ntp master
+!
+end

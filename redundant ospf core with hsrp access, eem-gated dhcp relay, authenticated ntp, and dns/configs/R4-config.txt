@@ -1,0 +1,169 @@
+!
+! No configuration change since last restart
+!
+version 12.4
+service timestamps debug datetime msec
+service timestamps log datetime msec
+service password-encryption
+service sequence-numbers
+!
+hostname R4
+!
+boot-start-marker
+boot-end-marker
+!
+logging buffered 65536 informational
+logging console notifications
+enable secret 5 $1$P7LD$cFx6yJI7gThUuR4WTr6gT.
+!
+no aaa new-model
+memory-size iomem 5
+no ip icmp rate-limit unreachable
+!
+!
+ip cef
+ip domain name test.com
+ip name-server 10.255.255.1
+!
+!
+multilink bundle-name authenticated
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+username admin secret 5 $1$3MKZ$wMrrOKbIppLt6obYFOYXZ.
+archive
+ log config
+  hidekeys
+!
+!
+!
+!
+ip tcp synwait-time 5
+!
+!
+!
+!
+interface Loopback0
+ ip address 10.255.255.4 255.255.255.255
+!
+interface FastEthernet0/0
+ ip address 192.168.10.3 255.255.255.0
+ duplex auto
+ speed auto
+ standby 10 ip 192.168.10.1
+ standby 10 priority 90
+ standby 10 preempt
+!
+interface FastEthernet0/1
+ description to R2
+ ip address 10.0.1.1 255.255.255.252
+ ip ospf authentication message-digest
+ ip ospf message-digest-key 1 md5 7 131112011F
+ ip ospf network point-to-point
+ duplex auto
+ speed auto
+!
+interface Ethernet1/0
+ no ip address
+ shutdown
+ half-duplex
+!
+interface Ethernet1/1
+ no ip address
+ shutdown
+ half-duplex
+!
+interface Ethernet1/2
+ no ip address
+ shutdown
+ half-duplex
+!
+interface Ethernet1/3
+ no ip address
+ shutdown
+ half-duplex
+!
+!
+router ospf 1
+ router-id 10.255.255.4
+ log-adjacency-changes
+ area 0 authentication message-digest
+ area 10 stub no-summary
+ passive-interface FastEthernet0/0
+ network 10.0.1.0 0.0.0.3 area 0
+ network 10.255.255.4 0.0.0.0 area 0
+ network 192.168.10.0 0.0.0.255 area 10
+!
+no ip http server
+no ip http secure-server
+ip forward-protocol nd
+!
+!
+!
+no cdp log mismatch duplex
+!
+!
+!
+!
+control-plane
+!
+!
+!
+!
+!
+!
+!
+!
+!
+line con 0
+ exec-timeout 0 0
+ privilege level 15
+ logging synchronous
+line aux 0
+ exec-timeout 0 0
+ privilege level 15
+ logging synchronous
+line vty 0 4
+ login local
+ transport input ssh
+line vty 5 15
+ login local
+ transport input ssh
+!
+ntp authentication-key 1 md5 010703174F 7
+ntp authenticate
+ntp trusted-key 1
+ntp clock-period 17179874
+ntp source Loopback0
+ntp server 10.255.255.1 key 1
+!
+event manager applet HSRP-RELAY-ON
+ event syslog pattern "HSRP-5-STATECHANGE: FastEthernet0/0 Grp 10 state .* -> Active"
+ action 1.0 cli command "enable"
+ action 2.0 cli command "conf t"
+ action 3.0 cli command "interface FastEthernet0/0"
+ action 4.0 cli command "no ip helper-address 10.0.0.2"
+ action 5.0 cli command "ip helper-address 10.0.0.2"
+ action 6.0 cli command "end"
+ action 7.0 syslog msg "EEM: helper ENABLED on Fa0/0 (HSRP Active)"
+event manager applet HSRP-RELAY-OFF
+ event syslog pattern "HSRP-5-STATECHANGE: FastEthernet0/0 Grp 10 state Active -> .*"
+ action 1.0 cli command "enable"
+ action 2.0 cli command "conf t"
+ action 3.0 cli command "interface FastEthernet0/0"
+ action 4.0 cli command "no ip helper-address 10.0.0.2"
+ action 5.0 cli command "end"
+ action 6.0 syslog msg "EEM: helper DISABLED on Fa0/0 (HSRP not Active)"
+!
+end
