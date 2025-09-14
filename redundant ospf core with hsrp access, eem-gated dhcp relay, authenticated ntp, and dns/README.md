@@ -17,21 +17,15 @@ All devices use local `admin` for SSH (`login local`, `transport input ssh`). Co
 
 ## Topology
 
-         R1 
-          |
-          |
-          R2 
-      /       \
-     /         \
-    /           \
-   R3           R4
-     \         /
-      \       /
-       \     /
-          |
-         SW1
-        /   \
-      PC1   PC2
+		 R1
+         |
+         R2
+       /   \
+     R3     R4
+       \   /
+        SW1
+      /     \
+    PC1     PC2
 
 No IPs in the diagram; see addressing tables below.
 
@@ -52,9 +46,9 @@ No IPs in the diagram; see addressing tables below.
 
 | Link     | Network         | Endpoint A         | Endpoint B         |
 |----------|-----------------|--------------------|--------------------|
-| R1 ↔ R2  | 203.0.113.0/30  | R1: 203.0.113.1    | R2: 203.0.113.2    |
-| R2 ↔ R3  | 10.0.0.0/30     | R3: 10.0.0.1       | R2: 10.0.0.2       |
-| R2 ↔ R4  | 10.0.1.0/30     | R4: 10.0.1.1       | R2: 10.0.1.2       |
+| R1 - R2  | 203.0.113.0/30  | R1: 203.0.113.1    | R2: 203.0.113.2    |
+| R2 - R3  | 10.0.0.0/30     | R3: 10.0.0.1       | R2: 10.0.0.2       |
+| R2 - R4  | 10.0.1.0/30     | R4: 10.0.1.1       | R2: 10.0.1.2       |
 | LAN      | 192.168.10.0/24 | R3: 192.168.10.2   | R4: 192.168.10.3   |
 
 ### HSRP (VLAN 192.168.10.0/24)
