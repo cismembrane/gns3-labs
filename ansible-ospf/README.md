@@ -61,7 +61,7 @@ Management addressing is:
       │         ┼───────────────────────────────────┼         │      
       │         │            10.0.3.0/30            │         │      
       └─────────┘                                   └─────────┘      
-					Additional: R1-R4 10.0.3.0/30
+					Additional: R1-R4 10.0.5.0/30
 ```
 	
 ## Tools used
@@ -114,23 +114,20 @@ It checks existing SSH status first with `show ip ssh`. In this run, SSH was alr
 
 The base config then applies:
 
-`no ip domain-lookup`
-`ip domain-name test.com`
-`enable secret admin` (already applied manually)
-`username admin privilege 15 secret admin` (already applied manually)
-`ip ssh authentication-retries 3`
+- `no ip domain-lookup`
+- `ip domain-name test.com`
+- `enable secret admin` (already applied manually)
+- `username admin privilege 15 secret admin` (already applied manually)
+- `ip ssh authentication-retries 3`
 
 The actual playbook also includes service timestamps, login success/failure logging, ip ssh version 2, and ip ssh time-out 60.
 
 Console and VTY access are standardized:
 
-console timeout set to 10 minutes
-
-VTY login set to local authentication
-
-VTY transport locked to SSH
-
-VTY timeout set to 15 minutes
+- console timeout set to 10 minutes
+- VTY login set to local authentication
+- VTY transport locked to SSH
+- VTY timeout set to 15 minutes
 
 NTP was attempted as an optional baseline and returned ok with no change. (NTP server not used in this lab)
 
@@ -151,26 +148,26 @@ TRANSIT (was Vlan50)
 The resulting interface layout was:
 
 R1
-FastEthernet0/0  10.0.1.1/30
-FastEthernet1/0  10.0.4.1/30
-FastEthernet3/0  10.0.5.1/30
-FastEthernet3/1  172.16.99.11/24
+- FastEthernet0/0  10.0.1.1/30
+- FastEthernet1/0  10.0.4.1/30
+- FastEthernet3/0  10.0.5.1/30
+- FastEthernet3/1  172.16.99.11/24
 
 R2
-FastEthernet0/0  10.0.1.2/30
-FastEthernet2/0  10.0.2.1/30
-FastEthernet3/1  172.16.99.12/24
+- FastEthernet0/0  10.0.1.2/30
+- FastEthernet2/0  10.0.2.1/30
+- FastEthernet3/1  172.16.99.12/24
 
 R3
-FastEthernet1/0  10.0.4.2/30
-FastEthernet1/1  10.0.3.1/30
-FastEthernet3/1  172.16.99.13/24
+- FastEthernet1/0  10.0.4.2/30
+- FastEthernet1/1  10.0.3.1/30
+- FastEthernet3/1  172.16.99.13/24
 
 R4
-FastEthernet1/1  10.0.3.2/30
-FastEthernet2/0  10.0.2.2/30
-FastEthernet3/0  10.0.5.2/30
-FastEthernet3/1  172.16.99.14/24
+- FastEthernet1/1  10.0.3.2/30
+- FastEthernet2/0  10.0.2.2/30
+- FastEthernet3/0  10.0.5.2/30
+- FastEthernet3/1  172.16.99.14/24
 
 The sanity check after interface deployment confirmed that the interfaces were up/up and that each router had the expected connected routes for its local /30 links plus the management subnet.
 
