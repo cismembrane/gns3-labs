@@ -180,9 +180,9 @@ The precheck playbook runs two commands:
 
 This confirms two useful things before routing goes on:
 
-the interface state is where it should be after interface deployment
+- the interface state is where it should be after interface deployment
 
-all targets are Cisco IOS 7200 devices running 15.3(3)XB12
+- all targets are Cisco IOS 7200 devices running 15.3(3)XB12
 
 At this point, the network is built at Layer 3 but OSPF is not yet deployed.
 
