@@ -40,6 +40,7 @@ Management addressing is:
 - `R3` `FastEthernet3/1` -> `172.16.99.13/24`
 - `R4` `FastEthernet3/1` -> `172.16.99.14/24`
 
+```text
       ┌─────────┐                                   ┌─────────┐      
       │         │                                   │         │      
       │   R1    │            10.0.1.0/30            │   R2    │      
@@ -61,7 +62,8 @@ Management addressing is:
       │         │            10.0.3.0/30            │         │      
       └─────────┘                                   └─────────┘      
 					Additional: R1-R4 10.0.3.0/30
-					
+```
+	
 ## Tools used
 
 - Ansible Core 2.16.3
@@ -176,8 +178,8 @@ The sanity check after interface deployment confirmed that the interfaces were u
 
 The precheck playbook runs two commands:
 
-`show ip interface brief`
-`show version | include IOS`
+- `show ip interface brief`
+- `show version | include IOS`
 
 This confirms two useful things before routing goes on:
 
@@ -194,18 +196,18 @@ The OSPF deploy playbook renders the router process config from templates/ospf-r
 Rendered examples from the run:
 
 R1
-`router ospf 1`
-`router-id 1.1.1.1`
-`network 10.0.1.0 0.0.0.3 area 0`
-`network 10.0.4.0 0.0.0.3 area 0`
-`network 10.0.5.0 0.0.0.3 area 0`
+- `router ospf 1`
+- `router-id 1.1.1.1`
+- `network 10.0.1.0 0.0.0.3 area 0`
+- `network 10.0.4.0 0.0.0.3 area 0`
+- `network 10.0.5.0 0.0.0.3 area 0`
 
 R4
-`router ospf 1`
-`router-id 4.4.4.4`
-`network 10.0.5.0 0.0.0.3 area 0`
-`network 10.0.2.0 0.0.0.3 area 0`
-`network 10.0.3.0 0.0.0.3 area 0`
+- `router ospf 1`
+- `router-id 4.4.4.4`
+- `network 10.0.5.0 0.0.0.3 area 0`
+- `network 10.0.2.0 0.0.0.3 area 0`
+- `network 10.0.3.0 0.0.0.3 area 0`
 
 Every router reported Changed: True, which makes sense because this looks like the first OSPF push in the sequence.
 
@@ -213,24 +215,24 @@ Every router reported Changed: True, which makes sense because this looks like t
 
 The validation playbook runs the command set defined in group_vars/ios.yml:
 
-`show ip ospf neighbor`
-`show ip route ospf`
-`show ip protocols`
+- `show ip ospf neighbor`
+- `show ip route ospf`
+- `show ip protocols`
 
 It prints the output for each router and also saves a local file per device:
 
-`outputs/R1-ospf-validation.txt`
-`outputs/R2-ospf-validation.txt`
-`outputs/R3-ospf-validation.txt`
-`outputs/R4-ospf-validation.txt`
+- `outputs/R1-ospf-validation.txt`
+- `outputs/R2-ospf-validation.txt`
+- `outputs/R3-ospf-validation.txt`
+- `outputs/R4-ospf-validation.txt`
 
 ### Deployment steps
 
-`ansible-playbook playbooks/base-config.yml -v --diff`
-`ansible-playbook playbooks/interface-config.yml -v --diff`
-`ansible-playbook playbooks/precheck.yml -v`
-`ansible-playbook playbooks/ospf-deploy.yml -v --diff`
-`ansible-playbook playbooks/ospf-validate.yml -v`
+- `ansible-playbook playbooks/base-config.yml -v --diff`
+- `ansible-playbook playbooks/interface-config.yml -v --diff`
+- `ansible-playbook playbooks/precheck.yml -v`
+- `ansible-playbook playbooks/ospf-deploy.yml -v --diff`
+- `ansible-playbook playbooks/ospf-validate.yml -v`
 
 ### Validation
 
@@ -240,34 +242,34 @@ Neighbor state
 
 R1 sees three neighbors:
 
-2.2.2.2 on 10.0.1.2
-3.3.3.3 on 10.0.4.2
-4.4.4.4 on 10.0.5.2
+- 2.2.2.2 on 10.0.1.2
+- 3.3.3.3 on 10.0.4.2
+- 4.4.4.4 on 10.0.5.2
 
 R2 sees two neighbors:
 
-1.1.1.1 on 10.0.1.1
-4.4.4.4 on 10.0.2.2
+- 1.1.1.1 on 10.0.1.1
+- 4.4.4.4 on 10.0.2.2
 
 R3 sees two neighbors:
 
-1.1.1.1 on 10.0.4.1
-4.4.4.4 on 10.0.3.2
+- 1.1.1.1 on 10.0.4.1
+- 4.4.4.4 on 10.0.3.2
 
 R4 sees three neighbors:
 
-1.1.1.1 on 10.0.5.1
-2.2.2.2 on 10.0.2.1
-3.3.3.3 on 10.0.3.1
+- 1.1.1.1 on 10.0.5.1
+- 2.2.2.2 on 10.0.2.1
+- 3.3.3.3 on 10.0.3.1
 
 OSPF process state
 
 `show ip protocols` confirms on all four routers that:
 
-OSPF process ID is 1
-area is 0
-router IDs are correct
-the correct network statements were applied per router
+- OSPF process ID is 1
+- area is 0
+- router IDs are correct
+- the correct network statements were applied per router
 
 ### Results
 
@@ -275,33 +277,33 @@ The lab deployed cleanly.
 
 Base config:
 
-all four routers reachable
-all four routers updated
-no unreachable hosts
-no failed tasks
-RSA generation correctly skipped because SSH was already enabled
+- all four routers reachable
+- all four routers updated
+- no unreachable hosts
+- no failed tasks
+- RSA generation correctly skipped because SSH was already enabled
 
 Interface config:
 
-all required host variables present
-management and transit interfaces configured successfully
-connected route sanity check matched the intended per-router links
+- all required host variables present
+- management and transit interfaces configured successfully
+- connected route sanity check matched the intended per-router links
 
 Precheck:
 
-all four routers responded
-all four identified as Cisco 7200 IOS devices
+- all four routers responded
+- all four identified as Cisco 7200 IOS devices
 
 OSPF deploy:
 
-OSPF process pushed successfully to all four routers
-all four routers reported changes
+- OSPF process pushed successfully to all four routers
+- all four routers reported changes
 
 OSPF validation:
 
-all four routers returned neighbor and protocol output successfully
-local validation artifacts were written for all four routers
-no failures or unreachable devices
+- all four routers returned neighbor and protocol output successfully
+- local validation artifacts were written for all four routers
+- no failures or unreachable devices
 
 ### Notes
 
