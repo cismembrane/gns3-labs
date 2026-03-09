@@ -1,0 +1,52 @@
+- name: Configure management and transit routed interfaces (c7600)
+  hosts: ios
+  gather_facts: false
+
+  tasks:
+    - name: Validate required host variables exist
+      ansible.builtin.assert:
+        that:
+          - mgmt is defined
+          - mgmt.interface is defined
+          - mgmt.ip is defined
+          - mgmt.mask is defined
+          - routed_interfaces is defined
+          - routed_interfaces | length > 0
+        fail_msg: "Missing mgmt or routed_interfaces variables in host_vars for {{ inventory_hostname }}"
+
+    - name: Configure management routed interface
+      cisco.ios.ios_config:
+        parents: "interface {{ mgmt.interface }}"
+        lines:
+          - "{% if mgmt.description is defined and mgmt.description|length > 0 %}description {{ mgmt.description }}{% endif %}"
+          - "ip address {{ mgmt.ip }} {{ mgmt.mask }}"
+          - no shutdown
+        match: line
+        replace: line
+
+    - name: Configure transit routed interfaces (IP on physical ports)
+      cisco.ios.ios_config:
+        parents: "interface {{ item.name }}"
+        lines:
+          - "{% if item.description is defined and item.description|length > 0 %}description {{ item.description }}{% endif %}"
+          - "ip address {{ item.ip }} {{ item.mask }}"
+          - "{% if item.enabled is defined and (not item.enabled) %}shutdown{% else %}no shutdown{% endif %}"
+        match: line
+        replace: line
+      loop: "{{ routed_interfaces }}"
+      loop_control:
+        label: "{{ item.name }} {{ item.ip }}"
+
+    - name: Sanity check (L3 oriented)
+      cisco.ios.ios_command:
+        commands:
+          - show ip interface brief
+          - show ip route connected
+      register: post
+
+    - name: Print summary
+      ansible.builtin.debug:
+        msg:
+          - "Host: {{ inventory_hostname }}"
+          - "{{ post.stdout[0] }}"
+          - "{{ post.stdout[1] }}"

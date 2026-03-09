@@ -1,0 +1,86 @@
+- name: Bootstrap base config on Cisco IOS routers
+  hosts: ios
+  gather_facts: false
+
+  vars:
+    lab_domain_name: test.com
+    lab_ntp_server: 129.6.15.28
+    mgmt_username: admin
+    mgmt_password: admin
+    enable_secret: admin
+    ssh_modulus_bits: 1024
+
+  tasks:
+    - name: Check SSH status
+      cisco.ios.ios_command:
+        commands:
+          - show ip ssh
+      register: ssh_status
+      ignore_errors: true
+
+    - name: Set hostname from inventory name
+      cisco.ios.ios_config:
+        lines:
+          - "hostname {{ inventory_hostname }}"
+
+    - name: Apply base management config (without RSA key generation)
+      cisco.ios.ios_config:
+        lines:
+          - no ip domain-lookup
+          - "ip domain-name {{ base_config.domain_name }}"
+          - service timestamps debug datetime msec
+          - service timestamps log datetime msec
+          - login on-success log
+          - login on-failure log
+          - "enable secret {{ base_config.enable_secret }}"
+          - "username {{ base_config.mgmt_username }} privilege 15 secret {{ base_config.mgmt_password }}"
+          - ip ssh version 2
+          - ip ssh time-out 60
+          - ip ssh authentication-retries 3
+        match: line
+        replace: line
+      register: base_push
+
+    - name: Generate RSA key only if SSH keys are not present
+      cisco.ios.ios_config:
+        lines:
+          - "crypto key generate rsa modulus {{ ssh_modulus_bits }}"
+      when: ssh_status is failed or ('%Please create RSA keys' in (ssh_status.stdout[0] | default(''))) or ('SSH Disabled' in (ssh_status.stdout[0] | default('')))
+
+    - name: Configure console line
+      cisco.ios.ios_config:
+        parents: line con 0
+        lines:
+          - logging synchronous
+          - exec-timeout 10 0
+        match: line
+        replace: line
+
+    - name: Configure vty 0 15 for SSH
+      cisco.ios.ios_config:
+        parents: line vty 0 15
+        lines:
+          - login local
+          - transport input ssh
+          - exec-timeout 15 0
+        match: line
+        replace: line
+
+    - name: Disable DNS lookup (prevents 'Translating ...' stalls)
+      cisco.ios.ios_config:
+        lines:
+          - no ip domain-lookup
+        match: line
+        replace: line
+
+    - name: Optional NTP baseline
+      cisco.ios.ios_config:
+        lines:
+          - "ntp server {{ lab_ntp_server }}"
+        match: line
+        replace: line
+      ignore_errors: true
+
+    - name: Report result
+      ansible.builtin.debug:
+        msg: "Base config pushed on {{ inventory_hostname }} (changed={{ base_push.changed }})"
