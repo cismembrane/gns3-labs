@@ -137,7 +137,13 @@ The interface playbook first asserts that each router has the required managemen
 
 It then configures the management interface on FastEthernet3/1 for each router and brings it up. The management interfaces have IP addresses assigned and are brought up as part of the manual config done before the Ansible deployment.
 
-After that it pushes all transit links as routed physical interfaces. This lab initially used IOSvL2 images. These images displayed instability during the use of the `no switchport` command and were switched to IOSv images. These proved too too resource-intensive for the machine they were being used on. C3600 router images were then used, but SSH complained about outdated SSH encryption algorithms. C7200 router images were then used, to the same effect with SSH algorithims. The errors were finally overridden with client-side SSH command-line options and the C7200 router images were chosen despite this drawback. The interfaces are no longer living on SVIs or VLAN interfaces. The descriptions still preserve that history:
+After that it pushes all transit links as routed physical interfaces. This lab initially used IOSvL2 images. These images displayed instability during the use of the `no switchport` command and were switched to IOSv images. These proved too too resource-intensive for the machine they were being used on. 
+
+C3600 router images were then used, but SSH complained about outdated SSH encryption algorithms. 
+
+C7200 router images were then used, to the same effect with SSH algorithims. 
+
+The errors were finally overridden with client-side SSH command-line options and the C7200 router images were chosen despite this drawback. The interfaces are no longer living on SVIs or VLAN interfaces. The descriptions still preserve that history:
 
 - TRANSIT (was Vlan10)
 - TRANSIT (was Vlan20)
