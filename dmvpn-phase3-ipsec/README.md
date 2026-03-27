@@ -4,7 +4,9 @@
 
 This is a hub-and-spoke DMVPN Phase 3 deployment with IPsec encryption over a simulated ISP underlay. I built it to understand how Phase 3 shortcut tunnels actually form. Not just the theory, but watching the NHRP redirect fire on the hub, the resolution request go out from the spoke, and the shortcut route get installed in real time. The lab runs EIGRP as the overlay routing protocol and uses IKEv1 with pre-shared keys to keep the focus on DMVPN mechanics rather than PKI.
 
-This maps directly to CCNP ENCOR objectives under VPN technologies. The IPsec component also crosses into security territory, since understanding encrypted tunnel behavior matters for traffic analysis and incident response in blue-team and SOC work.
+This maps directly to CCNP ENCOR objectives under VPN technologies. The IPsec component also crosses into security territory, since understanding encrypted tunnel behavior matters for traffic analysis and incident response.
+
+**Video walkthrough:** [DMVPN Phase 3 with IPsec on YouTube](https://www.youtube.com/watch?v=68Raa0FWNkg)
 
 ## Topology
 
@@ -21,7 +23,7 @@ This maps directly to CCNP ENCOR objectives under VPN technologies. The IPsec co
                   ┌─────┴─┐ ┌─┴────┐ ┌┴─────┐
                   │  R1   │ │  R2  │ │  R3  │
                   │  Hub  │ │Spoke1│ │Spoke2│
-                  └───┬───┘ └──┬───┘ └──┬───┘
+                  └───┬───┘ └──┬───┘ └───┬──┘
                       │        │         │
              ─────────┼────────┼─────────┼─────── DMVPN Overlay
              Tunnel0  │        │         │        172.16.0.0/24
@@ -225,6 +227,16 @@ One thing to know: a single ICMP packet might not trigger the redirect. If the s
 **EIGRP neighbors not forming.** This is almost always a multicast mapping problem. The hub needs `ip nhrp map multicast dynamic`. Each spoke needs `ip nhrp map multicast 10.0.1.1`. Without these, EIGRP hellos don't traverse the tunnel.
 
 **Phase 3 shortcut not triggering.** Verify `ip nhrp redirect` on the hub and `ip nhrp shortcut` on both spokes. Generate sustained traffic, not just one ping. Use `debug nhrp` on the hub to confirm Traffic Indication messages are being sent.
+
+## Lessons Learned
+
+These are problems I actually hit while building this lab and the debugging that resolved them.
+
+**EIGRP split-horizon on the tunnel interface.** EIGRP adjacencies came up and the hub learned spoke routes, but the spokes couldn't see each other's LAN prefixes. The hub was receiving routes from one spoke over `Tunnel0` and refusing to advertise them back out the same interface. Split-horizon is on by default for EIGRP, and on a multipoint interface all spokes share the same interface from the hub's perspective. The fix was `no ip split-horizon eigrp 100` on the hub's `Tunnel0`. Without it, spoke-to-spoke reachability through the hub never works, which means Phase 3 shortcuts can never trigger either, since there's no initial traffic to redirect.
+
+**IPsec profile name mismatch.** The tunnel came up at the GRE/NHRP layer but traffic wasn't encrypting. `show crypto ipsec sa` showed zero encaps and decaps. The problem was a typo in the `tunnel protection ipsec profile` statement on one router. The profile name referenced under the tunnel interface didn't match the name defined in `crypto ipsec profile`. IOS accepts the mismatched name without complaint at configuration time. The tunnel still forms because DMVPN doesn't require IPsec to function. You only find out when you check the crypto counters and realize nothing is being encrypted. This is the kind of thing that could sit in production unnoticed if nobody verifies encryption is actually happening.
+
+**Tunnel source vs tunnel interface confusion.** Early in the build I had a spoke configured with `tunnel source Tunnel0` instead of `tunnel source FastEthernet1/0`. The tunnel source needs to be the physical interface (or its IP) facing the underlay, not the tunnel interface itself. Pointing the tunnel source at the tunnel creates a recursive dependency: the tunnel needs the tunnel to be up in order to come up. IOS doesn't block this at config time. The interface just stays down and the debugs don't make the cause obvious unless you're specifically looking at the tunnel source line.
 
 ## Key Takeaways
 
