@@ -1,0 +1,36 @@
+# IOS images (copyrighted, large)
+*.image
+*.bin
+*.IOS
+
+# NVRAM and runtime state
+*.nvram
+*.ghost
+*.lock
+
+# GNS3 temp, log, and capture files
+*.log
+*_log.txt
+*_stdout.txt
+*.pcap
+*.bkp
+
+# GNS3 project runtime directories
+project-files/tmp/
+project-files/snapshots/
+
+# Dynamips runtime artifacts
+project-files/dynamips/*/dynamips_*
+project-files/dynamips/*/ilt_*
+
+# Docker and QEMU artifacts
+project-files/docker/
+project-files/qemu/
+
+# VPCS runtime logs
+project-files/vpcs/*/vpcs.log
+project-files/vpcs/*/ubridge.log
+
+# OS artifacts
+.DS_Store
+Thumbs.db
