@@ -18,7 +18,7 @@ Five routers in a diamond layout. R1 sits at the top, R5 at the bottom, and R2, 
                            Lo0: 5.5.5.5/32
 ```
 
-![GNS3 topology](images/gns3-topology.png)
+![GNS3 topology](images/topology.png)
 
 R5 reaches R1 through three parallel two-hop paths: R5 to R2 to R1, R5 to R3 to R1, and R5 to R4 to R1. All transit links are /29 subnets. Each router has a loopback interface used as its EIGRP router-id.
 
