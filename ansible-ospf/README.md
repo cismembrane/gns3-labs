@@ -141,7 +141,7 @@ After that it pushes all transit links as routed physical interfaces. This lab i
 
 C3600 router images were then used, but SSH complained about outdated SSH encryption algorithms. 
 
-C7200 router images were then used, to the same effect with SSH algorithims. 
+C7200 router images were then used, to the same effect with SSH algorithms. 
 
 The errors were finally overridden with client-side SSH command-line options and the C7200 router images were chosen despite this drawback. The interfaces are no longer living on SVIs or VLAN interfaces. The descriptions still preserve that history:
 
