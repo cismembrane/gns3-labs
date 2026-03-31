@@ -12,10 +12,10 @@ Demonstrate the configuration and behavior of GLBP in a dual-router topology whe
 ## Topology Diagram
 
 ```
-                 192.168.2.0/24
-        Fa0/0 +--------+ Fa0/0
-     +--------+  WAN   +---------+
-     |        +--------+         |
+             192.168.2.0/24
+        Fa0/0             Fa0/0
+     +---------------------------+
+     |                           |
  +--------+                  +--------+
  |   R1   |                  |   R2   |
  +--------+                  +--------+
