@@ -1,55 +1,41 @@
-# Proxy ARP “Stretched Subnet” Lab (GNS3)
+# Proxy ARP Stretched Subnet Lab
 
-This lab demonstrates how to let two hosts talk as if they are on the same /24 network even though they are separated by routers. The trick is a combination of static host routes and standard proxy ARP on Cisco IOS.
-
-The topology is built in GNS3 using two IOS routers and two VPCS hosts.
-
----
+Two VPCS hosts on separate LAN segments communicate as if they share a flat 192.168.10.0/24 subnet. A pair of IOS routers sit between them, using static /32 host routes and proxy ARP to hide the routed hop. Built in GNS3 with Dynamips.
 
 ## Topology
+```
+         10.0.0.0/30
+              (Fa0/1 10.0.0.1)        (10.0.0.2 Fa0/1)
+                     +------+      +------+
+                     |  R1  |------|  R2  |
+                     +------+      +------+
+              Fa0/0 192.168.10.1    192.168.10.2 Fa0/0
+                   |                            |
+            192.168.10.0/24              192.168.10.0/24
+                   |                            |
+            +--------------+            +--------------+
+            |     PC1      |            |      PC2     |
+            | 192.168.10.10|            | 192.168.10.20|
+            |     /24      |            |      /24     |
+            +--------------+            +--------------+
+```
 
-Logical diagram:
-
-PC1 ─ R1 ──────── R2 ─ PC2  
-192.168.10.0/24 ─ 10.0.0.0/30 ─ 192.168.10.0/24
-
-ASCII diagram:
-
-     10.0.0.0/30
-          (Fa0/1 10.0.0.1)        (10.0.0.2 Fa0/1)
-                 +------+      +------+
-                 |  R1  |------|  R2  |
-                 +------+      +------+
-          Fa0/0 192.168.10.1    192.168.10.2 Fa0/0
-               |                            |
-               |                            |
-        192.168.10.0/24              192.168.10.0/24
-               |                            |
-        +--------------+            +--------------+
-        |     PC1      |            |      PC2     |
-        | 192.168.10.10|            | 192.168.10.20|
-        |     /24      |            |      /24     |
-        +--------------+            +--------------+
-
----
+R1 and R2 are connected by a 10.0.0.0/30 point-to-point link (Fa0/1 on both routers). Each router's Fa0/0 faces a local LAN segment addressed out of 192.168.10.0/24. PC1 sits on R1's LAN at 192.168.10.10/24. PC2 sits on R2's LAN at 192.168.10.20/24. Neither host has a default gateway configured; both assume every 192.168.10.x address is local and will ARP directly for it.
 
 ## Addressing
 
-|Node | Int   | IP address    | Mask            | Notes                         |
-|-----|-------|---------------|-----------------|-------------------------------|
-| PC1 | eth0  | 192.168.10.10 | 255.255.255.0   | No default gateway configured |
-| PC2 | eth0  | 192.168.10.20 | 255.255.255.0   | No default gateway configured |
-| R1  | Fa0/0 | 192.168.10.1  | 255.255.255.0   | Connected to PC1              |
-| R1  | Fa0/1 | 10.0.0.1      | 255.255.255.252 | Point-to-point to R2          |
-| R2  | Fa0/1 | 10.0.0.2      | 255.255.255.252 | Point-to-point to R1          |
-| R2  | Fa0/0 | 192.168.10.2  | 255.255.255.0   | Connected to PC2              |
+| Node | Interface | IP Address      | Mask              |
+|------|-----------|-----------------|-------------------|
+| PC1  | eth0      | 192.168.10.10   | 255.255.255.0     |
+| PC2  | eth0      | 192.168.10.20   | 255.255.255.0     |
+| R1   | Fa0/0     | 192.168.10.1    | 255.255.255.0     |
+| R1   | Fa0/1     | 10.0.0.1        | 255.255.255.252   |
+| R2   | Fa0/1     | 10.0.0.2        | 255.255.255.252   |
+| R2   | Fa0/0     | 192.168.10.2    | 255.255.255.0     |
 
-Both PCs think they are on the same 192.168.10.0/24 network. There is no default gateway on either host; if they want to talk to each other, they ARP directly for the peer’s IP.
+## R1 Configuration
 
----
-
-## R1 Configuration (relevant parts)
-
+```
 hostname R1
 !
 interface FastEthernet0/0
@@ -66,91 +52,50 @@ interface FastEthernet0/1
 !
 ip route 192.168.10.0 255.255.255.0 10.0.0.2
 ip route 192.168.10.20 255.255.255.255 10.0.0.2
+```
 
-Notes on R1:
+Fa0/0 is the LAN-facing interface toward PC1. Fa0/1 is the point-to-point link to R2. The /32 static route for 192.168.10.20 points at R2's side of the link (10.0.0.2), which gives R1 a routing table entry for PC2's address. Proxy ARP is enabled by default on Cisco IOS LAN interfaces, so R1 will answer ARP requests on Fa0/0 for any destination it has a route to within the same subnet range. That /32 route is what makes proxy ARP work here.
 
-- Fa0/0 is the LAN facing PC1 (192.168.10.0/24).
-    
-- Fa0/1 is the point-to-point link to R2 (10.0.0.0/30).
-    
-- A static /32 route points 192.168.10.20 at R2 (10.0.0.2).
-    
-- On Cisco IOS, proxy ARP is enabled by default on LAN interfaces like Fa0/0. R1 will answer ARP requests on Fa0/0 for any destination it has a route to, as long as the destination appears to be in the same subnet as the interface.
+## R2 Configuration
 
----
+```
+hostname R2
+!
+interface FastEthernet0/0
+ ip address 192.168.10.2 255.255.255.0
+ duplex auto
+ speed auto
+!
+interface FastEthernet0/1
+ ip address 10.0.0.2 255.255.255.252
+ duplex auto
+ speed auto
+!
+ip route 192.168.10.10 255.255.255.255 10.0.0.1
+```
 
-## R2 Configuration (relevant parts)
+Same structure in reverse. Fa0/0 faces PC2, and the /32 static route for 192.168.10.10 points at R1 (10.0.0.1) across the point-to-point link.
 
-`hostname R2 ! interface FastEthernet0/0  ip address 192.168.10.2 255.255.255.0  duplex auto  speed auto ! interface FastEthernet0/1  ip address 10.0.0.2 255.255.255.252  duplex auto  speed auto ! ip route 192.168.10.10 255.255.255.255 10.0.0.1`
+## Traffic Flow
 
-Notes on R2:
+When PC1 sends traffic to 192.168.10.20, it ARPs for that address directly because it believes 192.168.10.20 is on its local /24 segment. R1's Fa0/0 receives the ARP broadcast. R1 has a /32 route for 192.168.10.20 via 10.0.0.2, so it responds to the ARP with its own MAC address on behalf of the remote host. PC1 caches that MAC, and all subsequent frames destined for 192.168.10.20 go to R1. R1 forwards them across the 10.0.0.0/30 link to R2, which delivers them to PC2 on its local segment.
 
-- Fa0/0 is the LAN facing PC2 (192.168.10.0/24).
-    
-- A static host route points 192.168.10.10 toward R1 (10.0.0.1) over the 10.0.0.0/30 link.
-    
-
----
-
-## How the lab works
-
-### From PC2 to PC1
-
-1. PC2 wants to talk to 192.168.10.10. Because the destination is in the same /24, PC2 ARPs for 192.168.10.10.
-    
-2. The traffic reaches R2, which has a /32 static route for 192.168.10.10 via 10.0.0.1 and forwards packets across the 10.0.0.0/30 link to R1.
-    
-3. R1 receives the packets, does a route lookup, and sees 192.168.10.0/24 as directly connected on Fa0/0. It forwards the packets directly to PC1.
-    
-
-### From PC1 to PC2 (proxy ARP path)
-
-1. PC1 wants to talk to 192.168.10.20. It believes this is a local host in the same /24, so it ARPs for 192.168.10.20.
-    
-2. The ARP broadcast hits R1’s Fa0/0. Because proxy ARP is enabled by default and R1 has a /32 static route for 192.168.10.20 via 10.0.0.2, R1 knows it can reach that IP through R2.
-    
-3. R1 responds to the ARP on behalf of the remote host, returning its own MAC address as the “MAC of 192.168.10.20.”
-    
-4. PC1 installs that MAC in its ARP cache and sends frames destined to 192.168.10.20 to R1’s MAC address.
-    
-5. R1 forwards the traffic across the 10.0.0.0/30 link to R2, which then sends it to PC2 on its local LAN.
-    
-
-The end result is that both PCs behave as if they are on a flat 192.168.10.0/24 network, but there is a routed hop in the middle. Proxy ARP on R1 hides the Layer-3 hop from PC1.
-
----
+The return path from PC2 to PC1 works the same way. PC2 ARPs for 192.168.10.10, R2 answers via proxy ARP (or forwards based on its /32 route), and traffic crosses the point-to-point link back to R1, which delivers it to PC1.
 
 ## Verification
+```
+PC1> ping 192.168.10.20
+PC2> ping 192.168.10.10
+```
+```
+R1# show ip arp
+R1# show ip route 192.168.10.20
+R2# show ip route 192.168.10.10
+R2# show ip arp
+```
 
-Basic connectivity checks:
+The ARP tables on both routers should show learned entries for the local host on Fa0/0 and the remote router on Fa0/1. The /32 static routes should be visible in the routing table pointing across the 10.0.0.0/30 link. Pings between PC1 and PC2 should succeed.
 
-`PC1> ping 192.168.10.20`
-`PC2> ping 192.168.10.10`
+## Notes
 
-On R1, check ARP and routing:
-
-`R1# show ip arp`
-`R1# show ip route 192.168.10.10` 
-`R1# show ip route 192.168.10.20`
-
-On R2:
-
-`R2# show ip route 192.168.10.10`
-`R2# show ip arp`
-
-You should see host routes for 192.168.10.10 and 192.168.10.20 pointing across the 10.0.0.0/30 link, and successful pings between PC1 and PC2.
-
----
-
-## Takeaways
-
-This lab shows how proxy ARP can be used to “stretch” a subnet across a routed link without changing host masks or configuring default gateways on the endpoints. It’s useful for understanding:
-
-- ARP behavior on Cisco IOS
-    
-- Static /32 host routes
-    
-- How routers can hide Layer-3 topology from legacy hosts
-    
-
-In production designs this pattern is generally avoided in favor of clean subnetting and explicit default gateways, but as a learning tool it’s a good way to see what proxy ARP is doing under the hood.
+This pattern stretches a single subnet across a routed boundary without changing host masks or adding default gateways. It works because proxy ARP lets a router answer ARP requests on behalf of hosts it can reach through its routing table, and the /32 static routes give it the specific entries it needs to do so. Production networks avoid this in favor of proper subnetting and explicit gateways, but it isolates the proxy ARP mechanism cleanly for study.
