@@ -7,8 +7,8 @@ Four Cisco c7200 routers in a linear BGP chain, one AS per router. Ansible pushe
 R1 through R4 in sequence. Each router sits in its own autonomous system.
 
 ```
-  [R1]---[R2]---[R3]---[R4]
- AS 65001  AS 65002  AS 65003  AS 65004
+     [R1]----------[R2]----------[R3]----------[R4]
+    AS 65001      AS 65002      AS 65003      AS 65004
 
   R1 Fa0/0  10.0.1.1 ----[ 10.0.1.0/29 ]---- 10.0.1.2  Fa0/0  R2
   R2 Fa1/0  10.0.2.2 ----[ 10.0.2.0/29 ]---- 10.0.2.3  Fa1/0  R3
@@ -16,6 +16,27 @@ R1 through R4 in sequence. Each router sits in its own autonomous system.
 ```
 
 Every router has a Loopback0 used as its BGP router-id (X.X.X.X/32, matching the router number), a management interface on FastEthernet3/0 (192.168.0.0/24), and a LAN segment on FastEthernet3/1 (192.168.X.0/24). Each router advertises its loopback and LAN prefix into BGP.
+
+| Router | Interface | Address          | Description     |
+|--------|-----------|------------------|-----------------|
+| R1     | Loopback0 | 1.1.1.1/32       | Router_ID       |
+| R1     | Fa0/0     | 10.0.1.1/29      | To_R2           |
+| R1     | Fa3/0     | 192.168.0.1/24   | Management      |
+| R1     | Fa3/1     | 192.168.1.254/24 | LAN_192.168.1.0 |
+| R2     | Loopback0 | 2.2.2.2/32       | Router_ID       |
+| R2     | Fa0/0     | 10.0.1.2/29      | To_R1           |
+| R2     | Fa1/0     | 10.0.2.2/29      | To_R3           |
+| R2     | Fa3/0     | 192.168.0.2/24   | Management      |
+| R2     | Fa3/1     | 192.168.2.254/24 | LAN_192.168.2.0 |
+| R3     | Loopback0 | 3.3.3.3/32       | Router_ID       |
+| R3     | Fa1/0     | 10.0.2.3/29      | To_R2           |
+| R3     | Fa1/1     | 10.0.3.3/29      | To_R4           |
+| R3     | Fa3/0     | 192.168.0.3/24   | Management      |
+| R3     | Fa3/1     | 192.168.3.254/24 | LAN_192.168.3.0 |
+| R4     | Loopback0 | 4.4.4.4/32       | Router_ID       |
+| R4     | Fa1/1     | 10.0.3.4/29      | To_R3           |
+| R4     | Fa3/0     | 192.168.0.4/24   | Management      |
+| R4     | Fa3/1     | 192.168.4.254/24 | LAN_192.168.4.0 |
 
 ![GNS3 Topology](images/gns3-topology.png)
 
@@ -103,7 +124,7 @@ The hostname and domain name are both required before IOS will generate RSA keys
 
 ### SSH Cipher Compatibility
 
-The c7200 on IOS 15.3 only offers CBC-mode ciphers and legacy key exchange algorithms. Modern OpenSSH clients (Ubuntu 22.04+) reject these by default. Add the following to `~/.ssh/config` on the Ansible control node:
+The c7200 on IOS 15.3 only offers CBC-mode ciphers and legacy key exchange algorithms. Modern OpenSSH clients reject these by default. Add the following to `~/.ssh/config` on the Ansible control node:
 
 ```
 Host 192.168.0.*
@@ -142,4 +163,4 @@ Ping results from R1 and R4 confirming end-to-end reachability, and the play rec
 
 ## Notes
 
-The `bgp.j2` template renders network statements with explicit masks (e.g., `network 192.168.1.0 mask 255.255.255.0`), but IOS stores them without the mask keyword when the mask matches the classful default. `network 192.168.1.0` in the running config and `network 192.168.1.0 mask 255.255.255.0` in the template are the same statement. IOS strips the redundant mask on commit.
+The `bgp.j2` template renders network statements with explicit masks (e.g., `network 192.168.1.0 mask 255.255.255.0`), but IOS stores them without the mask keyword when the mask matches the classful default. `network 192.168.1.0` in the running config and `network 192.168.1.0 mask 255.255.255.0` in the template are the same statement.
