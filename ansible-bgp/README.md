@@ -74,7 +74,7 @@ Ansible with the `cisco.ios` and `ansible.netcommon` collections installed. GNS3
 
 ### Router Bootstrap (before first playbook run)
 
-Ansible connects over SSH, so each router needs SSH enabled manually before the playbooks can reach it. On each router, configure the following (swap the hostname per device):
+Ansible connects over SSH, so each router needs SSH enabled manually before the playbooks can reach it. On each router, configure the following (swap the hostname and interface IP per device):
 
 ```
 conf t
@@ -96,7 +96,7 @@ The hostname and domain name are both required before IOS will generate RSA keys
 
 ### SSH Cipher Compatibility
 
-The c7200 on IOS 15.3 only offers CBC-mode ciphers and legacy key exchange algorithms. Modern OpenSSH clients (Ubuntu 22.04+) reject these by default. Add the following to `~/.ssh/config` on the Ansible control node:
+The c7200 on IOS 15.3 only offers CBC-mode ciphers and legacy key exchange algorithms. Modern OpenSSH clients reject these by default. Add the following to `~/.ssh/config` on the Ansible node:
 
 ```
 Host 192.168.0.*
@@ -117,7 +117,7 @@ ansible_ssh_common_args: >-
   -o Ciphers=+aes128-cbc,aes256-cbc,3des-cbc
 ```
 
-Verify SSH works interactively (`ssh admin@192.168.0.1`) before running Ansible. If the connection works manually, Ansible will work.
+Verify SSH works (`ssh admin@192.168.0.1`) before running Ansible. If the connection works manually, Ansible will work.
 
 ## Verification
 
@@ -135,4 +135,4 @@ Ping results from R1 and R4 confirming end-to-end reachability, and the play rec
 
 ## Notes
 
-The `bgp.j2` template renders network statements with explicit masks (e.g., `network 192.168.1.0 mask 255.255.255.0`), but IOS stores them without the mask keyword when the mask matches the classful default. `network 192.168.1.0` in the running config and `network 192.168.1.0 mask 255.255.255.0` in the template are the same statement. IOS strips the redundant mask on commit.
+The `bgp.j2` template renders network statements with explicit masks (e.g., `network 192.168.1.0 mask 255.255.255.0`), but IOS stores them without the mask keyword when the mask matches the classful default. `network 192.168.1.0` in the running config and `network 192.168.1.0 mask 255.255.255.0` in the template are the same statement.
