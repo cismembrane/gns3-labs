@@ -1,0 +1,52 @@
+---
+- name: Verify eBGP deployment
+  hosts: routers
+  gather_facts: false
+
+  tasks:
+    - name: Collect BGP summary
+      cisco.ios.ios_command:
+        commands:
+          - show ip bgp summary
+      register: bgp_summary
+
+    - name: Display BGP summary
+      ansible.builtin.debug:
+        var: bgp_summary.stdout_lines
+
+    - name: Collect BGP table
+      cisco.ios.ios_command:
+        commands:
+          - show ip bgp
+      register: bgp_table
+
+    - name: Display BGP table
+      ansible.builtin.debug:
+        var: bgp_table.stdout_lines
+
+    - name: Verify no neighbors in Idle state
+      ansible.builtin.assert:
+        that:
+          - "'Idle' not in bgp_summary.stdout[0]"
+        fail_msg: "One or more BGP neighbors are Idle on {{ inventory_hostname }}"
+        success_msg: "No Idle neighbors on {{ inventory_hostname }}"
+
+    - name: Verify no neighbors in Active state
+      ansible.builtin.assert:
+        that:
+          - "'Active' not in bgp_summary.stdout[0]"
+        fail_msg: "One or more BGP neighbors are Active (not Established) on {{ inventory_hostname }}"
+        success_msg: "No stuck neighbors on {{ inventory_hostname }}"
+
+    - name: Collect reachability from endpoints
+      cisco.ios.ios_command:
+        commands:
+          - ping 192.168.1.254 source {{ router_id }}
+          - ping 192.168.4.254 source {{ router_id }}
+      register: ping_results
+      when: inventory_hostname in ['R1', 'R4']
+
+    - name: Display ping results
+      ansible.builtin.debug:
+        var: ping_results.stdout_lines
+      when: ping_results is defined

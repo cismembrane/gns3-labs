@@ -1,0 +1,14 @@
+---
+- name: Deploy eBGP configuration
+  hosts: routers
+  gather_facts: false
+ 
+  tasks:
+    - name: Configure hostname and interfaces
+      cisco.ios.ios_config:
+        src: templates/interfaces.j2
+ 
+    - name: Configure BGP
+      cisco.ios.ios_config:
+        src: templates/bgp.j2
+ 

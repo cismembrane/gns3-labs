@@ -1,0 +1,9 @@
+hostname {{ hostname }}
+!
+{% for intf in interfaces %}
+interface {{ intf.name }}
+ description {{ intf.description }}
+ ip address {{ intf.address }} {{ intf.mask }}
+ no shutdown
+!
+{% endfor %}

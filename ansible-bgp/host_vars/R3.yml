@@ -1,0 +1,41 @@
+---
+hostname: R3
+router_id: 3.3.3.3
+asn: 65003
+ 
+interfaces:
+  - name: Loopback0
+    description: Router_ID
+    address: 3.3.3.3
+    mask: 255.255.255.255
+  - name: FastEthernet1/0
+    description: To_R2
+    address: 10.0.2.3
+    mask: 255.255.255.248
+  - name: FastEthernet1/1
+    description: To_R4
+    address: 10.0.3.3
+    mask: 255.255.255.248
+  - name: FastEthernet3/0
+    description: Management
+    address: 192.168.0.3
+    mask: 255.255.255.0
+  - name: FastEthernet3/1
+    description: LAN_192.168.3.0
+    address: 192.168.3.254
+    mask: 255.255.255.0
+ 
+bgp_neighbors:
+  - address: 10.0.2.2
+    remote_as: 65002
+    description: BGP_to_R2
+  - address: 10.0.3.4
+    remote_as: 65004
+    description: BGP_to_R4
+ 
+bgp_networks:
+  - prefix: 3.3.3.3
+    mask: 255.255.255.255
+  - prefix: 192.168.3.0
+    mask: 255.255.255.0
+ 
