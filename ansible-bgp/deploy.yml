@@ -1,5 +1,5 @@
 ---
-- name: Deploy eBGP configuration
+- name: Deploy BGP configuration
   hosts: routers
   gather_facts: false
  

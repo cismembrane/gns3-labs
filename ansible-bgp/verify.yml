@@ -1,5 +1,5 @@
 ---
-- name: Verify eBGP deployment
+- name: Verify BGP deployment
   hosts: routers
   gather_facts: false
 
