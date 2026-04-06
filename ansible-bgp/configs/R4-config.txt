@@ -1,5 +1,4 @@
 !
-! Last configuration change at 18:15:21 UTC Sun Apr 5 2026
 upgrade fpd auto
 version 15.3
 service timestamps debug datetime msec
@@ -13,14 +12,14 @@ boot-end-marker
 !
 aqm-register-fnf
 !
-enable secret 5 $1$Ae8z$WoArMQK8DWloXzbe39N0k.
+enable secret 5 $1$iqq5$4I20yX0RKH9dKgf900so6.
 !
 no aaa new-model
 no ip icmp rate-limit unreachable
 !
 !
-!         
 !
+!         
 !
 !
 no ip domain lookup
@@ -38,13 +37,11 @@ multilink bundle-name authenticated
 !
 !
 !
-username admin privilege 15 secret 5 $1$QbUz$ZRYwPvWiLTWzcAlJOIvme.
+username admin privilege 15 secret 5 $1$ixz3$P8QTV/MiWylYEoADs/UxY1
 !
 redundancy
 !
- --More-- 
-*Apr  5 18:15:21.919: %SYS-5-CONFIG_I: Configured from console by console
-!         
+!
 ip tcp synwait-time 5
 ! 
 !
@@ -56,10 +53,6 @@ ip tcp synwait-time 5
 !
 !
 !
-interface Loopback0
- description Router_ID
- ip address 4.4.4.4 255.255.255.255
-!
 interface FastEthernet0/0
  no ip address
  shutdown
@@ -67,13 +60,13 @@ interface FastEthernet0/0
 !
 interface FastEthernet1/0
  no ip address
- shutdown 
+ shutdown
  duplex auto
  speed auto
 !
 interface FastEthernet1/1
- description To_R3
- ip address 10.0.3.4 255.255.255.248
+ no ip address
+ shutdown
  duplex auto
  speed auto
 !
@@ -90,28 +83,15 @@ interface FastEthernet2/1
  speed auto
 !
 interface FastEthernet3/0
- description Management
  ip address 192.168.0.4 255.255.255.0
  duplex auto
  speed auto
 !
 interface FastEthernet3/1
- description LAN_192.168.4.0
- ip address 192.168.4.254 255.255.255.0
+ no ip address
+ shutdown
  duplex auto
  speed auto
-!
-router bgp 65004
- bgp router-id 4.4.4.4
- bgp log-neighbor-changes
- neighbor 10.0.3.3 remote-as 65003
- neighbor 10.0.3.3 description BGP_to_R3
- !
- address-family ipv4
-  network 4.4.4.4 mask 255.255.255.255
-  network 192.168.4.0
-  neighbor 10.0.3.3 activate
- exit-address-family
 !
 ip forward-protocol nd
 no ip http server
@@ -136,7 +116,7 @@ mgcp profile default
 !
 !
 gatekeeper
- shutdown 
+ shutdown
 !
 !
 line con 0

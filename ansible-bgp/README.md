@@ -149,17 +149,166 @@ Verify SSH works interactively (`ssh admin@192.168.0.1`) before running Ansible.
 
 ## Verification
 
-Successful deploy.yml run pushing interface and BGP configuration to all four routers:
+### deploy.yml
 
-![deploy.yml output](images/deploy-output.png)
+Successful run pushing interface and BGP configuration to all four routers. Both tasks return `changed` on every host, and the recap shows `changed=2` with zero failures.
 
-Successful verify.yml run confirming no BGP neighbors stuck in Idle or Active state:
+<details>
+<summary>deploy.yml output</summary>
 
-![verify.yml assert output](images/verify-output-1.png)
+```
+PLAY [Deploy BGP configuration] *********************************************************************
 
-Ping results from R1 and R4 confirming end-to-end reachability, and the play recap:
+TASK [Configure hostname and interfaces] ************************************************************
+changed: [R1]
+changed: [R4]
+changed: [R2]
+changed: [R3]
 
-![verify.yml ping and recap](images/verify-output-2.png)
+TASK [Configure BGP] ********************************************************************************
+changed: [R1]
+changed: [R4]
+changed: [R2]
+changed: [R3]
+
+PLAY RECAP ******************************************************************************************
+R1                         : ok=2    changed=2    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
+R2                         : ok=2    changed=2    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
+R3                         : ok=2    changed=2    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
+R4                         : ok=2    changed=2    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
+```
+</details>
+
+### verify.yml
+
+The verify playbook collects `show ip bgp summary` and `show ip bgp` from all four routers, asserts no neighbors are stuck in Idle or Active state, and runs end-to-end pings between R1 and R4.
+
+<details>
+<summary>BGP summary per router</summary>
+
+```
+TASK [Display BGP summary] **************************************************************************
+ok: [R1] =>
+  BGP router identifier 1.1.1.1, local AS number 65001
+  BGP table version is 9, 8 network entries using 1152 bytes of memory
+  Neighbor        V           AS MsgRcvd MsgSent   TblVer  InQ OutQ Up/Down  State/PfxRcd
+  10.0.1.2        4        65002      33      30        9    0    0 00:23:49        6
+
+ok: [R2] =>
+  BGP router identifier 2.2.2.2, local AS number 65002
+  BGP table version is 9, 8 network entries using 1152 bytes of memory
+  Neighbor        V           AS MsgRcvd MsgSent   TblVer  InQ OutQ Up/Down  State/PfxRcd
+  10.0.1.1        4        65001      30      33        9    0    0 00:23:49        2
+  10.0.2.3        4        65003      32      32        9    0    0 00:23:50        4
+
+ok: [R3] =>
+  BGP router identifier 3.3.3.3, local AS number 65003
+  BGP table version is 9, 8 network entries using 1152 bytes of memory
+  Neighbor        V           AS MsgRcvd MsgSent   TblVer  InQ OutQ Up/Down  State/PfxRcd
+  10.0.2.2        4        65002      32      32        9    0    0 00:23:50        4
+  10.0.3.4        4        65004      30      32        9    0    0 00:23:51        2
+
+ok: [R4] =>
+  BGP router identifier 4.4.4.4, local AS number 65004
+  BGP table version is 9, 8 network entries using 1152 bytes of memory
+  Neighbor        V           AS MsgRcvd MsgSent   TblVer  InQ OutQ Up/Down  State/PfxRcd
+  10.0.3.3        4        65003      32      30        9    0    0 00:23:52        6
+```
+</details>
+
+<details>
+<summary>BGP table per router</summary>
+
+```
+TASK [Display BGP table] ****************************************************************************
+ok: [R1] =>
+  BGP table version is 9, local router ID is 1.1.1.1
+     Network          Next Hop            Metric LocPrf Weight Path
+  *> 1.1.1.1/32       0.0.0.0                  0         32768 i
+  *> 2.2.2.2/32       10.0.1.2                 0             0 65002 i
+  *> 3.3.3.3/32       10.0.1.2                               0 65002 65003 i
+  *> 4.4.4.4/32       10.0.1.2                               0 65002 65003 65004 i
+  *> 192.168.1.0      0.0.0.0                  0         32768 i
+  *> 192.168.2.0      10.0.1.2                 0             0 65002 i
+  *> 192.168.3.0      10.0.1.2                               0 65002 65003 i
+  *> 192.168.4.0      10.0.1.2                               0 65002 65003 65004 i
+
+ok: [R2] =>
+  BGP table version is 9, local router ID is 2.2.2.2
+     Network          Next Hop            Metric LocPrf Weight Path
+  *> 1.1.1.1/32       10.0.1.1                 0             0 65001 i
+  *> 2.2.2.2/32       0.0.0.0                  0         32768 i
+  *> 3.3.3.3/32       10.0.2.3                 0             0 65003 i
+  *> 4.4.4.4/32       10.0.2.3                               0 65003 65004 i
+  *> 192.168.1.0      10.0.1.1                 0             0 65001 i
+  *> 192.168.2.0      0.0.0.0                  0         32768 i
+  *> 192.168.3.0      10.0.2.3                 0             0 65003 i
+  *> 192.168.4.0      10.0.2.3                               0 65003 65004 i
+
+ok: [R3] =>
+  BGP table version is 9, local router ID is 3.3.3.3
+     Network          Next Hop            Metric LocPrf Weight Path
+  *> 1.1.1.1/32       10.0.2.2                               0 65002 65001 i
+  *> 2.2.2.2/32       10.0.2.2                 0             0 65002 i
+  *> 3.3.3.3/32       0.0.0.0                  0         32768 i
+  *> 4.4.4.4/32       10.0.3.4                 0             0 65004 i
+  *> 192.168.1.0      10.0.2.2                               0 65002 65001 i
+  *> 192.168.2.0      10.0.2.2                 0             0 65002 i
+  *> 192.168.3.0      0.0.0.0                  0         32768 i
+  *> 192.168.4.0      10.0.3.4                 0             0 65004 i
+
+ok: [R4] =>
+  BGP table version is 9, local router ID is 4.4.4.4
+     Network          Next Hop            Metric LocPrf Weight Path
+  *> 1.1.1.1/32       10.0.3.3                               0 65003 65002 65001 i
+  *> 2.2.2.2/32       10.0.3.3                               0 65003 65002 i
+  *> 3.3.3.3/32       10.0.3.3                 0             0 65003 i
+  *> 4.4.4.4/32       0.0.0.0                  0         32768 i
+  *> 192.168.1.0      10.0.3.3                               0 65003 65002 65001 i
+  *> 192.168.2.0      10.0.3.3                               0 65003 65002 i
+  *> 192.168.3.0      10.0.3.3                 0             0 65003 i
+  *> 192.168.4.0      0.0.0.0                  0         32768 i
+```
+</details>
+
+<details>
+<summary>Neighbor state assertions and ping results</summary>
+
+```
+TASK [Verify no neighbors in Idle state] ************************************************************
+ok: [R1] => "No Idle neighbors on R1"
+ok: [R2] => "No Idle neighbors on R2"
+ok: [R3] => "No Idle neighbors on R3"
+ok: [R4] => "No Idle neighbors on R4"
+
+TASK [Verify no neighbors in Active state] **********************************************************
+ok: [R1] => "No stuck neighbors on R1"
+ok: [R2] => "No stuck neighbors on R2"
+ok: [R3] => "No stuck neighbors on R3"
+ok: [R4] => "No stuck neighbors on R4"
+
+TASK [Display ping results] *************************************************************************
+ok: [R1] =>
+  Sending 5, 100-byte ICMP Echos to 192.168.4.254, timeout is 2 seconds:
+  Packet sent with a source address of 1.1.1.1
+  !!!!!
+  Success rate is 100 percent (5/5), round-trip min/avg/max = 32/43/52 ms
+
+ok: [R4] =>
+  Sending 5, 100-byte ICMP Echos to 192.168.1.254, timeout is 2 seconds:
+  Packet sent with a source address of 4.4.4.4
+  !!!!!
+  Success rate is 100 percent (5/5), round-trip min/avg/max = 28/36/52 ms
+
+PLAY RECAP ******************************************************************************************
+R1                         : ok=8    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
+R2                         : ok=7    changed=0    unreachable=0    failed=0    skipped=1    rescued=0    ignored=0
+R3                         : ok=7    changed=0    unreachable=0    failed=0    skipped=1    rescued=0    ignored=0
+R4                         : ok=8    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
+```
+</details>
+
+All four routers have converged on the full set of eight prefixes. R1 and R4 sit at opposite ends of the AS chain, so their BGP tables show the longest AS_PATH entries (three hops for the far-end prefixes). The endpoint PfxRcd counts confirm the expected distribution: R1 and R4 each receive 6 prefixes from their single neighbor, while R2 and R3 each receive 2 from one side and 4 from the other. End-to-end pings between R1 (sourced from 1.1.1.1) and R4's LAN gateway (192.168.4.254), and vice versa, succeed at 100%.
 
 ## Notes
 

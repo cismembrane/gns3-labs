@@ -1,5 +1,4 @@
 !
-! Last configuration change at 18:14:46 UTC Sun Apr 5 2026
 upgrade fpd auto
 version 15.3
 service timestamps debug datetime msec
@@ -13,14 +12,14 @@ boot-end-marker
 !
 aqm-register-fnf
 !
-enable secret 5 $1$JfF1$.dmxOIiVwOSxA/SN0A7a30
+enable secret 5 $1$Ozb/$LxeMuIdKSV03dF/TEnHoX/
 !
 no aaa new-model
 no ip icmp rate-limit unreachable
 !
 !
-!         
 !
+!         
 !
 !
 no ip domain lookup
@@ -38,11 +37,11 @@ multilink bundle-name authenticated
 !
 !
 !
-username admin privilege 15 secret 5 $1$OMKH$ofwYoJl1SRhqqDpM6kcEf/
+username admin privilege 15 secret 5 $1$IWDr$8a8TdCkzzByTNEqGHJteZ/
 !
 redundancy
 !
-!         
+!
 ip tcp synwait-time 5
 ! 
 !
@@ -54,24 +53,20 @@ ip tcp synwait-time 5
 !
 !
 !
-interface Loopback0
- description Router_ID
- ip address 3.3.3.3 255.255.255.255
-!
 interface FastEthernet0/0
  no ip address
  shutdown
  duplex half
 !
 interface FastEthernet1/0
- description To_R2
- ip address 10.0.2.3 255.255.255.248
+ no ip address
+ shutdown
  duplex auto
  speed auto
 !
 interface FastEthernet1/1
- description To_R4
- ip address 10.0.3.3 255.255.255.248
+ no ip address
+ shutdown
  duplex auto
  speed auto
 !
@@ -88,31 +83,15 @@ interface FastEthernet2/1
  speed auto
 !
 interface FastEthernet3/0
- description Management
  ip address 192.168.0.3 255.255.255.0
  duplex auto
  speed auto
 !
 interface FastEthernet3/1
- description LAN_192.168.3.0
- ip address 192.168.3.254 255.255.255.0
+ no ip address
+ shutdown
  duplex auto
  speed auto
-!
-router bgp 65003
- bgp router-id 3.3.3.3
- bgp log-neighbor-changes
- neighbor 10.0.2.2 remote-as 65002
- neighbor 10.0.2.2 description BGP_to_R2
- neighbor 10.0.3.4 remote-as 65004
- neighbor 10.0.3.4 description BGP_to_R4
- !
- address-family ipv4
-  network 3.3.3.3 mask 255.255.255.255
-  network 192.168.3.0
-  neighbor 10.0.2.2 activate
-  neighbor 10.0.3.4 activate
- exit-address-family
 !
 ip forward-protocol nd
 no ip http server
@@ -134,7 +113,7 @@ mgcp behavior comedia-sdp-force disable
 !
 mgcp profile default
 !
-!         
+!
 !
 gatekeeper
  shutdown
@@ -157,6 +136,5 @@ line vty 5 15
  login local
  transport input ssh
 !
-!         
+!
 end
-

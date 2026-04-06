@@ -1,0 +1,26 @@
+cismembrane@cismembrane-OptiPlex-9020M:~/gns3-labs-audit/ansible-bgp$ ansible-playbook deploy.yml
+
+PLAY [Deploy BGP configuration] *********************************************************************
+
+TASK [Configure hostname and interfaces] ************************************************************
+[WARNING]: ansible-pylibssh not installed, falling back to paramiko
+[WARNING]: To ensure idempotency and correct diff the input configuration lines should be similar to
+how they appear if present in the running configuration on device including the indentation
+changed: [R1]
+changed: [R4]
+changed: [R2]
+changed: [R3]
+
+TASK [Configure BGP] ********************************************************************************
+changed: [R1]
+changed: [R4]
+changed: [R2]
+changed: [R3]
+
+PLAY RECAP ******************************************************************************************
+R1                         : ok=2    changed=2    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   
+R2                         : ok=2    changed=2    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   
+R3                         : ok=2    changed=2    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   
+R4                         : ok=2    changed=2    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   
+
+cismembrane@cismembrane-OptiPlex-9020M:~/gns3-labs-audit/ansible-bgp$ ansible-playbook verify.yml
