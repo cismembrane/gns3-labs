@@ -36,6 +36,23 @@ This maps directly to CCNP ENCOR objectives under VPN technologies. The IPsec co
 
 Four routers total. R4 is a minimal ISP transit box: Layer 3 forwarding only, no dynamic routing, no overlay awareness. R1 is the hub (headquarters). R2 and R3 are spokes (branch offices). Each site has a `Loopback0` simulating a LAN segment behind it.
 
+![GNS3 Topology](images/topology.png)
+
+## Project Structure
+
+```
+dmvpn-phase3-ipsec/
+├── README.md
+├── dmvpn.gns3
+├── configs/
+│   ├── R1.cfg          # Hub
+│   ├── R2.cfg          # Spoke 1
+│   ├── R3.cfg          # Spoke 2
+│   └── R4.cfg          # ISP Transit
+└── images/
+	└── topology.png
+```
+
 ## Technologies & Protocols
 
 - **DMVPN Phase 3**: mGRE with `ip nhrp redirect` (hub) and `ip nhrp shortcut` (spokes)
@@ -59,7 +76,7 @@ I configured and validated four things in this lab. First, a working DMVPN Phase
 | R2↔ R4    | R2 `f1/0`     | `10.0.2.1/30` |
 | R4↔ R2    | R4 `f1/0`     | `10.0.2.2/30` |
 | R3↔ R4    | R3 `f1/1`     | `10.0.3.1/30` |
-| R4↔ R3    | `f1/1`        | `10.0.3.2/30` |
+| R4↔ R3    | R4 `f1/1`     | `10.0.3.2/30` |
 
 ### DMVPN Overlay (Tunnel0)
 

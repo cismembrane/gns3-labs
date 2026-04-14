@@ -2,8 +2,6 @@
 
 A 4-router lab demonstrating OSPFv2 with MD5 authentication, a totally-stub access area, HSRP gateway redundancy, centralized DHCP on R2 with an EEM-controlled relay that follows HSRP state, plus core services (IOS DNS and authenticated NTP).
 
----
-
 ## Overview
 
 This topology models a small core/access design:
@@ -12,8 +10,6 @@ This topology models a small core/access design:
 - Services: R1 provides IOS DNS and authenticated NTP; it does not run OSPF.
 
 All devices use local `admin` for SSH (`login local`, `transport input ssh`). Config archive hides keys.
-
----
 
 ## Topology
 
@@ -29,18 +25,33 @@ All devices use local `admin` for SSH (`login local`, `transport input ssh`). Co
 
 No IPs in the diagram; see addressing tables below.
 
----
+![Topology](redundant-ospf-hsrp-eem-dhcp.drawio.png) 
+
+## Project Structure
+
+```
+redundant-ospf-hsrp-eem-dhcp/
+├── README.md
+├── redundant-ospf-hsrp-eem-dhcp.gns3
+├── redundant-ospf-hsrp-eem-dhcp.drawio        # editable topology diagram
+├── redundant-ospf-hsrp-eem-dhcp.drawio.png
+└── configs/
+	├── R1-config.txt
+	├── R2-config.txt
+	├── R3-config.txt
+	└── R4-config.txt
+```
 
 ## Addressing Summary
 
 ### Loopbacks
 
 | Device | Interface | Address          |
-|:-----:|:---------:|:------------------|
-| R1    | Lo0       | 10.255.255.1/32  |
-| R2    | Lo0       | 10.255.255.2/32  |
-| R3    | Lo0       | 10.255.255.3/32  |
-| R4    | Lo0       | 10.255.255.4/32  |
+|--------|-----------|------------------|
+| R1     | Lo0       | 10.255.255.1/32  |
+| R2     | Lo0       | 10.255.255.2/32  |
+| R3     | Lo0       | 10.255.255.3/32  |
+| R4     | Lo0       | 10.255.255.4/32  |
 
 ### Transit & LAN
 
@@ -57,8 +68,6 @@ No IPs in the diagram; see addressing tables below.
 |-------|---------------|------------------------------|-----------------------------|---------------------|
 | 10    | 192.168.10.1  | 192.168.10.2 / 110 (preempt) | 192.168.10.3 / 90 (preempt) | R3 typically Active |
 
----
-
 ## Routing
 
 - OSPF process 1 on R2/R3/R4  
@@ -67,8 +76,6 @@ No IPs in the diagram; see addressing tables below.
 - Authentication: OSPF MD5 on area 0 links (message-digest configured end-to-end)  
 - Default: R2 has `ip route 0.0.0.0/0 203.0.113.1` and `default-information originate` toward Area 0  
 - R1: static `ip route 0.0.0.0/0 203.0.113.2`; no OSPF
-
----
 
 ## DHCP
 
@@ -90,8 +97,6 @@ R4 (LAN = Fa0/0)
 - Applet removes/adds helper on Active transition (idempotent “no/add” pair), and removes on leaving Active.  
 - Pattern is unanchored (works across platforms/IOS messages).
 
----
-
 ## Core Services
 
 | Service     | Location | Details                                                                            |
@@ -100,15 +105,11 @@ R4 (LAN = Fa0/0)
 | NTP         | R1       | `ntp master` with auth key 1; `ntp authenticate` and `ntp trusted-key 1`           |
 | NTP Clients | R2/R3/R4 | `ntp server 10.255.255.1 key 1`, `ntp source Loopback0`, auth/trusted configured   |
 
----
-
 ## Management & Hardening
 
 - SSH-only on VTY (`transport input ssh`) with `login local` (user `admin` defined on all devices)  
 - Config archive with `hidekeys`; logging buffered; `exec-timeout` applied on VTYs  
 - Domain `test.com` on devices (R1 disables DNS lookup to avoid CLI hangs)
-
----
 
 ## Key Interface Notes
 
@@ -118,8 +119,6 @@ R4 (LAN = Fa0/0)
 | R2     | `Fa1/0` → R1 (`203.0.113.2/30`); `Fa0/0` → R3 (`10.0.0.2/30`); `Fa0/1` → R4 (`10.0.1.2/30`) |
 | R3     | `Fa0/0` → R2 (`10.0.0.1/30`); `Fa0/1` → LAN (`192.168.10.2/24`, HSRP G10)                   |
 | R4     | `Fa0/1` → R2 (`10.0.1.1/30`); `Fa0/0` → LAN (`192.168.10.3/24`, HSRP G10)                   |
-
----
 
 ## Verification Checklist
 
@@ -141,15 +140,11 @@ R4 (LAN = Fa0/0)
 ### Edge Reachability
 - From R3: `traceroute 203.0.113.1` → `10.0.0.2` (R2) → `203.0.113.1` (R1).
 
----
-
 ## Design Notes
 
 - Totally-stub Area 10 keeps access simple; ABRs inject only a default toward the LAN.  
 - OSPF MD5 on the uplinks thwarts trivial neighbor spoofing in demos.  
 - EEM-gated relay ensures DHCP `giaddr` matches the active gateway, avoiding duplicate offers and keeping state consistent across failovers.
-
----
 
 ## Reproduce Quickly
 

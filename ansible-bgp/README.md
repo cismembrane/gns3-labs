@@ -54,7 +54,9 @@ ansible-bgp/
 │   ├── R1-config.txt
 │   ├── R2-config.txt
 │   ├── R3-config.txt
-│   └── R4-config.txt
+│   ├── R4-config.txt
+│   ├── ansible-playbook-deploy-output.txt
+│   └── ansible-playbook-verify-output.txt
 ├── group_vars/
 │   └── routers.yml
 ├── host_vars/

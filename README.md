@@ -21,6 +21,22 @@ Each lab directory contains a `README.md` with the full topology, IP addressing,
 
 To import a lab, open the `.gns3` project file in GNS3 and remap the IOS image to your local copy if the filename differs.
 
+## Repository Layout
+
+gns3-labs/
+├── ansible-bgp/
+├── ansible-lab/
+├── ansible-ospf/
+├── dmvpn-phase3-ipsec/
+├── eigrp-delay-manipulation/
+├── glbp-basic/
+├── proxy-arp/
+├── redundant-ospf-hsrp-eem-dhcp/
+├── LICENSE
+└── README.md
+
+Each lab directory contains a `README.md`, a `configs/` folder with per-router running configs, a `.gns3` project file, and an `images/` folder where applicable. Ansible-based labs also include inventory, playbooks, host/group vars, and Jinja2 templates.
+
 ## Links
 
 - [YouTube: DMVPN Phase 3 with IPsec Walkthrough](https://youtube.com/@cismembrane)

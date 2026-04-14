@@ -33,6 +33,21 @@ R1 and R2 are connected by a 10.0.0.0/30 point-to-point link (Fa0/1 on both rout
 | R2   | Fa0/1     | 10.0.0.2        | 255.255.255.252   |
 | R2   | Fa0/0     | 192.168.10.2    | 255.255.255.0     |
 
+## Project Structure
+
+```
+proxy-arp/
+├── README.md
+├── proxy-arp.gns3
+├── captures/
+│   └── wireshark-capture.txt
+├── configs/
+│   ├── R1-config.txt
+│   └── R2-config.txt
+└── images/
+	└── wireshark-screenshot.png
+```
+
 ## R1 Configuration
 
 ```
@@ -83,6 +98,7 @@ When PC1 sends traffic to 192.168.10.20, it ARPs for that address directly becau
 The return path from PC2 to PC1 works the same way. PC2 ARPs for 192.168.10.10, R2 answers via proxy ARP (or forwards based on its /32 route), and traffic crosses the point-to-point link back to R1, which delivers it to PC1.
 
 ## Verification
+
 ```
 PC1> ping 192.168.10.20
 PC2> ping 192.168.10.10
@@ -95,6 +111,8 @@ R2# show ip arp
 ```
 
 The ARP tables on both routers should show learned entries for the local host on Fa0/0 and the remote router on Fa0/1. The /32 static routes should be visible in the routing table pointing across the 10.0.0.0/30 link. Pings between PC1 and PC2 should succeed.
+
+![Wireshark Screenshot](images/wireshark-screenshot.png)
 
 ## Notes
 

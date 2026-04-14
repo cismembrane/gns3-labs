@@ -63,6 +63,7 @@ Management addressing is:
       └─────────┘                                   └─────────┘      
 					Additional: R1-R4 10.0.5.0/30
 ```
+![GNS3 Topology](screenshots/GNS3_Screenshot.png)
 	
 ## Tools used
 
@@ -71,6 +72,41 @@ Management addressing is:
 - GNS3
 - Cisco IOS 7200 image `C7200-ADVENTERPRISEK9-M Version 15.3(3)XB12`
 - Jinja2 template rendering
+
+## Project Structure
+
+```
+ansible-ospf/
+├── ansible.cfg
+├── inventory-ios.ini
+├── command_line_output.txt          # raw CLI capture from deployment
+├── notes.txt                        # working notes (text file)
+├── gns3/
+│   └── ansible-ospf.gns3
+├── group_vars/
+│   └── ios.yml                      # shared OSPF settings, credentials, validation commands
+├── host_vars/
+│   ├── R1.yml
+│   ├── R2.yml
+│   ├── R3.yml
+│   └── R4.yml
+├── playbooks/
+│   ├── base-config.yml
+│   ├── interface-config.yml
+│   ├── precheck.yml
+│   ├── ospf-deploy.yml
+│   ├── ospf-validate.yml
+│   └── command_line_output.txt      # raw CLI capture from playbook runs
+├── outputs/
+│   ├── R1-ospf-validation.txt
+│   ├── R2-ospf-validation.txt
+│   ├── R3-ospf-validation.txt
+│   └── R4-ospf-validation.txt
+├── screenshots/
+│   └── GNS3_Screenshot.png
+└── templates/
+└── ospf-router.j2
+```
 
 ## How the lab is structured
 
@@ -228,14 +264,6 @@ It prints the output for each router and also saves a local file per device:
 - `outputs/R2-ospf-validation.txt`
 - `outputs/R3-ospf-validation.txt`
 - `outputs/R4-ospf-validation.txt`
-
-### Deployment steps
-
-- `ansible-playbook playbooks/base-config.yml -v --diff`
-- `ansible-playbook playbooks/interface-config.yml -v --diff`
-- `ansible-playbook playbooks/precheck.yml -v`
-- `ansible-playbook playbooks/ospf-deploy.yml -v --diff`
-- `ansible-playbook playbooks/ospf-validate.yml -v`
 
 ### Validation
 

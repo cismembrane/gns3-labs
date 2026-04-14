@@ -32,6 +32,20 @@ Demonstrate the configuration and behavior of GLBP in a dual-router topology whe
 
 ![GLBP lab topology](images/glbp-basic.drawio.png)
 
+## Project Structure
+
+```
+glbp-basic/
+├── README.md
+├── glbp-basic.gns3
+├── configs/
+│   ├── R1-config.txt
+│   └── R2-config.txt
+└── images/
+	├── glbp-basic.drawio        # editable topology diagram source
+	└── glbp-basic.drawio.png    # exported topology diagram
+```
+
 ## Topology Overview
 
 R1 and R2 are both members of GLBP group 1 on the 192.168.1.0/24 LAN segment. They share a single virtual IP (192.168.1.254) that PC1 and PC2 use as their default gateway.

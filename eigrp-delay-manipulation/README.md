@@ -47,6 +47,23 @@ Host octets follow the router number (.1 for R1, .2 for R2, etc.) across every s
 | R5     | FastEthernet2/1 | 10.1.16.5      | 10.1.16.0/29   | R3     |
 | R5     | FastEthernet3/0 | 10.1.17.5      | 10.1.17.0/29   | R4     |
 
+## Project Structure
+
+```
+eigrp-delay-manipulation/
+├── README.md
+├── eigrp-delay-manipulation.gns3
+├── configs/
+│   ├── R1-config.txt
+│   ├── R2-config.txt
+│   ├── R3-config.txt
+│   ├── R4-config.txt
+│   └── R5-config.txt
+└── images/
+    ├── gns3-topology.png
+    ├── eigrp-delay-topology.drawio.svg    # exported topology diagram
+```
+
 ## EIGRP Configuration
 
 All routers run EIGRP AS 100. Each advertises its loopback and all directly connected transit subnets. Router-ids are set explicitly to match loopback addresses.

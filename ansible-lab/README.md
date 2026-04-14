@@ -1,4 +1,4 @@
-# GNS3 IOSvL2 to Ubuntu Cloud Ansible Baseline Push Lab
+# Ansible Baseline Push Lab (GNS3 + IOSvL2)
 
 ## Overview
 
@@ -53,17 +53,20 @@ What is visible from the screenshots and confirmed in setup:
 
 ### IP Address Chart
 
-| Device | Interface | IP Address    | Subnet Mask   | Prefix         | Network          | Broadcast           |
-|------------|---------------|---------------------|-----------------------|-------------------|----------------------|---------------------------|
+| Device   | Interface  | IP Address   | Subnet Mask   | Prefix      | Network       | Broadcast      |
+|----------|------------|--------------|---------------|-------------|---------------|----------------|
 | R1       | Vlan1      | 172.16.99.11 | 255.255.255.0 | 172.16.99.0 | 172.16.99.255 | Management SVI |
 | R2       | Vlan1      | 172.16.99.12 | 255.255.255.0 | 172.16.99.0 | 172.16.99.255 | Management SVI |
 
-## Repository Contents
+## Project Structure
 
-- `ansible-lab.gns3` - GNS3 project file
-- `ansible.cfg` - Project-local Ansible configuration used when running from this directory
-- `inventory-ios.ini` - Static inventory (INI format) with IOS targets and connection variables
-- `baseline.yml` - Playbook that runs pre-checks, pushes baseline config, and runs post-checks
+```
+ansible-lab/
+├── ansible.cfg           # local Ansible config (inventory path, timeouts, paramiko)
+├── ansible-lab.gns3      # GNS3 project file
+├── baseline.yml          # playbook: pre-checks, config push, post-checks
+└── inventory-ios.ini     # static inventory with R1/R2 and connection vars
+```
 
 ## Ansible Workflow
 
