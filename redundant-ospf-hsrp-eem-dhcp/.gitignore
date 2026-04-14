@@ -2,6 +2,7 @@
 *.image
 *.bin
 *.IOS
+images/
 
 # NVRAM and runtime state
 *.nvram
@@ -21,4 +22,3 @@ project-files/qemu/
 # OS artifacts
 .DS_Store
 Thumbs.db
-
