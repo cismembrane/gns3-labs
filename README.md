@@ -4,16 +4,16 @@ Hands-on network engineering labs built in GNS3, covering CCNP ENCOR routing, sw
 
 ## Labs
 
-| Lab | Description | Key Technologies |
-|-----|-------------|------------------|
-| [ansible-bgp](ansible-bgp/) | Four-router eBGP topology across AS 65001–65004, automated with Ansible. Jinja2 templates render per-router configs from host_vars. Separate deploy and verify playbooks with BGP neighbor state assertions and end-to-end reachability checks. | eBGP (AS 65001-65004), Ansible, Jinja2 templates, cisco.ios collection, assert-based verification
-| [dmvpn-phase3-ipsec](dmvpn-phase3-ipsec/) | Hub-and-spoke DMVPN with dynamic spoke-to-spoke tunnels and IPsec transport encryption | DMVPN Phase 3, NHRP shortcuts, IPsec, EIGRP, GRE mGRE |
-| [ansible-ospf](ansible-ospf/) | Automated OSPF deployment across a multi-router topology using Ansible | Ansible, OSPF, Jinja2 templates, ios_config module |
-| [ansible-lab](ansible-lab/) | Baseline Ansible environment for pushing configurations to GNS3 routers | Ansible, GNS3 integration, network automation fundamentals |
-| [redundant-ospf-hsrp-eem-dhcp](redundant-ospf-hsrp-eem-dhcp/) | Redundant OSPF core with HSRP at the access layer, EEM-gated DHCP relay, authenticated NTP, and DNS | OSPF totally stubby areas, HSRP, EEM applets, DHCP relay, NTP authentication |
-| [eigrp-delay-manipulation](eigrp-delay-manipulation/) | EIGRP path selection using interface delay to influence feasible successor calculation | EIGRP composite metric, delay tuning, feasible distance, reported distance |
-| [glbp-basic](glbp-basic/) | Gateway Load Balancing Protocol with AVG election and AVF load distribution | GLBP, AVG, AVF, round-robin forwarding |
-| [proxy-arp](proxy-arp/) | Proxy ARP behavior across a stretched subnet with packet capture analysis | Proxy ARP, ARP, L2/L3 boundary behavior |
+| Lab | Description | Key Technologies | Video |
+| --- | --- | --- | --- |
+| [ansible-bgp](ansible-bgp) | Four-router eBGP topology across AS 65001–65004, deployed and verified with Ansible using Jinja2 templates and host_vars | eBGP, Ansible, Jinja2, paramiko, BGP neighbor verification | [▶ Watch](https://www.youtube.com/watch?v=1HKZocY5SMY) |
+| [dmvpn-phase3-ipsec](dmvpn-phase3-ipsec) | Hub-and-spoke DMVPN with dynamic spoke-to-spoke tunnels and IPsec transport encryption | DMVPN Phase 3, NHRP shortcuts, IPsec, EIGRP, GRE mGRE | [▶ Watch](https://www.youtube.com/watch?v=CdZ0fmA12-E) |
+| [ansible-ospf](ansible-ospf) | Automated OSPF deployment across a multi-router topology using Ansible | Ansible, OSPF, Jinja2 templates, ios\_config module | [▶ Watch](https://www.youtube.com/watch?v=7IEfZew-7wQ) |
+| [ansible-lab](ansible-lab) | Baseline Ansible environment for pushing configurations to GNS3 routers | Ansible, GNS3 integration, network automation fundamentals | [▶ Watch](https://www.youtube.com/watch?v=cSly8RQOZYU) |
+| [redundant-ospf-hsrp-eem-dhcp](redundant-ospf-hsrp-eem-dhcp) | Redundant OSPF core with HSRP at the access layer, EEM-gated DHCP relay, authenticated NTP, and DNS | OSPF totally stubby areas, HSRP, EEM applets, DHCP relay, NTP authentication | |
+| [eigrp-delay-manipulation](eigrp-delay-manipulation) | EIGRP path selection using interface delay to influence feasible successor calculation | EIGRP composite metric, delay tuning, feasible distance, reported distance | |
+| [glbp-basic](glbp-basic) | Gateway Load Balancing Protocol with AVG election and AVF load distribution | GLBP, AVG, AVF, round-robin forwarding | |
+| [proxy-arp](proxy-arp) | Proxy ARP behavior across a stretched subnet with packet capture analysis | Proxy ARP, ARP, L2/L3 boundary behavior | |
 
 ## How to Use These Labs
 
@@ -21,25 +21,11 @@ Each lab directory contains a `README.md` with the full topology, IP addressing,
 
 To import a lab, open the `.gns3` project file in GNS3 and remap the IOS image to your local copy if the filename differs.
 
-## Repository Layout
-
-```
-gns3-labs/
-├── ansible-bgp/
-├── ansible-lab/
-├── ansible-ospf/
-├── dmvpn-phase3-ipsec/
-├── eigrp-delay-manipulation/
-├── glbp-basic/
-├── proxy-arp/
-├── redundant-ospf-hsrp-eem-dhcp/
-├── LICENSE
-└── README.md
-```
-
-Each lab directory contains a `README.md`, a `configs/` folder with per-router running configs, a `.gns3` project file, and an `images/` folder where applicable. Ansible-based labs also include inventory, playbooks, host/group vars, and Jinja2 templates.
-
 ## Links
 
-- [YouTube: DMVPN Phase 3 with IPsec Walkthrough](https://youtube.com/@cismembrane)
-- [LinkedIn](https://linkedin.com/in/cismembrane)
+* [YouTube: BGP Across Four Autonomous Systems, Deployed with Ansible](https://www.youtube.com/watch?v=1HKZocY5SMY)
+* [YouTube: DMVPN Phase 3 with IPsec — Full GNS3 Lab Walkthrough](https://www.youtube.com/watch?v=CdZ0fmA12-E)
+* [YouTube: Automating a 4-Router OSPF Lab with Ansible](https://www.youtube.com/watch?v=7IEfZew-7wQ)
+* [YouTube: Basic Ansible Baseline Push and Validation in GNS3](https://www.youtube.com/watch?v=cSly8RQOZYU)
+* [YouTube Channel](https://youtube.com/@cismembrane)
+* [LinkedIn](https://linkedin.com/in/cismembrane)

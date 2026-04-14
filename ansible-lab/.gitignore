@@ -2,7 +2,6 @@
 *.image
 *.bin
 *.IOS
-images/
 gns3/project-files/
 
 # NVRAM and runtime state
