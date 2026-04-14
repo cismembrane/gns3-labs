@@ -28,4 +28,4 @@ To import a lab, open the `.gns3` project file in GNS3 and remap the IOS image t
 * [YouTube: Automating a 4-Router OSPF Lab with Ansible](https://www.youtube.com/watch?v=7IEfZew-7wQ)
 * [YouTube: Basic Ansible Baseline Push and Validation in GNS3](https://www.youtube.com/watch?v=cSly8RQOZYU)
 * [YouTube Channel](https://youtube.com/@cismembrane)
-* [LinkedIn](https://linkedin.com/in/cismembrane)
+
