@@ -4,7 +4,7 @@
     "auto_start": false,
     "drawing_grid_size": 25,
     "grid_size": 75,
-    "name": "routers",
+    "name": "redundant-ospf-hsrp-eem-dhcp",
     "project_id": "729f828d-9542-44a4-832c-9c2b684349c6",
     "revision": 9,
     "scene_height": 1000,
