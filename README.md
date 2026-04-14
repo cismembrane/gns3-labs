@@ -23,6 +23,7 @@ To import a lab, open the `.gns3` project file in GNS3 and remap the IOS image t
 
 ## Repository Layout
 
+```
 gns3-labs/
 ├── ansible-bgp/
 ├── ansible-lab/
@@ -34,6 +35,7 @@ gns3-labs/
 ├── redundant-ospf-hsrp-eem-dhcp/
 ├── LICENSE
 └── README.md
+```
 
 Each lab directory contains a `README.md`, a `configs/` folder with per-router running configs, a `.gns3` project file, and an `images/` folder where applicable. Ansible-based labs also include inventory, playbooks, host/group vars, and Jinja2 templates.
 
