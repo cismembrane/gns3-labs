@@ -5,7 +5,8 @@ Hands-on network engineering labs built in GNS3, covering CCNP ENCOR routing, sw
 ## Labs
 
 | Lab | Description | Key Technologies |
-|-----|-------------|-----------------|
+|-----|-------------|------------------|
+| [ansible-bgp](ansible-bgp/) | Four-router eBGP topology across AS 65001–65004, automated with Ansible. Jinja2 templates render per-router configs from host_vars. Separate deploy and verify playbooks with BGP neighbor state assertions and end-to-end reachability checks. |
 | [dmvpn-phase3-ipsec](dmvpn-phase3-ipsec/) | Hub-and-spoke DMVPN with dynamic spoke-to-spoke tunnels and IPsec transport encryption | DMVPN Phase 3, NHRP shortcuts, IPsec, EIGRP, GRE mGRE |
 | [ansible-ospf](ansible-ospf/) | Automated OSPF deployment across a multi-router topology using Ansible | Ansible, OSPF, Jinja2 templates, ios_config module |
 | [ansible-lab](ansible-lab/) | Baseline Ansible environment for pushing configurations to GNS3 routers | Ansible, GNS3 integration, network automation fundamentals |
