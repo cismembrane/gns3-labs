@@ -1,0 +1,21 @@
+- name: Deploy OSPF on Cisco IOS routers
+  hosts: ios
+  gather_facts: false
+
+  tasks:
+    - name: Build OSPF config from template
+      ansible.builtin.set_fact:
+        ospf_rendered_config: "{{ lookup('template', '../templates/ospf-router.j2') }}"
+
+    - name: Push OSPF configuration
+      cisco.ios.ios_config:
+        lines: "{{ ospf_rendered_config.split('\n') | reject('equalto', '') | list }}"
+      register: ospf_push
+
+    - name: Show change result
+      ansible.builtin.debug:
+        msg:
+          - "Host: {{ inventory_hostname }}"
+          - "Changed: {{ ospf_push.changed }}"
+
+ 

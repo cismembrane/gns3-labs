@@ -1,0 +1,18 @@
+ospf_process_id: 1
+ospf_area: 0
+
+exclude_mgmt_from_ospf: true
+
+ospf_validation_commands:
+  - show ip ospf neighbor
+  - show ip route ospf
+  - show ip protocols
+
+base_config:
+  domain_name: test.com
+  dns_server: 1.1.1.1
+  ntp_server: 129.6.15.28
+  ssh_modulus_bits: 1024
+  mgmt_username: admin
+  mgmt_password: admin
+  enable_secret: admin

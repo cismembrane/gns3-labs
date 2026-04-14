@@ -1,0 +1,31 @@
+mgmt:
+  interface: FastEthernet3/1
+  ip: 172.16.99.11
+  mask: 255.255.255.0
+  description: MGMT
+
+ospf_router_id: 1.1.1.1
+
+routed_interfaces:
+  - name: FastEthernet0/0
+    ip: 10.0.1.1
+    mask: 255.255.255.252
+    description: TRANSIT (was Vlan10)
+    enabled: true
+  - name: FastEthernet1/0
+    ip: 10.0.4.1
+    mask: 255.255.255.252
+    description: TRANSIT (was Vlan40)
+    enabled: true
+  - name: FastEthernet3/0
+    ip: 10.0.5.1
+    mask: 255.255.255.252
+    description: TRANSIT (was Vlan50) 
+    enabled: true
+
+ospf_networks:
+  - { network: "10.0.1.0", wildcard: "0.0.0.3", area: 0 }
+  - { network: "10.0.4.0", wildcard: "0.0.0.3", area: 0 }
+  - { network: "10.0.5.0", wildcard: "0.0.0.3", area: 0 }
+
+ospf_passive_interfaces: []
