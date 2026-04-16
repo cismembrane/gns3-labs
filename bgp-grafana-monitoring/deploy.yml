@@ -1,0 +1,13 @@
+name: deploy bgp configuration
+  hosts: routers
+  gather_facts: false
+ 
+  tasks:
+    - name: configure interfaces
+      cisco.ios.ios_config:
+        src: templates/interfaces.j2
+ 
+    - name: configure bgp
+      cisco.ios.ios_config:
+        src: templates/bgp.j2
+ 

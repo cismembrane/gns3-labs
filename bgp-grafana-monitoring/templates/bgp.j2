@@ -1,0 +1,16 @@
+router bgp {{ asn }}
+ bgp router-id {{ router_id }}
+ bgp log-neighbor-changes
+{% for peer in bgp_neighbors %}
+ neighbor {{ peer.neighbor }} remote-as {{ peer.remote_as }}
+ neighbor {{ peer.neighbor }} description {{ peer.description }}
+{% endfor %}
+ !
+ address-family ipv4 unicast
+{% for net in bgp_networks %}
+  network {{ net.prefix }} mask {{ net.mask }}
+{% endfor %}
+{% for peer in bgp_neighbors %}
+  neighbor {{ peer.neighbor }} activate
+{% endfor %}
+ exit-address-family

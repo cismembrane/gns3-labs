@@ -1,0 +1,39 @@
+- name: no neighbors stuck in active
+      ansible.builtin.assert:
+        that:
+          - "'Active' not in bgp_summary.stdout[0]"
+        fail_msg: "One or more BGP neighbors are in Active state"
+        success_msg: "No neighbors in Active state"
+ 
+    - name: ping loopback from R1 to R3
+      cisco.ios.ios_command:
+        commands:
+          - ping 3.3.3.3 source 1.1.1.1
+      register: ping
+      when: inventory_hostname == 'R1'
+ 
+    - name: ping loopback from R3 to R1
+      cisco.ios.ios_command:
+        commands:
+          - ping 1.1.1.1 source 3.3.3.3
+      register: ping
+      when: inventory_hostname == 'R3'
+ 
+    - name: ping diagonal loopback from R2 to R4
+      cisco.ios.ios_command:
+        commands:
+          - ping 4.4.4.4 source 2.2.2.2
+      register: ping
+      when: inventory_hostname == 'R2'
+ 
+    - name: ping loopback from R4 to R2
+      cisco.ios.ios_command:
+        commands:
+          - ping 2.2.2.2 source 4.4.4.4
+      register: ping
+      when: inventory_hostname == 'R4'
+ 
+    - name: display ping results
+      ansible.builtin.debug:
+        var: ping.stdout_lines
+      when: ping is defined

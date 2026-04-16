@@ -1,0 +1,37 @@
+hostname: R1
+router_id: 1.1.1.1
+asn: 65001
+ 
+interfaces:
+  - name: Loopback0
+    description: router_id
+    address: 1.1.1.1
+    mask: 255.255.255.255
+  - name: GigabitEthernet0/0
+	description: management
+	address 192.168.0.1
+	mask: 255.255.255.0
+  - name: GigabitEthernet0/1
+    description: to_r2
+    address: 10.0.1.1
+    mask: 255.255.255.248
+  - name: GigabitEthernet0/2
+    description: to_R4
+    address: 10.0.4.1
+    mask: 255.255.255.248
+ 
+bgp_neighbors:
+  - neighbor: 10.0.1.2
+    remote_as: 65002
+    description: ebgp_to_R2
+  - neighbor: 10.0.4.4
+    remote_as: 65004
+    description: ebgp_to_R4
+ 
+bgp_networks:
+  - prefix: 1.1.1.1
+    mask: 255.255.255.255
+  - prefix: 10.0.1.0
+    mask: 255.255.255.248
+  - prefix: 10.0.4.0
+    mask: 255.255.255.248

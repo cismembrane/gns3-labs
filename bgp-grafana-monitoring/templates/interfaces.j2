@@ -1,0 +1,11 @@
+hostname {{ hostname }}
+!
+{% for iface in interfaces %}
+interface {{ iface.name }}
+ description {{ iface.description }}
+ ip address {{ iface.address }} {{ iface.mask }}
+{% if 'Loopback' not in iface.name %}
+ no shutdown
+{% endif %}
+!
+{% endfor %}

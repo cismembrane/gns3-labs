@@ -1,0 +1,38 @@
+hostname: R4
+router_id: 4.4.4.4
+asn: 65004
+ 
+interfaces:
+  - name: Loopback0
+    description: router_id
+    address: 4.4.4.4
+    mask: 255.255.255.255
+  - name: GigabitEthernet0/0
+	description: management
+	address: 192.168.0.4
+	mask: 255.255.255.0
+  - name: GigabitEthernet0/1
+    description: to_r3
+    address: 10.0.3.4
+    mask: 255.255.255.248
+  - name: GigabitEthernet0/2
+    description: to_r1
+    address: 10.0.4.4
+    mask: 255.255.255.248
+ 
+bgp_neighbors:
+  - neighbor: 10.0.3.3
+    remote_as: 65003
+    description: bgp_to_r3
+  - neighbor: 10.0.4.1
+    remote_as: 65001
+    description: bgp_to_r1
+ 
+bgp_networks:
+  - prefix: 4.4.4.4
+    mask: 255.255.255.255
+  - prefix: 10.0.3.0
+    mask: 255.255.255.248
+  - prefix: 10.0.4.0
+    mask: 255.255.255.248
+ 

@@ -1,0 +1,38 @@
+hostname: R3
+router_id: 3.3.3.3
+asn: 65003
+ 
+interfaces:
+  - name: Loopback0
+    description: router_id
+    address: 3.3.3.3
+    mask: 255.255.255.255
+  - name:GigabitEthernet0/0
+	description: management
+	address: 192.168.0.3
+	mask: 255.255.255.0
+  - name: GigabitEthernet0/1
+    description: to_r2
+    address: 10.0.2.3
+    mask: 255.255.255.248
+  - name: GigabitEthernet0/2
+    description: to_r4
+    address: 10.0.3.3
+    mask: 255.255.255.248
+ 
+bgp_neighbors:
+  - neighbor: 10.0.2.2
+    remote_as: 65002
+    description: bgp_to_r2
+  - neighbor: 10.0.3.4
+    remote_as: 65004
+    description: bgp_to_r4
+ 
+bgp_networks:
+  - prefix: 3.3.3.3
+    mask: 255.255.255.255
+  - prefix: 10.0.2.0
+    mask: 255.255.255.248
+  - prefix: 10.0.3.0
+    mask: 255.255.255.248
+ 
