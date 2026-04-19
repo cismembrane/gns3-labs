@@ -1,0 +1,46 @@
+global:
+  scrape_interval: 30s
+  evaluation_interval: 30s
+ 
+scrape_configs:
+  - job_name: snmp_routers
+    static_configs:
+      - targets:
+          - 192.168.0.1  # R1
+          - 192.168.0.2  # R2
+          - 192.168.0.3  # R3
+          - 192.168.0.4  # R4
+    metrics_path: /snmp
+    params:
+      module: [if_mib]
+      auth: [cisco_v3]
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: __param_target
+      - source_labels: [__param_target]
+        target_label: instance
+      - target_label: __address__
+        replacement: 127.0.0.1:9116
+ 
+  - job_name: snmp_bgp
+    static_configs:
+      - targets:
+          - 192.168.0.1
+          - 192.168.0.2
+          - 192.168.0.3
+          - 192.168.0.4
+    metrics_path: /snmp
+    params:
+      module: [bgp4]
+      auth: [cisco_v3]
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: __param_target
+      - source_labels: [__param_target]
+        target_label: instance
+      - target_label: __address__
+        replacement: 127.0.0.1:9116
+ 
+  - job_name: prometheus
+    static_configs:
+      - targets: ['127.0.0.1:9090']

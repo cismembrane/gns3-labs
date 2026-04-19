@@ -1,4 +1,4 @@
-- name: Deploy eBGP configuration to IOSv routers
+- name: Deploy BGP configuration to IOSv routers
   hosts: routers
   gather_facts: false
  
