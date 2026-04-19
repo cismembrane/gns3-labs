@@ -1,0 +1,11 @@
+ip access-list standard SNMP_ACL
+ permit {{ snmp_acl_network }} {{ snmp_acl_wildcard }}
+!
+snmp-server view READONLY iso included
+snmp-server group MONITORING v3 priv read READONLY access SNMP_ACL
+snmp-server user {{ snmp_user }} MONITORING v3 auth sha {{ snmp_auth_pass }} priv aes 128 {{ snmp_priv_pass }}
+snmp-server host {{ snmp_trap_destination }} version 3 priv {{ snmp_user }}
+snmp-server enable traps bgp
+snmp-server enable traps config
+snmp-server contact {{ snmp_contact }}
+snmp-server location {{ hostname }}

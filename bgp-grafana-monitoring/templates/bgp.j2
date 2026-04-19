@@ -5,7 +5,6 @@ router bgp {{ asn }}
  neighbor {{ peer.neighbor }} remote-as {{ peer.remote_as }}
  neighbor {{ peer.neighbor }} description {{ peer.description }}
 {% endfor %}
- !
  address-family ipv4 unicast
 {% for net in bgp_networks %}
   network {{ net.prefix }} mask {{ net.mask }}

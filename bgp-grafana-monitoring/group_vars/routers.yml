@@ -6,3 +6,11 @@ ansible_become: true
 ansible_become_method: enable
 ansible_become_password: admin
  
+snmp_user: monitor
+snmp_auth_pass: admin
+snmp_priv_pass: admin
+snmp_acl_network: 192.168.0.0
+snmp_acl_wildcard: 0.0.0.255
+snmp_trap_destination: 192.168.0.100
+snmp_contact: noc@lab.local
+ 

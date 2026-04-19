@@ -7,10 +7,6 @@ interfaces:
     description: router_id
     address: 3.3.3.3
     mask: 255.255.255.255
-  - name:GigabitEthernet0/0
-	description: management
-	address: 192.168.0.3
-	mask: 255.255.255.0
   - name: GigabitEthernet0/1
     description: to_r2
     address: 10.0.2.3
@@ -19,6 +15,10 @@ interfaces:
     description: to_r4
     address: 10.0.3.3
     mask: 255.255.255.248
+  - name: GigabitEthernet0/4
+    description: mgmt
+    address: 192.168.0.3
+    mask: 255.255.255.0
  
 bgp_neighbors:
   - neighbor: 10.0.2.2
@@ -35,4 +35,3 @@ bgp_networks:
     mask: 255.255.255.248
   - prefix: 10.0.3.0
     mask: 255.255.255.248
- 

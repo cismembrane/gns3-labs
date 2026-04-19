@@ -1,39 +1,86 @@
-- name: no neighbors stuck in active
+- name: verify ebgp deployment on iosv routers
+  hosts: routers
+  gather_facts: false
+ 
+  tasks:
+    - name: collect bgp summary
+      cisco.ios.ios_command:
+        commands:
+          - show ip bgp summary
+      register: bgp_summary
+ 
+    - name: display bgp summary
+      ansible.builtin.debug:
+        var: bgp_summary.stdout_lines
+ 
+    - name: collect bgp table
+      cisco.ios.ios_command:
+        commands:
+          - show ip bgp
+      register: bgp_table
+ 
+    - name: display bgp table
+      ansible.builtin.debug:
+        var: bgp_table.stdout_lines
+ 
+    - name: no neighbors stuck in idle
+      ansible.builtin.assert:
+        that:
+          - "'Idle' not in bgp_summary.stdout[0]"
+        fail_msg: "One or more BGP neighbors are in Idle state"
+        success_msg: "No neighbors in Idle state"
+ 
+    - name: no neighbors stuck in active
       ansible.builtin.assert:
         that:
           - "'Active' not in bgp_summary.stdout[0]"
         fail_msg: "One or more BGP neighbors are in Active state"
         success_msg: "No neighbors in Active state"
  
-    - name: ping loopback from R1 to R3
+    - name: ping loopback from r1 to r3
       cisco.ios.ios_command:
         commands:
           - ping 3.3.3.3 source 1.1.1.1
-      register: ping
+      register: ping_r1
       when: inventory_hostname == 'R1'
  
-    - name: ping loopback from R3 to R1
+    - name: display r1 ping
+      ansible.builtin.debug:
+        var: ping_r1.stdout_lines
+      when: inventory_hostname == 'R1'
+ 
+    - name: ping loopback from r3 to r1
       cisco.ios.ios_command:
         commands:
           - ping 1.1.1.1 source 3.3.3.3
-      register: ping
+      register: ping_r3
       when: inventory_hostname == 'R3'
  
-    - name: ping diagonal loopback from R2 to R4
+    - name: display r3 ping
+      ansible.builtin.debug:
+        var: ping_r3.stdout_lines
+      when: inventory_hostname == 'R3'
+ 
+    - name: ping loopback from r2 to r4
       cisco.ios.ios_command:
         commands:
           - ping 4.4.4.4 source 2.2.2.2
-      register: ping
+      register: ping_r2
       when: inventory_hostname == 'R2'
  
-    - name: ping loopback from R4 to R2
+    - name: display r2 ping
+      ansible.builtin.debug:
+        var: ping_r2.stdout_lines
+      when: inventory_hostname == 'R2'
+ 
+    - name: ping loopback from r4 to r2
       cisco.ios.ios_command:
         commands:
           - ping 2.2.2.2 source 4.4.4.4
-      register: ping
+      register: ping_r4
       when: inventory_hostname == 'R4'
  
-    - name: display ping results
+    - name: display r4 ping
       ansible.builtin.debug:
-        var: ping.stdout_lines
-      when: ping is defined
+        var: ping_r4.stdout_lines
+      when: inventory_hostname == 'R4'

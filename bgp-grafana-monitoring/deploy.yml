@@ -1,13 +1,13 @@
-name: deploy bgp configuration
+- name: Deploy eBGP configuration to IOSv routers
   hosts: routers
   gather_facts: false
  
   tasks:
-    - name: configure interfaces
+    - name: Configure interfaces
       cisco.ios.ios_config:
         src: templates/interfaces.j2
  
-    - name: configure bgp
+    - name: Configure BGP
       cisco.ios.ios_config:
         src: templates/bgp.j2
  
