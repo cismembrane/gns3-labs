@@ -1,0 +1,22 @@
+# Environment variables with secrets
+.env
+.env.local
+
+# Editor
+*.swp
+*.swo
+*~
+.vscode/
+.idea/
+
+# Backup files
+*.bak
+*.orig
+
+# Python
+__pycache__/
+*.pyc
+
+# Ansible
+*.retry
+
