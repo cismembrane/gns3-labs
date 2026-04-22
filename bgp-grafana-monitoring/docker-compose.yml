@@ -1,6 +1,6 @@
 services:
   prometheus:
-    image: prom/prometheus:latest
+    image: prom/prometheus:v3.1.0
     container_name: prometheus
     network_mode: host
     restart: unless-stopped
@@ -14,7 +14,7 @@ services:
       - '--web.console.templates=/usr/share/prometheus/consoles'
  
   snmp_exporter:
-    image: prom/snmp-exporter:latest
+    image: prom/snmp-exporter:v0.30.1
     container_name: snmp_exporter
     network_mode: host
     restart: unless-stopped
@@ -24,7 +24,7 @@ services:
       - '--config.file=/etc/snmp_exporter/snmp.yml'
  
   grafana:
-    image: grafana/grafana:latest
+    image: grafana/grafana:13.1.0
     container_name: grafana
     network_mode: host
     restart: unless-stopped
