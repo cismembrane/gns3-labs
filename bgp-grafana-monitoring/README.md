@@ -6,6 +6,12 @@ Router config is built by Ansible. The monitoring stack runs from `docker-compos
 
 ---
 
+## Dashboard Preview
+
+![Grafana dashboard overview showing BGP peer state, session uptime, and update rate panels](images/grafana-dashboard-overview.png)
+
+---
+
 ## Topology and Data Flow
 
 Four routers peer in a ring: R1 (AS 65001) ↔ R2 (AS 65002) ↔ R3 (AS 65003) ↔ R4 (AS 65004) ↔ R1. Every router holds two eBGP sessions, so SNMP reports eight directional peering states total.
@@ -13,6 +19,12 @@ Four routers peer in a ring: R1 (AS 65001) ↔ R2 (AS 65002) ↔ R3 (AS 65003) �
 Prometheus runs three scrape jobs. Two go to snmp_exporter: the `snmp_routers` job requests the `if_mib` module for interface counters and state, and the `snmp_bgp` job requests the `bgp4` module for BGP4-MIB entries covering peer state, uptime, and update counters. Both reference the `cisco_v3` auth profile in `snmp.yml`. The third job scrapes Prometheus itself at `127.0.0.1:9090`. Global `scrape_interval` is 30 seconds, which triggers a fresh SNMP walk against each target router on every cycle. Grafana reads from Prometheus via PromQL and renders the dashboard at `monitoring/grafana/dashboards/bgp-health.json`.
 
 SNMPv3 is used instead of v2c so auth and priv are in play. The difference doesn't matter inside a lab, but I'd rather not have a plaintext community string pattern sitting in a public repo.
+
+---
+
+## Topology and Data Flow
+
+![Four-router eBGP ring topology with AS 65001 through AS 65004](images/topology.png)
 
 ---
 
@@ -113,3 +125,11 @@ Six panels: three stat counters across the top, a Neighbor State table in the mi
 **Session Uptime.** Time series of `bgpPeerFsmEstablishedTime` per peering, Y axis in days. Lines stay flat at the session age. A drop to zero and climb back up means the session reset.
 
 **Update Rate.** Time series of `rate(bgpPeerInUpdates[5m])` and `rate(bgpPeerOutUpdates[5m])`, both directions per peering, 16 series total. Zero when nothing is changing. Nonzero during convergence or topology changes.
+
+---
+
+## Lab Validation
+
+![Docker Compose showing snmp_exporter, Prometheus, and Grafana running](images/docker-compose-running.png)
+
+![Prometheus targets showing healthy SNMP scrape jobs](images/prometheus-targets.png)
