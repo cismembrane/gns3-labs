@@ -1,0 +1,178 @@
+!
+version 15.8
+service timestamps debug datetime msec
+service timestamps log datetime msec
+no service password-encryption
+!
+hostname R1
+!
+boot-start-marker
+boot-end-marker
+!
+!
+!
+no aaa new-model
+!
+!
+!
+mmi polling-interval 60
+no mmi auto-configure
+no mmi pvc
+mmi snmp-timeout 180
+!         
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+ip domain name lab
+ip cef
+no ipv6 cef
+!
+multilink bundle-name authenticated
+!
+!
+!
+!
+username admin privilege 15 secret 5 $1$P/2.$BGKeBreMBYYSV2X26lvFO.
+!
+redundancy
+!         
+!
+! 
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+interface Loopback0
+ description router_id
+ ip address 1.1.1.1 255.255.255.255
+!
+interface GigabitEthernet0/0
+ description to_r2
+ ip address 10.0.1.1 255.255.255.248
+ duplex auto
+ speed auto
+ media-type rj45
+!
+interface GigabitEthernet0/1
+ no ip address
+ shutdown
+ duplex auto
+ speed auto
+ media-type rj45
+!
+interface GigabitEthernet0/2
+ no ip address
+ shutdown
+ duplex auto
+ speed auto
+ media-type rj45
+!
+interface GigabitEthernet0/3
+ description to_r4
+ ip address 10.0.4.1 255.255.255.248
+ duplex auto
+ speed auto
+ media-type rj45
+!         
+interface GigabitEthernet0/4
+ description mgmt
+ ip address 192.168.0.1 255.255.255.0
+ duplex auto
+ speed auto
+ media-type rj45
+!
+router bgp 65001
+ bgp router-id 1.1.1.1
+ bgp log-neighbor-changes
+ neighbor 10.0.1.2 remote-as 65002
+ neighbor 10.0.1.2 description bgp_to_r2
+ neighbor 10.0.4.4 remote-as 65004
+ neighbor 10.0.4.4 description bgp_to_r4
+ !
+ address-family ipv4
+  network 1.1.1.1 mask 255.255.255.255
+  network 10.0.1.0 mask 255.255.255.248
+  network 10.0.4.0 mask 255.255.255.248
+  neighbor 10.0.1.2 activate
+  neighbor 10.0.4.4 activate
+ exit-address-family
+!         
+ip forward-protocol nd
+!
+!
+no ip http server
+no ip http secure-server
+!
+ip access-list standard SNMP_ACL
+ permit 192.168.0.0 0.0.0.255
+!
+ipv6 ioam timestamp
+!
+snmp-server group MONITORING v3 priv read READONLY access SNMP_ACL
+snmp-server view READONLY iso included
+snmp-server location R1
+snmp-server contact noc@lab.local
+snmp-server chassis-id 
+snmp-server enable traps bgp
+snmp-server enable traps config
+snmp-server host 192.168.0.100 version 3 priv monitor 
+!
+!
+control-plane
+!         
+banner exec ^C
+**************************************************************************
+* IOSv is strictly limited to use for evaluation, demonstration and IOS  *
+* education. IOSv is provided as-is and is not supported by Cisco's      *
+* Technical Advisory Center. Any use or disclosure, in whole or in part, *
+* of the IOSv Software or Documentation to any third party for any       *
+* purposes is expressly prohibited except as otherwise authorized by     *
+* Cisco in writing.                                                      *
+**************************************************************************^C
+banner incoming ^C
+**************************************************************************
+* IOSv is strictly limited to use for evaluation, demonstration and IOS  *
+* education. IOSv is provided as-is and is not supported by Cisco's      *
+* Technical Advisory Center. Any use or disclosure, in whole or in part, *
+* of the IOSv Software or Documentation to any third party for any       *
+* purposes is expressly prohibited except as otherwise authorized by     *
+* Cisco in writing.                                                      *
+**************************************************************************^C
+banner login ^C
+**************************************************************************
+* IOSv is strictly limited to use for evaluation, demonstration and IOS  *
+* education. IOSv is provided as-is and is not supported by Cisco's      *
+* Technical Advisory Center. Any use or disclosure, in whole or in part, *
+* of the IOSv Software or Documentation to any third party for any       *
+* purposes is expressly prohibited except as otherwise authorized by     *
+* Cisco in writing.                                                      *
+**************************************************************************^C
+!
+line con 0
+line aux 0
+line vty 0 4
+ login local
+ transport input ssh
+line vty 5 15
+ login local
+ transport input ssh
+!
+no scheduler allocate
+!
+end
+
