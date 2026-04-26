@@ -38,11 +38,13 @@ The lab is a four-router eBGP ring. The physical link mapping, interface names, 
 | R3 to R4 | R3       | GigabitEthernet0/2 | 10.0.3.3/29 | R4       | GigabitEthernet0/2 | 10.0.3.4/29 | 10.0.3.0/29    |
 | R4 to R1 | R4       | GigabitEthernet0/3 | 10.0.4.4/29 | R1       | GigabitEthernet0/3 | 10.0.4.1/29 | 10.0.4.0/29    |
 
-This creates the full eBGP ring:
-
-```text
-R1 -> R2 -> R3 -> R4 -> R1
-```
+| Link         | Interface          | Switch Interface |       
+|--------------|--------------------|------------------|
+| R1 to SW1    | GigabitEthernet0/4 | Ethernet0        |
+| R2 to SW1    | GigabitEthernet0/4 | Ethernet1        |
+| R3 to SW1    | GigabitEthernet0/4 | Ethernet2        |
+| R4 to SW1    | GigabitEthernet0/4 | Ethernet3        |
+| Cloud to SW1 | tap0               | Ethernet4        |
 
 ### BGP Neighbor Map
 
@@ -59,7 +61,7 @@ R1 -> R2 -> R3 -> R4 -> R1
 
 ### Management Address Map
 
-The rest of the repo expects these management addresses:
+The repo expects these management addresses:
 
 | Router | Management Interface | Management IP  |
 |--------|----------------------|----------------|
@@ -72,26 +74,44 @@ These addresses are used by Ansible inventory and Prometheus scrape targets.
 
 ---
 
+## Host Connectivity to the Lab
+
+This lab assumes R1 through R4 are reachable from the GNS3 host at 192.168.0.1 through 192.168.0.4. The simplest way to do this is a TAP interface bound to a GNS3 Cloud node.
+
+To create the TAP, bring it up, and assign the host an address on the management subnet:
+
+```text
+sudo ip tuntap add dev tap0 mode tap user $(whoami)
+sudo ip link set tap0 up
+sudo ip addr add 192.168.0.100/24 dev tap0
+```
+
+In GNS3, add a Cloud node to the topology, edit it and add tap0 as the bound interface. Connect the one of the switch ports to the Cloud. The host now sits at 192.168.0.100 on the same segment as the routers.
+
+Validate from the host with `ping 192.168.0.1`. If the ping does not work, check `iptables -L -v` for a FORWARD drop and confirm the TAP is `UP` with `ip -br link show tap0`.
+
+---
+
 ## Included Files
 
 This directory contains the exported GNS3 project files needed to rebuild the lab topology.
 
-The project files define the router layout and links. They do not include Cisco IOS images.
+The project files define the router layout and links. They do not include the Cisco vIOS images used in this lab.
 
 ---
 
 ## Requirements
 
-Before importing the project, make sure GNS3 has the required router image available locally.
+Before importing the project, make sure GNS3 has the router image available locally.
 
 This project expects:
 
 - Four Cisco router nodes named `R1`, `R2`, `R3`, and `R4`
+- One GNS3 Ethernet Switch named `SW1`
+- One GNS3 Cloud Node named `Cloud1`
 - Router management reachability from the Ansible control host
 - Management IPs reachable at `192.168.0.1` through `192.168.0.4`
 - The same interface mapping used by the Ansible `host_vars/` files
-
-Cisco IOS images are not included in this repo.
 
 ---
 
@@ -104,10 +124,10 @@ In GNS3:
 1. Open GNS3.
 2. Go to `File` > `Import portable project`.
 3. Select the project file from this directory.
-4. Confirm that all four routers load correctly.
-5. Start the routers.
-6. Copy and paste the pre-deployment configs for each router.
-7. Confirm that SSH works for `192.168.0.1`, `192.168.0.2`, `192.168.0.3`, and `192.168.0.4`.
+4. Confirm that all four routers and the switch load correctly.
+5. Start the routers and the switch.
+6. Copy and paste the pre-deployment configs for each router. The switch is a GNS3 switch with all interfaces on the same VLAN.
+7. Confirm that both ping and SSH work for `192.168.0.1`, `192.168.0.2`, `192.168.0.3`, and `192.168.0.4`.
 
 After the topology is running, apply one of the router configuration paths below.
 
@@ -129,22 +149,13 @@ The fallback path is:
 paste completed post-deployment configs -> verify BGP/SNMP state
 ```
 
-Ansible does not configure completely blank routers from zero. Each router needs an initial bootstrap config first so the Ansible control host can reach it over SSH.
+Each router needs an initial bootstrap (pre-deploy) config first so the Ansible control host can reach it over SSH.
 
 ---
 
 ## Option 1: Bootstrap the Routers, Then Run Ansible
 
 Use this path if you want to follow the intended automation workflow.
-
-The initial router configs are stored in the main repo under:
-
-```text
-../configs/R1-pre-deployment.txt
-../configs/R2-pre-deployment.txt
-../configs/R3-pre-deployment.txt
-../configs/R4-pre-deployment.txt
-```
 
 Paste the matching pre-deployment config into each router first:
 
@@ -182,7 +193,7 @@ ssh admin@192.168.0.3
 ssh admin@192.168.0.4
 ```
 
-Once the routers are reachable, return to the repo root and run the normal deployment sequence:
+Once the routers are reachable, return to the repo root and run the deployment sequence:
 
 ```text
 ansible-playbook deploy.yml
@@ -199,16 +210,7 @@ The pre-deployment configs provide management access. The Ansible playbooks buil
 
 Use this path if you want to rebuild the finished lab state without running Ansible.
 
-The completed post-deployment configs are stored in the main repo under:
-
-```text
-../configs/R1-post-deployment.txt
-../configs/R2-post-deployment.txt
-../configs/R3-post-deployment.txt
-../configs/R4-post-deployment.txt
-```
-
-Paste the matching completed config into each router:
+Paste the matching post-depoloyment config into each router:
 
 ```text
 R1 -> ../configs/R1-post-deployment.txt
@@ -241,7 +243,7 @@ R3
 R4
 ```
 
-Wire the routers using the physical link map above. The important part is keeping the logical links and interface order the same:
+Wire the routers using the physical link map above.
 
 ```text
 R1 Gi0/0 <-> R2 Gi0/0
@@ -250,13 +252,11 @@ R3 Gi0/2 <-> R4 Gi0/2
 R4 Gi0/3 <-> R1 Gi0/3
 ```
 
-Connect each router's `GigabitEthernet0/4` interface to the management network so the Ansible control host can reach:
-
 ```text
-R1 192.168.0.1
-R2 192.168.0.2
-R3 192.168.0.3
-R4 192.168.0.4
+R1 Gi0/4 <-> SW1 e0
+R2 Gi0/4 <-> SW1 e1
+R3 Gi0/4 <-> SW1 e2
+R4 Gi0/4 <-> SW1 e3
 ```
 
 After the links are rebuilt, use Option 1 or Option 2 above to configure the routers.
@@ -278,6 +278,7 @@ show ip interface brief
 show ip bgp summary
 show running-config | section router bgp
 show snmp user
+show running-config | sec snmp
 ```
 
 Each router should show two established eBGP neighbors once the full ring is configured.
@@ -306,7 +307,7 @@ admin / admin
 
 If the project does not open cleanly on another system, recreate the four router nodes manually using the same names and interface links, then apply one of the router configuration paths above.
 
-The Ansible workflow depends on initial management reachability. The automation starts after the routers can already be reached over SSH.
+The Ansible workflow depends on initial management reachability. The automation will not deploy until the routers are reachable via SSH.
 
 If a different router image exposes different interface names, keep the same logical links and update the interface names in the configs and host variable files.
 
@@ -327,4 +328,3 @@ Files to check if the topology changes:
 ../configs/R4-post-deployment.txt
 ../monitoring/prometheus/prometheus.yml
 ```
-
