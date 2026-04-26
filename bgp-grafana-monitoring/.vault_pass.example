@@ -1,0 +1,3 @@
+# Copy this file to .vault_pass and replace the line below with your vault password.
+# .vault_pass is gitignored. .vault_pass.example is committed.
+your-vault-password-here

@@ -20,3 +20,6 @@ __pycache__/
 # Ansible
 *.retry
 
+
+# Ansible vault password
+.vault_pass
