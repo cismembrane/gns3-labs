@@ -28,6 +28,7 @@ Use this section if you need to recreate the GNS3 topology manually.
 
 The lab is a four-router eBGP ring. The physical link mapping, interface names, transit subnets, and BGP neighbor IPs need to match the Ansible `host_vars/` files and saved router configs.
 
+---
 
 ### Physical Link Map
 
@@ -38,7 +39,7 @@ The lab is a four-router eBGP ring. The physical link mapping, interface names, 
 | R3 to R4 | R3       | GigabitEthernet0/2 | 10.0.3.3/29 | R4       | GigabitEthernet0/2 | 10.0.3.4/29 | 10.0.3.0/29    |
 | R4 to R1 | R4       | GigabitEthernet0/3 | 10.0.4.4/29 | R1       | GigabitEthernet0/3 | 10.0.4.1/29 | 10.0.4.0/29    |
 
-| Link         | Interface          | Switch Interface |       
+| Link         | Interface          | Switch Interface |
 |--------------|--------------------|------------------|
 | R1 to SW1    | GigabitEthernet0/4 | Ethernet0        |
 | R2 to SW1    | GigabitEthernet0/4 | Ethernet1        |
@@ -74,29 +75,11 @@ These addresses are used by Ansible inventory and Prometheus scrape targets.
 
 ---
 
-## Host Connectivity to the Lab
-
-This lab assumes R1 through R4 are reachable from the GNS3 host at 192.168.0.1 through 192.168.0.4. The simplest way to do this is a TAP interface bound to a GNS3 Cloud node.
-
-To create the TAP, bring it up, and assign the host an address on the management subnet:
-
-```text
-sudo ip tuntap add dev tap0 mode tap user $(whoami)
-sudo ip link set tap0 up
-sudo ip addr add 192.168.0.100/24 dev tap0
-```
-
-In GNS3, add a Cloud node to the topology, edit it and add tap0 as the bound interface. Connect the one of the switch ports to the Cloud. The host now sits at 192.168.0.100 on the same segment as the routers.
-
-Validate from the host with `ping 192.168.0.1`. If the ping does not work, check `iptables -L -v` for a FORWARD drop and confirm the TAP is `UP` with `ip -br link show tap0`.
-
----
-
 ## Included Files
 
 This directory contains the exported GNS3 project files needed to rebuild the lab topology.
 
-The project files define the router layout and links. They do not include the Cisco vIOS images used in this lab.
+The project files define the router layout and links. They do not include the Cisco IOSv images used in this lab.
 
 ---
 
@@ -126,10 +109,33 @@ In GNS3:
 3. Select the project file from this directory.
 4. Confirm that all four routers and the switch load correctly.
 5. Start the routers and the switch.
-6. Copy and paste the pre-deployment configs for each router. The switch is a GNS3 switch with all interfaces on the same VLAN.
-7. Confirm that both ping and SSH work for `192.168.0.1`, `192.168.0.2`, `192.168.0.3`, and `192.168.0.4`.
+6. Confirm that Cloud1 has connectivity, as discussed below.
+7. Copy and paste the pre-deployment configs for each router. The switch is a GNS3 switch with all interfaces on the same VLAN.
+8. Confirm that both ping and SSH work for `192.168.0.1`, `192.168.0.2`, `192.168.0.3`, and `192.168.0.4`.
 
 After the topology is running, apply one of the router configuration paths below.
+
+---
+
+## Host Connectivity to the Lab
+
+This lab assumes R1 through R4 are reachable from the GNS3 host at 192.168.0.1 through 192.168.0.4. The simplest way to do this is a TAP interface bound to a GNS3 Cloud node.
+
+To create the TAP, bring it up, and assign the host an address on the management subnet:
+
+```text
+sudo ip tuntap add dev tap0 mode tap user $(whoami)
+sudo ip link set tap0 up
+sudo ip addr add 192.168.0.100/24 dev tap0
+```
+
+In GNS3, add or edit the Cloud node and confirm tap0 as the bound interface. Connect one of the switch ports to the Cloud. The host now sits at 192.168.0.100 on the same segment as the routers.
+
+Validate from the host with `ping 192.168.0.1`. If the ping does not work, confirm the TAP is `UP` with `ip -br link show tap0`.
+
+Note that a TAP interface will not persist after a reboot when implemented in this manner.
+
+![TAP and Ping Confirm](../images/tap-and-ping-confirm.png)
 
 ---
 
@@ -202,15 +208,13 @@ ansible-playbook configure-snmp.yml
 docker compose up
 ```
 
-The pre-deployment configs provide management access. The Ansible playbooks build the lab state from there.
-
 ---
 
 ## Option 2: Paste the Completed Router Configs
 
 Use this path if you want to rebuild the finished lab state without running Ansible.
 
-Paste the matching post-depoloyment config into each router:
+Paste the matching post-deployment config into each router:
 
 ```text
 R1 -> ../configs/R1-post-deployment.txt
@@ -234,7 +238,7 @@ This skips the automation path and puts the routers directly into the finished l
 
 ## Rebuilding the Topology Manually
 
-If the imported GNS3 project does not open cleanly, recreate the topology manually with four router nodes named exactly:
+If the imported GNS3 project does not open cleanly, recreate the topology manually with four router nodes named:
 
 ```text
 R1
@@ -271,6 +275,8 @@ After either configuration path, verify the router state from the Ansible contro
 ansible-playbook verify.yml
 ```
 
+Note the SNMP verification will not be performed with this command.
+
 You can also verify directly from the router consoles:
 
 ```text
@@ -289,11 +295,15 @@ After SNMPv3 is configured and the monitoring stack is running, Prometheus shoul
 http://localhost:9090/targets
 ```
 
+![Prometheus targets showing healthy SNMP scrape jobs](../images/prometheus-targets.png)
+
 Grafana should be available at:
 
 ```text
 http://localhost:3000
 ```
+
+![Grafana login screen](../images/grafana-login.png)
 
 Default login:
 
@@ -309,7 +319,7 @@ If the project does not open cleanly on another system, recreate the four router
 
 The Ansible workflow depends on initial management reachability. The automation will not deploy until the routers are reachable via SSH.
 
-If a different router image exposes different interface names, keep the same logical links and update the interface names in the configs and host variable files.
+If a different router image exposes different interface names, keep the same logical links and update the interface names in the configs and host variable files. It is recommended that the interface names remain the same for ease of deployability.
 
 Files to check if the topology changes:
 
@@ -328,3 +338,7 @@ Files to check if the topology changes:
 ../configs/R4-post-deployment.txt
 ../monitoring/prometheus/prometheus.yml
 ```
+
+---
+
+For the full lab workflow including the monitoring stack, dashboard panels, and SNMPv3 scraping, return to the [main README](../README.md).

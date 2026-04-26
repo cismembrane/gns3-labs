@@ -20,10 +20,6 @@ Prometheus runs three scrape jobs. Two go to snmp_exporter: the `snmp_routers` j
 
 SNMPv3 is used instead of v2c so auth and priv are in play. The difference doesn't matter inside a lab, but I'd rather not have a plaintext community string pattern sitting in a public repo.
 
----
-
-## Topology and Data Flow
-
 ![Four-router eBGP ring topology with AS 65001 through AS 65004](images/topology.png)
 
 ---
@@ -36,7 +32,7 @@ Three services in `docker-compose.yml`: `snmp_exporter` v0.30.1, `prometheus` v3
 
 `./monitoring/grafana/provisioning` is mounted into the Grafana container, so the Prometheus datasource and `bgp-health.json` dashboard load on startup without any UI clicking.
 
-**Running the deployment.** Prerequisites: GNS3 project running with R1–R4 reachable at 192.168.0.1–4, Ansible with the `cisco.ios` collection, and Docker with compose. Then:
+**Running the deployment.** Prerequisites: GNS3 project running with R1–R4 reachable at 192.168.0.1–4 (see the [GNS3 project README](gns3/README.md) for topology rebuild and host TAP setup), Ansible with the `cisco.ios` collection, and Docker with compose. Then:
 
 1. `ansible-playbook deploy.yml` pushes interface and BGP config.
 2. `ansible-playbook verify.yml` confirms sessions and ring reachability.
@@ -66,8 +62,10 @@ bgp-grafana-monitoring/
 ├── configure-snmp.yml
 ├── deploy.yml
 ├── docker-compose.yml
+├── gns3/
+│   └── README.md
 ├── group_vars/
-│   └── routers.yml
+    └── routers.yml
 ├── host_vars/
 │   ├── R1.yml
 │   ├── R2.yml
