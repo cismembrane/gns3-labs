@@ -1,5 +1,7 @@
 # BGP Observability with SNMPv3, Prometheus, and Grafana
 
+A four-router eBGP topology configured by Ansible, polled over SNMPv3, and rendered in Grafana with a dashboard pinned to BGP4-MIB rather than generic interface counters. The whole lab rebuilds from the GNS3 project file and the playbooks in this repo.
+
 Monitoring stack for a four-router eBGP GNS3 lab (AS 65001–65004). SNMPv3 polling into snmp_exporter, scraped by Prometheus, rendered in Grafana. Six dashboard panels cover peer state, session uptime, and update rates across all eight directional peerings.
 
 Router config is built by Ansible. The monitoring stack runs from `docker-compose.yml`. Both are in this repo.
@@ -28,7 +30,7 @@ SNMPv3 is used instead of v2c so auth and priv are in play. The difference doesn
 
 The routers are configured first. Three Ansible playbooks run in sequence: `deploy.yml` pushes interface and BGP config, `verify.yml` confirms sessions are established and end-to-end loopback pings across the ring succeed, and `configure-snmp.yml` enables SNMPv3. Once SNMPv3 is listening, the monitoring stack stands up via `docker-compose.yml`.
 
-Three services in `docker-compose.yml`: `snmp_exporter` v0.30.1, `prometheus` v3.1.0, `grafana` 13.1.0. All run with `network_mode: host` because the containers need to reach the GNS3 routers' management IPs, which live on the host's network. Host mode means SNMP polls leave the host's stack directly, with no bridge routing or port mapping to fight. Prometheus scrapes over localhost to `:9116`, and Grafana listens on host `:3000`.
+Three services in `docker-compose.yml`: `snmp_exporter` v0.30.1, `prometheus` v3.1.0, `grafana` 13.0.1. All run with `network_mode: host` because the containers need to reach the GNS3 routers' management IPs, which live on the host's network. Host mode means SNMP polls leave the host's stack directly, with no bridge routing or port mapping to fight. Prometheus scrapes over localhost to `:9116`, and Grafana listens on host `:3000`.
 
 `./monitoring/grafana/provisioning` is mounted into the Grafana container, so the Prometheus datasource and `bgp-health.json` dashboard load on startup without any UI clicking.
 
@@ -65,7 +67,7 @@ bgp-grafana-monitoring/
 ├── gns3/
 │   └── README.md
 ├── group_vars/
-    └── routers.yml
+│   └── routers.yml
 ├── host_vars/
 │   ├── R1.yml
 │   ├── R2.yml
@@ -98,7 +100,7 @@ bgp-grafana-monitoring/
 
 **Ansible entry points.** `deploy.yml` uses `cisco.ios.ios_config` to render `interfaces.j2` and `bgp.j2` in that order and push each result to the router's running-config. `verify.yml` collects BGP summary and table output, asserts no neighbors are in Idle or Active, and runs loopback-to-loopback pings across the ring diagonals (R1↔R3, R2↔R4) to confirm end-to-end reachability. `configure-snmp.yml` pushes `snmp.j2` via `cisco.ios.ios_config` to enable SNMPv3, then collects `show snmp group/user/host` and the ACL, asserting the `MONITORING` group and trap destination are present before the play exits. None of the playbooks save to startup-config, so router reloads drop the config.
 
-**Variables.** `host_vars/R{1-4}.yml` carry per-router state: hostname, router ID, ASN, interface table, BGP neighbors, advertised networks. `group_vars/routers.yml` carries everything shared across the fleet: Ansible connection settings, SNMPv3 credentials (user, auth and priv passphrases), the ACL network and wildcard, and the trap destination. Credentials are currently in plaintext and marked for vault-ing as a cleanup item.
+**Variables.** `host_vars/R{1-4}.yml` carry per-router state: hostname, router ID, ASN, interface table, BGP neighbors, advertised networks. `group_vars/routers.yml` carries everything shared across the fleet: Ansible connection settings, SNMPv3 credentials (user, auth and priv passphrases), the ACL network and wildcard, and the trap destination. Sensitive values (router login, enable password, SNMPv3 auth and priv passphrases) are encrypted with `ansible-vault` per-value, with the vault password file referenced from `ansible.cfg` and gitignored.
 
 **Templates.** `interfaces.j2` builds the hostname and interface stanzas, including the `description` that ends up in `ifAlias`. `bgp.j2` builds the BGP process with neighbors, descriptions, and advertised prefixes. `snmp.j2` builds the ACL, the SNMPv3 view/group/user, the trap host, and `snmp-server location` (set to the hostname, which is how the instance labels trace back to specific routers).
 
@@ -128,6 +130,12 @@ Six panels: three stat counters across the top, a Neighbor State table in the mi
 
 ## Lab Validation
 
+Two points of evidence the stack is running end to end.
+
+Docker stack up:
+
 ![Docker Compose showing snmp_exporter, Prometheus, and Grafana running](images/docker-compose-running.png)
+
+Prometheus targets healthy on both SNMP jobs:
 
 ![Prometheus targets showing healthy SNMP scrape jobs](images/prometheus-targets.png)
