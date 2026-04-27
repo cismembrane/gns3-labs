@@ -2,10 +2,10 @@ auths:
   cisco_v3:
     version: 3
     security_level: authPriv
-    username: monitor
-    password: admin123
+    username: ${SNMP_USERNAME}
+    password: ${SNMP_AUTH_PASSWORD}
     auth_protocol: SHA
-    priv_password: admin123
+    priv_password: ${SNMP_PRIV_PASSWORD}
     priv_protocol: AES
  
 modules:

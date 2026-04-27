@@ -22,6 +22,9 @@ services:
       - ./monitoring/snmp_exporter/snmp.yml:/etc/snmp_exporter/snmp.yml:ro
     command:
       - '--config.file=/etc/snmp_exporter/snmp.yml'
+      - '--config.expand-environment-variables'
+    env_file:
+      - .env
  
   grafana:
     image: grafana/grafana:13.0.1
