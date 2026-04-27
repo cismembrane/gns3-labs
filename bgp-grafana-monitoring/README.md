@@ -128,6 +128,26 @@ Six panels: three stat counters across the top, a Neighbor State table in the mi
 
 ---
 
+## Alerting
+
+Three rules in `monitoring/prometheus/alerts.yml`, loaded by Prometheus on startup. Two cover BGP health and one covers the scrape path itself, so a stack failure looks different than a routing failure.
+
+`BGPPeerNotEstablished` fires per peer when `bgpPeerState != 6` for two minutes. If three of the eight peerings break, three alerts fire — one per session, not one rolled-up "ring is unhealthy." Severity critical.
+
+`BGPSessionFlapping` watches `changes(bgpPeerFsmEstablishedTime[10m]) > 1` over a five-minute pending window. The rule fires on sessions that won't stay up. Worth knowing: the 10-minute window is rolling, so a session that recovers from a flap stays in the alert state for roughly fifteen minutes before going quiet. That's the rule working as intended, not a bug. Severity warning.
+
+`SNMPTargetDown` fires on `up{job=~"snmp_routers|snmp_bgp"} == 0` for two minutes. This is the one that catches "Prometheus can't reach the exporter" or "the exporter can't reach the router." Severity warning.
+
+Below, the alerts page after I shut R2's neighbor toward R1. `BGPPeerNotEstablished` is firing in both directions, `BGPSessionFlapping` is pending, `SNMPTargetDown` stayed green because the routers themselves were still reachable:
+
+![Prometheus alerts page showing BGPPeerNotEstablished firing, BGPSessionFlapping pending, and SNMPTargetDown inactive after a BGP neighbor was shut on R2](images/prometheus-alert-firing.png)
+
+Drilling into `BGPPeerNotEstablished` shows the per-peer breakdown. R1 sees its session toward R2 down at 10.0.1.2, R2 sees its session toward R1 down at 10.0.1.1, both with `bgpPeerState=1` (Idle):
+
+![BGPPeerNotEstablished alert detail showing the PromQL expression, severity label, and two firing instances with bgpPeerRemoteAddr labels and active-since timestamps](images/prometheus-alert-detail.png)
+
+---
+
 ## Lab Validation
 
 Two points of evidence the stack is running end to end.

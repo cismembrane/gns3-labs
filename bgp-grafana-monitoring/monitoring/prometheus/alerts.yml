@@ -1,0 +1,31 @@
+groups:
+  - name: bgp_health
+    rules:
+      - alert: BGPPeerNotEstablished
+        expr: bgpPeerState != 6
+        for: 2m
+        labels:
+          severity: critical
+        annotations:
+          summary: "BGP peer {{ $labels.bgpPeerRemoteAddr }} on {{ $labels.instance }} not established"
+          description: "Peer state is {{ $value }} (1=idle, 2=connect, 3=active, 4=opensent, 5=openconfirm, 6=established)."
+
+      - alert: BGPSessionFlapping
+        expr: changes(bgpPeerFsmEstablishedTime[10m]) > 1
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "BGP session {{ $labels.bgpPeerRemoteAddr }} flapping on {{ $labels.instance }}"
+          description: "Session has reset more than once in the last 10 minutes."
+
+  - name: scrape_health
+    rules:
+      - alert: SNMPTargetDown
+        expr: up{job=~"snmp_routers|snmp_bgp"} == 0
+        for: 2m
+        labels:
+          severity: warning
+        annotations:
+          summary: "SNMP scrape failing for {{ $labels.instance }}"
+          description: "Prometheus cannot reach snmp_exporter or snmp_exporter cannot reach the router."
