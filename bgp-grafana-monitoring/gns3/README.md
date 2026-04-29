@@ -181,6 +181,8 @@ configure terminal
 
 Then paste the matching pre-deployment config into the matching router.
 
+It is important to note that you will have to manually enable the GigabitEthernet0/4 interface with the `no shut` command and manually run `crypto key generate rsa modulus 1024` on each router to enable connectivity.
+
 After all four initial configs are applied, confirm the Ansible control host can reach each router:
 
 ```text
