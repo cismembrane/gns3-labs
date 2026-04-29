@@ -134,11 +134,11 @@ Three rules in `monitoring/prometheus/alerts.yml`, loaded by Prometheus on start
 
 `BGPPeerNotEstablished` fires per peer when `bgpPeerState != 6` for two minutes. If three of the eight peerings break, three alerts fire — one per session, not one rolled-up "ring is unhealthy." Severity critical.
 
-`BGPSessionFlapping` watches `changes(bgpPeerFsmEstablishedTime[10m]) > 1` over a five-minute pending window. The rule fires on sessions that won't stay up. Worth knowing: the 10-minute window is rolling, so a session that recovers from a flap stays in the alert state for roughly fifteen minutes before going quiet. That's the rule working as intended, not a bug. Severity warning.
+`BGPSessionFlapping` fires when `resets(bgpPeerFsmEstablishedTime[10m]) > 1` for five minutes. `resets()` counts how many times the timer has gone backward in the rolling window, which is exactly what a BGP session reset looks like — the timer drops to zero and starts climbing again. A single bounce won't trip the alert; the threshold is `>1`, so the rule waits for at least two resets within ten minutes before firing. Severity warning.
 
 `SNMPTargetDown` fires on `up{job=~"snmp_routers|snmp_bgp"} == 0` for two minutes. This is the one that catches "Prometheus can't reach the exporter" or "the exporter can't reach the router." Severity warning.
 
-Below, the alerts page after I shut R2's neighbor toward R1. `BGPPeerNotEstablished` is firing in both directions, `BGPSessionFlapping` is pending, `SNMPTargetDown` stayed green because the routers themselves were still reachable:
+I originally wrote this rule using `changes()` instead of `resets()`. That was wrong. `changes()` counts any change in the metric value, including the steady tick of a healthy timer climbing once per scrape. The rule fired continuously against perfectly stable sessions. Caught it after two days of running the lab and noticing the alert had been firing the whole time. The fix was a one-word change but the lesson was bigger: counter-vs-gauge semantics in Prometheus matter, and `resets()` is the right tool when you care specifically about a counter going backward.
 
 ![Prometheus alerts page showing BGPPeerNotEstablished firing, BGPSessionFlapping pending, and SNMPTargetDown inactive after a BGP neighbor was shut on R2](images/prometheus-alert-firing.png)
 

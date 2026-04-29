@@ -11,7 +11,7 @@ groups:
           description: "Peer state is {{ $value }} (1=idle, 2=connect, 3=active, 4=opensent, 5=openconfirm, 6=established)."
 
       - alert: BGPSessionFlapping
-        expr: changes(bgpPeerFsmEstablishedTime[10m]) > 1
+        expr: resets(bgpPeerFsmEstablishedTime[10m]) > 1
         for: 5m
         labels:
           severity: warning
