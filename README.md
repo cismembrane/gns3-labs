@@ -16,6 +16,10 @@ Hands-on network engineering labs built in GNS3, covering CCNP ENCOR routing, sw
 | [glbp-basic](glbp-basic) | Gateway Load Balancing Protocol with AVG election and AVF load distribution | GLBP, AVG, AVF, round-robin forwarding | |
 | [proxy-arp](proxy-arp) | Proxy ARP behavior across a stretched subnet with packet capture analysis | Proxy ARP, ARP, L2/L3 boundary behavior | |
 
+## Scripts
+
+[restconf-netconf-scripts](restconf-netconf-scripts) contains Python scripts that talk to a Cisco IOS XE device over RESTCONF and NETCONF. Discovery, interface reads, and full PUT/PATCH/DELETE lifecycle examples on a loopback and a static route. Targets the DevNet Always-On sandbox. See the [directory README](restconf-netconf-scripts/README.md) for details.
+
 ## How to Use These Labs
 
 Each lab directory contains a `README.md` with the full topology, IP addressing, configuration walkthrough, and verification steps. Router configs are in the `configs/` directory. GNS3 project files are included where applicable, built against Cisco c7200 `adventerprisek9` images running on Dynamips, with IOSvL2 images used in some labs for Layer 2 switching.
