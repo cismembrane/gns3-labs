@@ -6,6 +6,7 @@ Hands-on network engineering labs built in GNS3, covering CCNP ENCOR routing, sw
 
 | Lab | Description | Key Technologies | Video |
 | --- | --- | --- | --- |
+| [bgp-grafana-monitoring](bgp-grafana-monitoring) | Four-router eBGP ring (AS 65001–65004) with a monitoring stack on top. Ansible configures the routers and SNMPv3, snmp_exporter walks BGP4-MIB, Prometheus scrapes it, Grafana renders peer state, session uptime, and update rates across all eight directional peerings. Prometheus alerts cover peer-not-established, session flapping, and exporter reachability. [GNS3 rebuild notes](bgp-grafana-monitoring/gns3/README.md). | eBGP, Ansible, SNMPv3, snmp_exporter, Prometheus, Grafana, BGP4-MIB, Docker Compose | [▶ Watch](https://www.youtube.com/watch?v=QE9bilhj34w) |
 | [ansible-bgp](ansible-bgp) | Four-router eBGP topology across AS 65001–65004, deployed and verified with Ansible using Jinja2 templates and host_vars | eBGP, Ansible, Jinja2, paramiko, BGP neighbor verification | [▶ Watch](https://www.youtube.com/watch?v=1HKZocY5SMY) |
 | [dmvpn-phase3-ipsec](dmvpn-phase3-ipsec) | Hub-and-spoke DMVPN with dynamic spoke-to-spoke tunnels and IPsec transport encryption | DMVPN Phase 3, NHRP shortcuts, IPsec, EIGRP, GRE mGRE | [▶ Watch](https://www.youtube.com/watch?v=CdZ0fmA12-E) |
 | [ansible-ospf](ansible-ospf) | Automated OSPF deployment across a multi-router topology using Ansible | Ansible, OSPF, Jinja2 templates, ios\_config module | [▶ Watch](https://www.youtube.com/watch?v=7IEfZew-7wQ) |
@@ -24,6 +25,7 @@ To import a lab, open the `.gns3` project file in GNS3 and remap the IOS image t
 ## Links
 
 * [YouTube: BGP Across Four Autonomous Systems, Deployed with Ansible](https://www.youtube.com/watch?v=1HKZocY5SMY)
+* [YouTube: BGP Observability with SNMPv3, Prometheus, and Grafana](https://www.youtube.com/watch?v=QE9bilhj34w)
 * [YouTube: DMVPN Phase 3 with IPsec — Full GNS3 Lab Walkthrough](https://www.youtube.com/watch?v=CdZ0fmA12-E)
 * [YouTube: Automating a 4-Router OSPF Lab with Ansible](https://www.youtube.com/watch?v=7IEfZew-7wQ)
 * [YouTube: Basic Ansible Baseline Push and Validation in GNS3](https://www.youtube.com/watch?v=cSly8RQOZYU)
