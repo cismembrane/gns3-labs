@@ -28,8 +28,8 @@ To import a lab, open the `.gns3` project file in GNS3 and remap the IOS image t
 
 ## Links
 
-* [YouTube: BGP Across Four Autonomous Systems, Deployed with Ansible](https://www.youtube.com/watch?v=1HKZocY5SMY)
 * [YouTube: BGP Observability with SNMPv3, Prometheus, and Grafana](https://www.youtube.com/watch?v=QE9bilhj34w)
+* [YouTube: BGP Across Four Autonomous Systems, Deployed with Ansible](https://www.youtube.com/watch?v=1HKZocY5SMY)
 * [YouTube: DMVPN Phase 3 with IPsec — Full GNS3 Lab Walkthrough](https://www.youtube.com/watch?v=CdZ0fmA12-E)
 * [YouTube: Automating a 4-Router OSPF Lab with Ansible](https://www.youtube.com/watch?v=7IEfZew-7wQ)
 * [YouTube: Basic Ansible Baseline Push and Validation in GNS3](https://www.youtube.com/watch?v=cSly8RQOZYU)
