@@ -2,7 +2,7 @@
 hostname: R2
 router_id: 2.2.2.2
 asn: 65002
- 
+
 interfaces:
   - name: Loopback0
     description: Router_ID
@@ -24,7 +24,7 @@ interfaces:
     description: LAN_192.168.2.0
     address: 192.168.2.254
     mask: 255.255.255.0
- 
+
 bgp_neighbors:
   - address: 10.0.1.1
     remote_as: 65001
@@ -32,10 +32,9 @@ bgp_neighbors:
   - address: 10.0.2.3
     remote_as: 65003
     description: BGP_to_R3
- 
+
 bgp_networks:
   - prefix: 2.2.2.2
     mask: 255.255.255.255
   - prefix: 192.168.2.0
     mask: 255.255.255.0
- 

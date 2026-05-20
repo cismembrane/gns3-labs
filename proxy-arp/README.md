@@ -3,6 +3,7 @@
 Two VPCS hosts on separate LAN segments communicate as if they share a flat 192.168.10.0/24 subnet. A pair of IOS routers sit between them, using static /32 host routes and proxy ARP to hide the routed hop. Built in GNS3 with Dynamips.
 
 ## Topology
+
 ```
          10.0.0.0/30
               (Fa0/1 10.0.0.1)        (10.0.0.2 Fa0/1)
@@ -45,7 +46,7 @@ proxy-arp/
 │   ├── R1-config.txt
 │   └── R2-config.txt
 └── images/
-	└── wireshark-screenshot.png
+ └── wireshark-screenshot.png
 ```
 
 ## R1 Configuration
@@ -103,6 +104,7 @@ The return path from PC2 to PC1 works the same way. PC2 ARPs for 192.168.10.10, 
 PC1> ping 192.168.10.20
 PC2> ping 192.168.10.10
 ```
+
 ```
 R1# show ip arp
 R1# show ip route 192.168.10.20

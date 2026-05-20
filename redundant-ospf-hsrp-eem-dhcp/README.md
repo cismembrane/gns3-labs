@@ -5,6 +5,7 @@ A 4-router lab demonstrating OSPFv2 with MD5 authentication, a totally-stub acce
 ## Overview
 
 This topology models a small core/access design:
+
 - Core: R2 in OSPF Area 0 with uplinks to access ABRs (R3/R4), originates a default learned from a static route to R1.
 - Access: R3/R4 are HSRP peers on the user VLAN and ABRs into a totally-stub Area 10 (access interfaces are passive).
 - Services: R1 provides IOS DNS and authenticated NTP; it does not run OSPF.
@@ -13,7 +14,7 @@ All devices use local `admin` for SSH (`login local`, `transport input ssh`). Co
 
 ## Topology
 
-		 R1
+   R1
          |
          R2
        /   \
@@ -25,7 +26,7 @@ All devices use local `admin` for SSH (`login local`, `transport input ssh`). Co
 
 No IPs in the diagram; see addressing tables below.
 
-![Topology](redundant-ospf-hsrp-eem-dhcp.drawio.png) 
+![Topology](redundant-ospf-hsrp-eem-dhcp.drawio.png)
 
 ## Project Structure
 
@@ -36,10 +37,10 @@ redundant-ospf-hsrp-eem-dhcp/
 ├── redundant-ospf-hsrp-eem-dhcp.drawio        # editable topology diagram
 ├── redundant-ospf-hsrp-eem-dhcp.drawio.png
 └── configs/
-	├── R1-config.txt
-	├── R2-config.txt
-	├── R3-config.txt
-	└── R4-config.txt
+ ├── R1-config.txt
+ ├── R2-config.txt
+ ├── R3-config.txt
+ └── R4-config.txt
 ```
 
 ## Addressing Summary
@@ -90,10 +91,12 @@ redundant-ospf-hsrp-eem-dhcp/
 - Goal: Only the HSRP Active node relays DHCP, keeping `giaddr` aligned to the active gateway and preventing duplicate offers.
 
 R3 (LAN = Fa0/1)  
+
 - Applet enables `ip helper-address 10.0.0.2` when HSRP goes Active and removes it when it leaves Active.  
 - Notes: Config initially contains the helper; EEM ensures convergence to the correct state on transitions.
 
 R4 (LAN = Fa0/0)  
+
 - Applet removes/adds helper on Active transition (idempotent “no/add” pair), and removes on leaving Active.  
 - Pattern is unanchored (works across platforms/IOS messages).
 
@@ -123,21 +126,26 @@ R4 (LAN = Fa0/0)
 ## Verification Checklist
 
 ### HSRP
+
 - `show standby brief` (R3/R4) → VIP `192.168.10.1`, R3 Active (110), R4 Standby (90).
 
 ### OSPF
+
 - `show ip ospf neighbor` (R2/R3/R4) → FULL on /30 links (p2p).  
 - `show ip route` → R3/R4 learn only a default in Area 10.  
 - `show ip ospf interface` → message-digest enabled on Area 0 links.
 
 ### DHCP
+
 - Client on LAN receives IP in `192.168.10.0/24`, GW `192.168.10.1`, DNS `10.255.255.1`.  
 - Force HSRP failover (e.g., lower R3 priority or shut/no shut). New Active should own the helper and leases still arrive from R2.
 
 ### NTP
+
 - `show ntp associations` → R2/R3/R4 synced to `10.255.255.1` with key 1 (auth).
 
 ### Edge Reachability
+
 - From R3: `traceroute 203.0.113.1` → `10.0.0.2` (R2) → `203.0.113.1` (R1).
 
 ## Design Notes

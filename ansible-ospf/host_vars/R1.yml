@@ -20,7 +20,7 @@ routed_interfaces:
   - name: FastEthernet3/0
     ip: 10.0.5.1
     mask: 255.255.255.252
-    description: TRANSIT (was Vlan50) 
+    description: TRANSIT (was Vlan50)
     enabled: true
 
 ospf_networks:

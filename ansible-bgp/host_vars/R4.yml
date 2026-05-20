@@ -2,7 +2,7 @@
 hostname: R4
 router_id: 4.4.4.4
 asn: 65004
- 
+
 interfaces:
   - name: Loopback0
     description: Router_ID
@@ -20,15 +20,14 @@ interfaces:
     description: LAN_192.168.4.0
     address: 192.168.4.254
     mask: 255.255.255.0
- 
+
 bgp_neighbors:
   - address: 10.0.3.3
     remote_as: 65003
     description: BGP_to_R3
- 
+
 bgp_networks:
   - prefix: 4.4.4.4
     mask: 255.255.255.255
   - prefix: 192.168.4.0
     mask: 255.255.255.0
- 

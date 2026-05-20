@@ -55,4 +55,3 @@ TLS verification is off (`verify=False`) and `InsecureRequestWarning` is suppres
 Credentials and the target IP are hardcoded at the top of each script. They are the public sandbox values. Change them there if you point the scripts at your own gear.
 
 Scripts 03, 04, and 05 write to running config and clean up after themselves with a DELETE at the end. If a script exits before the DELETE runs, the device may still have the Loopback or route.
-

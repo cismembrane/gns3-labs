@@ -23,4 +23,3 @@ ospf_networks:
   - { network: "10.0.2.0", wildcard: "0.0.0.3", area: 0 }
 
 ospf_passive_interfaces: []
-

@@ -11,4 +11,3 @@ all:
           ansible_host: 192.168.0.3
         R4:
           ansible_host: 192.168.0.4
- 

@@ -1,0 +1,60 @@
+---
+# pre-commit hooks for gns3-labs.
+# Same checks as the lint.yml workflow, but they run locally before commit.
+# Install with: pip install pre-commit && pre-commit install
+
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.6.0
+    hooks:
+      - id: end-of-file-fixer
+        # Don't enforce trailing newline on captured device configs or YANG dumps.
+        exclude: |
+          (?x)^(
+            .*/configs/.*\.txt|
+            ansible-ospf/outputs/.*\.txt|
+            ansible-ospf/.*command_line_output\.txt|
+            proxy-arp/captures/.*\.txt|
+            restconf-netconf-scripts/yang-modules\.json|
+            bgp-grafana-monitoring/monitoring/grafana/dashboards/.*\.json|
+            .*\.gns3|
+            .*\.drawio
+          )$
+      - id: trailing-whitespace
+        exclude: |
+          (?x)^(
+            .*/configs/.*\.txt|
+            ansible-ospf/outputs/.*\.txt|
+            proxy-arp/captures/.*\.txt|
+            bgp-grafana-monitoring/monitoring/grafana/dashboards/.*\.json|
+            .*\.drawio
+          )$
+      - id: check-merge-conflict
+      - id: check-yaml
+        exclude: |
+          (?x)^(
+            bgp-grafana-monitoring/group_vars/routers\.yml|
+            bgp-grafana-monitoring/host_vars/.*\.yml
+          )$
+        # ^ ansible-vault encrypted values aren't valid plain YAML to a strict parser;
+        # yamllint and ansible-lint understand them, but check-yaml doesn't.
+
+  - repo: https://github.com/adrienverge/yamllint
+    rev: v1.35.1
+    hooks:
+      - id: yamllint
+        args: ["-c", ".yamllint.yml", "--strict"]
+
+  - repo: https://github.com/ansible/ansible-lint
+    rev: v24.7.0
+    hooks:
+      - id: ansible-lint
+        files: '\.(yml|yaml)$'
+        # ansible-lint reads .ansible-lint from the repo root automatically.
+
+  - repo: https://github.com/DavidAnson/markdownlint-cli2
+    rev: v0.13.0
+    hooks:
+      - id: markdownlint-cli2
+        args: ["--config", ".markdownlint.yaml"]
+        files: '\.md$'

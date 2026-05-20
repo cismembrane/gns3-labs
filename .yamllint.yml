@@ -1,0 +1,51 @@
+---
+# yamllint config for gns3-labs.
+# Tuned for Ansible-style YAML and aligned with ansible-lint's expectations so
+# the two linters agree on what's valid. Vault-encrypted scalars and pasted
+# device output can run long, so line-length is a warning at 200 chars.
+
+extends: default
+
+rules:
+  # Ansible-vault encrypted scalars and pasted device output blow past 80 chars.
+  line-length:
+    max: 200
+    level: warning
+
+  # ansible-lint expects exactly one space between # and the comment.
+  comments:
+    min-spaces-from-content: 1
+
+  # Required to match ansible-lint, and also matches the existing flow-style
+  # { network: "10.0.1.0", wildcard: "0.0.0.3", area: 0 } mappings in
+  # ansible-ospf host_vars OSPF network lists.
+  braces:
+    max-spaces-inside: 1
+
+  # Forbid octal literals; ansible-lint requires both forms be on.
+  octal-values:
+    forbid-implicit-octal: true
+    forbid-explicit-octal: true
+
+  # Ansible accepts yes/no/true/false. Keep all four valid.
+  truthy:
+    allowed-values:
+      - "true"
+      - "false"
+      - "yes"
+      - "no"
+    check-keys: false
+
+  # debug + when: + same-line comments are common across the playbooks.
+  comments-indentation: disable
+
+  # Some files start with --- and some don't. Both are valid YAML.
+  document-start: disable
+
+  # Two spaces, sequences indented one extra level — matches what's already in the repo.
+  indentation:
+    spaces: 2
+    indent-sequences: consistent
+
+  # Trailing whitespace is noise; keep this on as an error.
+  trailing-spaces: enable

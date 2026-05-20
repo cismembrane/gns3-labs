@@ -1,0 +1,43 @@
+---
+# ansible-lint config for gns3-labs.
+# Project profile is "production" — strictest preset that's still reasonable for a lab repo.
+# Exclusions are real captured device configs, validation outputs, and binary/image content
+# that ansible-lint shouldn't be looking at.
+
+profile: production
+
+exclude_paths:
+  # Pre/post-deployment running-config captures from real devices. Not Ansible source.
+  - "**/configs/"
+  # OSPF validation output, command-line capture files.
+  - "ansible-ospf/outputs/"
+  - "ansible-ospf/playbooks/command_line_output.txt"
+  - "ansible-ospf/notes.txt"
+  - "ansible-ospf/command_line_output.txt"
+  # Diagrams, screenshots, captures.
+  - "**/images/"
+  - "**/screenshots/"
+  - "**/captures/"
+  # Grafana dashboards are auto-generated JSON, not Ansible content.
+  - "bgp-grafana-monitoring/monitoring/grafana/dashboards/"
+  # Python scripts directory — not Ansible.
+  - "restconf-netconf-scripts/"
+  # GNS3 project files (JSON) and drawio diagrams.
+  - "**/*.gns3"
+  - "**/*.drawio"
+  - "**/*.drawio.png"
+  - "**/*.drawio.svg"
+
+# Lint rules to skip across the repo.
+skip_list:
+  # yamllint runs separately with its own line-length budget; don't double-fire.
+  - yaml[line-length]
+  # Ansible-vault encrypted values trip yaml[truthy] in some versions.
+  - yaml[truthy]
+
+# Treat these as warnings rather than errors. Keep visible without failing CI yet.
+warn_list:
+  - fqcn[action-core]
+  - name[casing]
+  - name[missing]
+  - no-changed-when

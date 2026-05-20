@@ -1,7 +1,7 @@
 hostname: R1
 router_id: 1.1.1.1
 asn: 65001
- 
+
 interfaces:
   - name: Loopback0
     description: router_id
@@ -19,7 +19,7 @@ interfaces:
     description: mgmt
     address: 192.168.0.1
     mask: 255.255.255.0
- 
+
 bgp_neighbors:
   - neighbor: 10.0.1.2
     remote_as: 65002
@@ -27,7 +27,7 @@ bgp_neighbors:
   - neighbor: 10.0.4.4
     remote_as: 65004
     description: bgp_to_r4
- 
+
 bgp_networks:
   - prefix: 1.1.1.1
     mask: 255.255.255.255

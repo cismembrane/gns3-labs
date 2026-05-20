@@ -17,5 +17,3 @@
         msg:
           - "Host: {{ inventory_hostname }}"
           - "Changed: {{ ospf_push.changed }}"
-
- 

@@ -1,0 +1,30 @@
+# lychee link checker config for gns3-labs.
+# Skips lab-local IPs and the DevNet sandbox (auth-required, transient).
+# Accepts 429 from YouTube which rate-limits robots.
+
+# Exclude lab-local and reserved IP ranges that won't resolve from CI runners.
+exclude = [
+    '^https?://10\.10\.20\.48',                  # Cisco DevNet always-on IOS XE sandbox
+    '^https?://10\.',                            # RFC1918 — all lab IPs
+    '^https?://192\.168\.',                      # RFC1918 — lab management network
+    '^https?://172\.(1[6-9]|2[0-9]|3[01])\.',    # RFC1918
+    '^https?://localhost',
+    '^https?://127\.',
+    '^https?://0\.0\.0\.0',
+]
+
+# YouTube returns 429 to bot traffic. Treat as healthy.
+accept = ["200..=299", "429"]
+
+# Cache results across runs to avoid hammering hosts.
+cache = true
+max_cache_age = "1d"
+
+# Polite concurrency.
+max_concurrency = 4
+
+# Don't follow redirects that lead off the original host (avoids tracker bounce).
+# default is fine
+
+# Look at README files and any markdown in the repo.
+# (lychee gets pointed at "**/*.md" from CI; see .github/workflows/lint.yml in a later PR)

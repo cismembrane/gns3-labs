@@ -42,8 +42,8 @@ glbp-basic/
 │   ├── R1-config.txt
 │   └── R2-config.txt
 └── images/
-	├── glbp-basic.drawio        # editable topology diagram source
-	└── glbp-basic.drawio.png    # exported topology diagram
+ ├── glbp-basic.drawio        # editable topology diagram source
+ └── glbp-basic.drawio.png    # exported topology diagram
 ```
 
 ## Topology Overview
@@ -164,7 +164,7 @@ interface Fa0/1
  shutdown
 ```
 
-2. On R2, confirm AVG promotion:
+1. On R2, confirm AVG promotion:
 
 ```
 show glbp brief
@@ -172,14 +172,14 @@ show glbp brief
 
 R2 should transition from Standby to Active for the group and take ownership of both virtual MACs.
 
-3. Bring R1 back up:
+1. Bring R1 back up:
 
 ```cisco
 interface Fa0/1
  no shutdown
 ```
 
-4. On R1, confirm preemption:
+1. On R1, confirm preemption:
 
 ```
 show glbp brief

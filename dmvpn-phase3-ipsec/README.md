@@ -50,7 +50,7 @@ dmvpn-phase3-ipsec/
 │   ├── R3.cfg          # Spoke 2
 │   └── R4.cfg          # ISP Transit
 └── images/
-	└── topology.png
+ └── topology.png
 ```
 
 ## Technologies & Protocols

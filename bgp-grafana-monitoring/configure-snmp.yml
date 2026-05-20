@@ -1,61 +1,61 @@
 ---
-- name: deploy snmpv3 configuration to iosv routers
+- name: Deploy SNMPv3 configuration to IOSv routers
   hosts: routers
   gather_facts: false
 
   tasks:
-    - name: configure snmpv3
+    - name: Configure SNMPv3
       cisco.ios.ios_config:
         src: templates/snmp.j2
 
-    - name: collect snmp group
+    - name: Collect SNMP group
       cisco.ios.ios_command:
         commands:
           - show snmp group
       register: snmp_group
 
-    - name: display snmp group
+    - name: Display SNMP group
       ansible.builtin.debug:
         var: snmp_group.stdout_lines
 
-    - name: collect snmp user
+    - name: Collect SNMP user
       cisco.ios.ios_command:
         commands:
           - show snmp user
       register: snmp_user
 
-    - name: display snmp user
+    - name: Display SNMP user
       ansible.builtin.debug:
         var: snmp_user.stdout_lines
 
-    - name: collect snmp host
+    - name: Collect SNMP host
       cisco.ios.ios_command:
         commands:
           - show snmp host
       register: snmp_host
 
-    - name: display snmp host
+    - name: Display SNMP host
       ansible.builtin.debug:
         var: snmp_host.stdout_lines
 
-    - name: collect snmp acl
+    - name: Collect SNMP ACL
       cisco.ios.ios_command:
         commands:
           - show ip access-lists SNMP_ACL
       register: snmp_acl
 
-    - name: display snmp acl
+    - name: Display SNMP ACL
       ansible.builtin.debug:
         var: snmp_acl.stdout_lines
 
-    - name: assert monitoring group is present
+    - name: Assert MONITORING group is present
       ansible.builtin.assert:
         that:
           - "'MONITORING' in snmp_group.stdout[0]"
         fail_msg: "SNMPv3 group MONITORING not found"
         success_msg: "SNMPv3 group MONITORING is configured"
 
-    - name: assert trap host is configured
+    - name: Assert trap host is configured
       ansible.builtin.assert:
         that:
           - snmp_trap_destination in snmp_host.stdout[0]

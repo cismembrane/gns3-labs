@@ -1,0 +1,23 @@
+# Normalize line endings: LF in the repo, native in each contributor's working tree.
+# Windows users keep CRLF on disk via core.autocrlf=true (the Git for Windows default).
+# Linux/macOS users get LF. Git stores LF either way.
+* text=auto
+
+# Files that must always be LF because they execute on Linux runners (CI, shell scripts,
+# container entrypoints). Forcing eol=lf prevents a Windows commit from breaking CI with CRLF.
+*.sh text eol=lf
+.github/**/*.yml text eol=lf
+.github/**/*.yaml text eol=lf
+
+# Binary types that shouldn't be diffed or normalized.
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.pcap binary
+*.pdf binary
+
+# Generated content — collapse in GitHub's diff view so reviewers aren't asked to read
+# 4,000 lines of YANG module metadata or a Grafana dashboard export.
+restconf-netconf-scripts/yang-modules.json linguist-generated=true
+bgp-grafana-monitoring/monitoring/grafana/dashboards/*.json linguist-generated=true

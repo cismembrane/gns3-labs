@@ -5,6 +5,7 @@ EIGRP calculates path preference using a composite metric that includes cumulati
 ## Topology
 
 Five routers in a diamond layout. R1 sits at the top, R5 at the bottom, and R2, R3, R4 bridge the two in parallel. Each middle router connects only to R1 and R5.
+
 ```
                                 [R1]
                            Lo0: 1.1.1.1/32
@@ -81,11 +82,13 @@ All routers run EIGRP AS 100. Each advertises its loopback and all directly conn
 ### 1. Confirm Baseline Routing on R5
 
 On R5:
+
 ```
 show ip route
 ```
 
 Expected output:
+
 ```
 D       1.1.1.1 [90/158720] via 10.1.16.3, FastEthernet2/1
                 [90/158720] via 10.1.17.4, FastEthernet3/0
@@ -99,6 +102,7 @@ Three equal-cost paths to R1's loopback, one through each middle router. The met
 R3's Fa1/0 faces R1 on the 10.1.13.0/29 link. Raising the delay on this interface increases the cumulative metric for any path that crosses it.
 
 On R3:
+
 ```
 configure terminal
 interface FastEthernet1/0
@@ -109,11 +113,13 @@ end
 ### 3. Verify the Change on R5
 
 On R5:
+
 ```
 show ip route
 ```
 
 Expected output:
+
 ```
 D       1.1.1.1 [90/158720] via 10.1.17.4, FastEthernet3/0
                 [90/158720] via 10.1.15.2, FastEthernet2/0

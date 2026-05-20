@@ -1,0 +1,31 @@
+---
+# markdownlint config for gns3-labs.
+# Tuned for the README style already in this repo: long lines in tables, <details>
+# blocks for collapsible output, headers that occasionally repeat across siblings.
+
+default: true
+
+# MD013 — line length. The Labs table in README.md has multi-sentence cells that
+# would force ugly wrapping. Off.
+MD013: false
+
+# MD033 — inline HTML. The bgp-grafana README uses <details>/<summary> for
+# collapsible CLI output. Required.
+MD033: false
+
+# MD024 — duplicate headers. "Topology" and "Verification" repeat across labs.
+# Allow duplicates as long as they're not siblings of each other.
+MD024:
+  siblings_only: true
+
+# MD040 — fenced code blocks must declare a language. IOS show-output blocks
+# don't have a sensible language tag. Off.
+MD040: false
+
+# MD026 — trailing punctuation in headers. Some lab section headers end with a colon. Off.
+MD026: false
+
+# MD041 — first line must be top-level header. Keep on; every README starts with H1.
+
+# MD034 — bare URLs. Allow; the BGP table outputs sometimes contain bare URLs.
+MD034: false

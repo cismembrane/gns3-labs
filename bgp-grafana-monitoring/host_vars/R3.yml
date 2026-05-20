@@ -1,7 +1,7 @@
 hostname: R3
 router_id: 3.3.3.3
 asn: 65003
- 
+
 interfaces:
   - name: Loopback0
     description: router_id
@@ -19,7 +19,7 @@ interfaces:
     description: mgmt
     address: 192.168.0.3
     mask: 255.255.255.0
- 
+
 bgp_neighbors:
   - neighbor: 10.0.2.2
     remote_as: 65002
@@ -27,7 +27,7 @@ bgp_neighbors:
   - neighbor: 10.0.3.4
     remote_as: 65004
     description: bgp_to_r4
- 
+
 bgp_networks:
   - prefix: 3.3.3.3
     mask: 255.255.255.255

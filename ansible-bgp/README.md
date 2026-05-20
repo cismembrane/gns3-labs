@@ -90,10 +90,13 @@ Each router's host_vars file defines its hostname, router-id, ASN, interfaces, B
 
 1. Start the GNS3 topology. Confirm all four routers respond on their management IPs.
 2. Deploy:
+
    ```
    ansible-playbook deploy.yml
    ```
+
 3. Verify:
+
    ```
    ansible-playbook verify.yml
    ```
@@ -179,6 +182,7 @@ R2                         : ok=2    changed=2    unreachable=0    failed=0    s
 R3                         : ok=2    changed=2    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
 R4                         : ok=2    changed=2    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
 ```
+
 </details>
 
 ### verify.yml
@@ -216,6 +220,7 @@ ok: [R4] =>
   Neighbor        V           AS MsgRcvd MsgSent   TblVer  InQ OutQ Up/Down  State/PfxRcd
   10.0.3.3        4        65003      32      30        9    0    0 00:23:52        6
 ```
+
 </details>
 
 <details>
@@ -271,6 +276,7 @@ ok: [R4] =>
   *> 192.168.3.0      10.0.3.3                 0             0 65003 i
   *> 192.168.4.0      0.0.0.0                  0         32768 i
 ```
+
 </details>
 
 <details>
@@ -308,6 +314,7 @@ R2                         : ok=7    changed=0    unreachable=0    failed=0    s
 R3                         : ok=7    changed=0    unreachable=0    failed=0    skipped=1    rescued=0    ignored=0
 R4                         : ok=8    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
 ```
+
 </details>
 
 All four routers have converged on the full set of eight prefixes. R1 and R4 sit at opposite ends of the AS chain, so their BGP tables show the longest AS_PATH entries (three hops for the far-end prefixes). The endpoint PfxRcd counts confirm the expected distribution: R1 and R4 each receive 6 prefixes from their single neighbor, while R2 and R3 each receive 2 from one side and 4 from the other. End-to-end pings between R1 (sourced from 1.1.1.1) and R4's LAN gateway (192.168.4.254), and vice versa, succeed at 100%.
