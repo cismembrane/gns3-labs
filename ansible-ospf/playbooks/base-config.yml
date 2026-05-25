@@ -16,7 +16,7 @@
         commands:
           - show ip ssh
       register: ssh_status
-      ignore_errors: true
+      failed_when: false
 
     - name: Set hostname from inventory name
       cisco.ios.ios_config:
@@ -79,7 +79,7 @@
           - "ntp server {{ lab_ntp_server }}"
         match: line
         replace: line
-      ignore_errors: true
+      failed_when: false
 
     - name: Report result
       ansible.builtin.debug:
