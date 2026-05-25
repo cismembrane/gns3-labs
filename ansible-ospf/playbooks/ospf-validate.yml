@@ -31,3 +31,33 @@
           {{ ospf_checks.stdout[2] }}
         dest: "../outputs/{{ inventory_hostname }}-ospf-validation.txt"
         mode: '0644'
+
+    - name: Verify at least one neighbor is FULL
+      ansible.builtin.assert:
+        that:
+          - "'FULL' in ospf_checks.stdout[0]"
+        fail_msg: "No FULL adjacencies on {{ inventory_hostname }} — check DR election and interface types"
+        success_msg: "FULL adjacency confirmed on {{ inventory_hostname }}"
+
+    - name: Verify no neighbors stuck in INIT or LOADING
+      ansible.builtin.assert:
+        that:
+          - "'INIT' not in ospf_checks.stdout[0]"
+          - "'LOADING' not in ospf_checks.stdout[0]"
+          - "'EXSTART' not in ospf_checks.stdout[0]"
+        fail_msg: "One or more OSPF neighbors stuck in a non-converged state on {{ inventory_hostname }}"
+        success_msg: "No stuck neighbors on {{ inventory_hostname }}"
+
+    - name: Verify OSPF routes are in the routing table
+      ansible.builtin.assert:
+        that:
+          - "'O ' in ospf_checks.stdout[1]"
+        fail_msg: "No OSPF routes in the routing table on {{ inventory_hostname }}"
+        success_msg: "OSPF routes present on {{ inventory_hostname }}"
+
+    - name: Verify OSPF process is running
+      ansible.builtin.assert:
+        that:
+          - "'ospf' in ospf_checks.stdout[2]"
+        fail_msg: "OSPF process not found in routing protocols on {{ inventory_hostname }}"
+        success_msg: "OSPF process is running on {{ inventory_hostname }}"
