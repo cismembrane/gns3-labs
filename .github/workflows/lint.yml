@@ -1,0 +1,96 @@
+name: Lint
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  schedule:
+    # Link check runs weekly on Monday at 06:00 UTC.
+    # Push/PR jobs skip the links job; see the job-level `if` below.
+    - cron: '0 6 * * 1'
+
+jobs:
+
+  # ── YAML ──────────────────────────────────────────────────────────────────
+  yamllint:
+    name: YAML lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install yamllint
+        # Pin matches .pre-commit-config.yaml rev: v1.35.1
+        run: pip install "yamllint==1.35.1"
+
+      - name: Run yamllint
+        run: yamllint -c .yamllint.yml --strict .
+
+  # ── Ansible ───────────────────────────────────────────────────────────────
+  ansible-lint:
+    name: Ansible lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install ansible-lint and ansible-core
+        # ansible-lint pin matches .pre-commit-config.yaml rev: v24.7.0.
+        # ansible-core is required by ansible-lint; cisco.ios needs >=2.15.
+        run: pip install "ansible-lint==24.7.0" "ansible-core>=2.15,<2.17"
+
+      - name: Install required Ansible collections
+        # cisco.ios is used in ansible-bgp, ansible-ospf, and bgp-grafana-monitoring.
+        # ansible-lint needs it present to resolve module FQCNs.
+        run: ansible-galaxy collection install cisco.ios
+
+      - name: Run ansible-lint
+        # ansible-lint reads .ansible-lint from the repo root automatically.
+        # Vault-encrypted vars (bgp-grafana-monitoring host_vars / group_vars)
+        # are parsed as tagged scalars — no vault password needed for lint.
+        run: ansible-lint
+
+  # ── Markdown ──────────────────────────────────────────────────────────────
+  markdownlint:
+    name: Markdown lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install markdownlint-cli2
+        # Pin matches .pre-commit-config.yaml rev: v0.13.0
+        run: npm install -g "markdownlint-cli2@0.13.0"
+
+      - name: Run markdownlint
+        # Config is read from .markdownlint.yaml automatically.
+        run: markdownlint-cli2 "**/*.md" "#node_modules"
+
+  # ── Link check (schedule only) ────────────────────────────────────────────
+  links:
+    name: Check links
+    runs-on: ubuntu-latest
+    # Only run the link check on the weekly schedule.
+    # Skipping on push/PR avoids failing CI when YouTube rate-limits the runner
+    # or when a referenced IP (DevNet sandbox) is temporarily unreachable.
+    if: github.event_name == 'schedule'
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Run lychee
+        uses: lycheeverse/lychee-action@v2
+        with:
+          # Config is in .lychee.toml — RFC1918 exclusions and YouTube 429 handling
+          # are defined there so this command stays clean.
+          args: --config .lychee.toml "**/*.md"
+          fail: true

@@ -1,5 +1,7 @@
 # GNS3 Labs
 
+[![Lint](https://github.com/cismembrane/gns3-labs/actions/workflows/lint.yml/badge.svg)](https://github.com/cismembrane/gns3-labs/actions/workflows/lint.yml)
+
 Hands-on network engineering labs built in GNS3, covering CCNP ENCOR routing, switching, VPN, and first-hop redundancy topics alongside Ansible-driven automation. Each lab includes full router configurations, topology diagrams, and documentation explaining not just what was configured but why.
 
 ## Labs
