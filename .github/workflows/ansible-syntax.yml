@@ -1,0 +1,68 @@
+name: Ansible Syntax Check
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
+jobs:
+
+  syntax-check:
+    name: Playbook syntax check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install ansible-core and required collections
+        # ansible.netcommon is needed for network_cli; cisco.ios for IOS modules.
+        # Version range matches the ansible-lint job in lint.yml.
+        run: |
+          pip install "ansible-core>=2.15,<2.17"
+          ansible-galaxy collection install ansible.netcommon cisco.ios
+
+      # Each step runs from the project subdirectory so Ansible picks up
+      # the local ansible.cfg (inventory path, timeouts, callback settings).
+
+      - name: ansible-bgp — deploy
+        working-directory: ansible-bgp
+        run: ansible-playbook --syntax-check -i inventory.yml deploy.yml
+
+      - name: ansible-bgp — verify
+        working-directory: ansible-bgp
+        run: ansible-playbook --syntax-check -i inventory.yml verify.yml
+
+      - name: ansible-lab — baseline
+        working-directory: ansible-lab
+        run: ansible-playbook --syntax-check -i inventory-ios.ini baseline.yml
+
+      - name: ansible-ospf — precheck
+        working-directory: ansible-ospf
+        run: ansible-playbook --syntax-check -i inventory-ios.ini playbooks/precheck.yml
+
+      - name: ansible-ospf — base-config
+        working-directory: ansible-ospf
+        run: ansible-playbook --syntax-check -i inventory-ios.ini playbooks/base-config.yml
+
+      - name: ansible-ospf — interface-config
+        working-directory: ansible-ospf
+        run: ansible-playbook --syntax-check -i inventory-ios.ini playbooks/interface-config.yml
+
+      - name: ansible-ospf — ospf-deploy
+        working-directory: ansible-ospf
+        run: ansible-playbook --syntax-check -i inventory-ios.ini playbooks/ospf-deploy.yml
+
+      - name: ansible-ospf — ospf-validate
+        working-directory: ansible-ospf
+        run: ansible-playbook --syntax-check -i inventory-ios.ini playbooks/ospf-validate.yml
+
+      # bgp-grafana-monitoring playbooks use ansible-vault encrypted vars.
+      # Syntax check for those playbooks requires ANSIBLE_VAULT_PASSWORD set
+      # in repo secrets. Add them back once the vault is set up.
