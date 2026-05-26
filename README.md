@@ -30,11 +30,11 @@ To import a lab, open the `.gns3` project file in GNS3 and remap the IOS image t
 
 ## Automation and Validation
 
-The Ansible labs split deploy and verify into separate playbooks. Config gets pushed via Jinja2 templates with per-router variables in `host_vars/`. The verify playbooks run `ansible.builtin.assert` against the device after deployment. BGP fails the run if any neighbor sits in Idle or Active. OSPF fails if no neighbor reaches FULL or the routing table carries no OSPF routes. The run fails — it doesn't just print output to read through.
+The Ansible labs split deploy and verify into separate playbooks. Config gets pushed via Jinja2 templates with per-router variables in `host_vars/`. The verify playbooks run `ansible.builtin.assert` against the device after deployment. BGP fails the run if any neighbor sits in Idle or Active. OSPF fails if no neighbor reaches FULL or the routing table carries no OSPF routes.
 
 Router and SNMP passwords in `bgp-grafana-monitoring` are encrypted with ansible-vault and stored in `group_vars/routers.yml`. `.env.example` and `.vault_pass.example` list the variables you need without committing the values.
 
-Two workflows run on every push via GitHub Actions. `lint.yml` runs yamllint, ansible-lint, and markdownlint. `ansible-syntax.yml` runs `ansible-playbook --syntax-check` across the `ansible-bgp`, `ansible-lab`, and `ansible-ospf` playbooks — the vault-encrypted `bgp-grafana-monitoring` playbooks are excluded until CI has a vault secret. The same lint checks run locally through pre-commit before each commit, versions pinned to match.
+Two workflows run on every push via GitHub Actions. `lint.yml` runs yamllint, ansible-lint, and markdownlint. `ansible-syntax.yml` runs `ansible-playbook --syntax-check` across the `ansible-bgp`, `ansible-lab`, and `ansible-ospf` playbooks. `bgp-grafana-monitoring` playbooks are excluded until CI has a vault secret. The same lint checks run locally through pre-commit before each commit, versions pinned to match.
 
 ## Links
 
