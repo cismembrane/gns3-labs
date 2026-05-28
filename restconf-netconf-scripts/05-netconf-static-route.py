@@ -75,7 +75,7 @@ with manager.connect(
     # all operations happen inside this block
     
     # step 1 operations
-    # Create static route with PUT
+    # Create static route with edit_config
     print("=" * 60)
     print("STEP 1 INITIATING")
     print("=" * 60)
