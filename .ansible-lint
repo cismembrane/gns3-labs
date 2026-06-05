@@ -39,5 +39,3 @@ skip_list:
 warn_list:
   - fqcn[action-core]
   - name[casing]
-  - name[missing]
-  - no-changed-when
