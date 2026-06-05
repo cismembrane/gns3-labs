@@ -39,8 +39,8 @@ jobs:
           python-version: '3.12'
 
       - name: Install ansible-lint and ansible-core
-        # Pin matches .pre-commit-config.yaml rev: v24.7.0. cisco.ios requires >=2.15.
-        run: pip install "ansible-lint==24.7.0" "ansible-core>=2.15,<2.17"
+        # Pin matches .pre-commit-config.yaml rev: v24.7.0. cisco.ios 11.x requires >=2.16.
+        run: pip install "ansible-lint==24.7.0" "ansible-core>=2.16"
 
       - name: Install required collections
         # cisco.ios is used across ansible-bgp, ansible-ospf, and bgp-grafana-monitoring.
