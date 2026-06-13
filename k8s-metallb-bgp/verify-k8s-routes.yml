@@ -1,0 +1,72 @@
+# Run after the k3s/MetalLB side is up. Asserts the MetalLB eBGP sessions on
+# R1 and R4 are Established and that every router in the ring has learned the
+# /32 service routes from AS 65100.
+- name: Verify MetalLB BGP peerings and service routes
+  hosts: routers
+  gather_facts: false
+
+  vars:
+    service_pool_prefix: "172.16.10."
+    metallb_asn: "65100"
+
+  tasks:
+    - name: Collect MetalLB neighbor state
+      cisco.ios.ios_command:
+        commands:
+          - show ip bgp neighbors {{ item.neighbor }} | include BGP state
+      register: metallb_neighbor_state
+      loop: "{{ bgp_neighbors | selectattr('remote_as', 'equalto', 65100) | list }}"
+      loop_control:
+        label: "{{ item.neighbor }} ({{ item.description }})"
+      when: bgp_neighbors | selectattr('remote_as', 'equalto', 65100) | list | length > 0
+
+    - name: MetalLB peering is Established
+      ansible.builtin.assert:
+        that:
+          - "'Established' in item.stdout[0]"
+        fail_msg: "MetalLB neighbor {{ item.item.neighbor }} is not Established"
+        success_msg: "MetalLB neighbor {{ item.item.neighbor }} is Established"
+      loop: "{{ metallb_neighbor_state.results | default([]) }}"
+      loop_control:
+        label: "{{ item.item.neighbor }}"
+      when: metallb_neighbor_state is not skipped
+
+    - name: Collect BGP entries for the service pool
+      cisco.ios.ios_command:
+        commands:
+          - show ip bgp | include {{ service_pool_prefix }}
+      register: service_bgp_entries
+
+    - name: Display service pool BGP entries
+      ansible.builtin.debug:
+        var: service_bgp_entries.stdout_lines
+
+    - name: Service routes are present in the BGP table
+      ansible.builtin.assert:
+        that:
+          - service_pool_prefix in service_bgp_entries.stdout[0]
+        fail_msg: "No {{ service_pool_prefix }}0/24 service routes in the BGP table"
+        success_msg: "Service routes from MetalLB are present"
+
+    - name: Collect routing table entries for the service pool
+      cisco.ios.ios_command:
+        commands:
+          - show ip route | include {{ service_pool_prefix }}
+      register: service_rib_entries
+
+    - name: Display service routes in the RIB
+      ansible.builtin.debug:
+        var: service_rib_entries.stdout_lines
+
+    - name: Collect BGP entry for the whoami VIP
+      cisco.ios.ios_command:
+        commands:
+          - show ip bgp {{ service_pool_prefix }}10/32
+      register: whoami_route
+
+    - name: Whoami route carries the MetalLB AS in its path
+      ansible.builtin.assert:
+        that:
+          - metallb_asn in whoami_route.stdout[0]
+        fail_msg: "172.16.10.10/32 is missing or did not originate from AS {{ metallb_asn }}"
+        success_msg: "172.16.10.10/32 learned via AS {{ metallb_asn }}"
