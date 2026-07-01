@@ -27,7 +27,6 @@ MGMT_IP = {"R1": "192.168.0.1", "R2": "192.168.0.2",
            "R3": "192.168.0.3", "R4": "192.168.0.4"}
 
 BOOTSTRAP = """\
-enable
 configure terminal
 hostname {name}
 ip domain-name lab
@@ -132,11 +131,26 @@ def wait_for_prompt(con, name, total_timeout=420, poke_interval=10):
     raise TimeoutError(f"{name}: no prompt after {total_timeout}s")
 
 
+def enter_enable(con, name, secret="admin"):
+    """Reach privileged EXEC, supplying the enable secret if prompted.
+
+    A fresh router has no enable password, so `enable` goes straight to `#`.
+    Once the bootstrap has set `enable secret`, a rerun prompts for a password
+    -- send it. If we are already at `#`, `enable` is a harmless no-op.
+    """
+    con.send("enable")
+    idx, _ = con.read_until([r"[Pp]assword:", r"#\s*$"], timeout=15)
+    if idx == 0:
+        con.send(secret)
+        con.read_until([r"#\s*$"], timeout=15)
+
+
 def bootstrap(name, host, port, debug=False):
     con = Console(host, port, name, debug=debug)
     print(f"[{name}] connected to console {host}:{port}")
 
     wait_for_prompt(con, name)
+    enter_enable(con, name)
     print(f"[{name}] prompt up, pasting bootstrap")
 
     for line in BOOTSTRAP.format(name=name, ip=MGMT_IP[name]).splitlines():

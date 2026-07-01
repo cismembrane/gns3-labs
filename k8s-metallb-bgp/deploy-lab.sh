@@ -24,10 +24,13 @@ run_stage() {
 }
 
 wait_for_ssh() {
+  # Only check that each router's SSH port is answering -- do not log in. The
+  # routers use password auth (no key), so an actual ssh login blocks on a
+  # password prompt and hangs the rerun once the config is already applied.
+  # Ansible (over paramiko) does the real authenticated login in the next stage.
   local ip deadline=$((SECONDS + 300))
   for ip in 192.168.0.{1..4}; do
-    until ssh -o ConnectTimeout=3 -o StrictHostKeyChecking=no \
-              -o BatchMode=no admin@"$ip" exit 2>/dev/null; do
+    until timeout 3 bash -c "exec 3<>/dev/tcp/$ip/22" 2>/dev/null; do
       ((SECONDS < deadline)) || { echo "SSH to $ip never came up"; exit 1; }
       sleep 10
     done
