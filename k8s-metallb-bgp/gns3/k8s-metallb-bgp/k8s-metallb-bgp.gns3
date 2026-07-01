@@ -4,7 +4,7 @@
     "auto_start": false,
     "drawing_grid_size": 25,
     "grid_size": 75,
-    "name": "k8s-metalbp-bgp",
+    "name": "k8s-metallb-bgp",
     "project_id": "91ffbfce-a5ed-4d8d-bf50-8b3f8f02016f",
     "revision": 9,
     "scene_height": 1000,
@@ -800,12 +800,22 @@
                 "properties": {
                     "interfaces": [
                         {
+                            "name": "cni0",
+                            "special": false,
+                            "type": "ethernet"
+                        },
+                        {
                             "name": "docker0",
                             "special": true,
                             "type": "ethernet"
                         },
                         {
                             "name": "eno1",
+                            "special": false,
+                            "type": "ethernet"
+                        },
+                        {
+                            "name": "flannel.1",
                             "special": false,
                             "type": "ethernet"
                         },
@@ -828,6 +838,41 @@
                             "name": "tap2",
                             "special": false,
                             "type": "tap"
+                        },
+                        {
+                            "name": "veth1b0f7040",
+                            "special": true,
+                            "type": "ethernet"
+                        },
+                        {
+                            "name": "veth79809a49",
+                            "special": true,
+                            "type": "ethernet"
+                        },
+                        {
+                            "name": "veth8b5d96b4",
+                            "special": true,
+                            "type": "ethernet"
+                        },
+                        {
+                            "name": "veth9e56ba7c",
+                            "special": true,
+                            "type": "ethernet"
+                        },
+                        {
+                            "name": "vethb6c5ee2c",
+                            "special": true,
+                            "type": "ethernet"
+                        },
+                        {
+                            "name": "vethc0a1a812",
+                            "special": true,
+                            "type": "ethernet"
+                        },
+                        {
+                            "name": "vethd19f2983",
+                            "special": true,
+                            "type": "ethernet"
                         },
                         {
                             "name": "virbr0",
@@ -888,7 +933,7 @@
                 "compute_id": "local",
                 "console": null,
                 "console_auto_start": false,
-                "console_type": null,
+                "console_type": "none",
                 "custom_adapters": [],
                 "first_port_name": null,
                 "height": 71,
@@ -908,12 +953,22 @@
                 "properties": {
                     "interfaces": [
                         {
+                            "name": "cni0",
+                            "special": false,
+                            "type": "ethernet"
+                        },
+                        {
                             "name": "docker0",
                             "special": true,
                             "type": "ethernet"
                         },
                         {
                             "name": "eno1",
+                            "special": false,
+                            "type": "ethernet"
+                        },
+                        {
+                            "name": "flannel.1",
                             "special": false,
                             "type": "ethernet"
                         },
@@ -936,6 +991,41 @@
                             "name": "tap2",
                             "special": false,
                             "type": "tap"
+                        },
+                        {
+                            "name": "veth1b0f7040",
+                            "special": true,
+                            "type": "ethernet"
+                        },
+                        {
+                            "name": "veth79809a49",
+                            "special": true,
+                            "type": "ethernet"
+                        },
+                        {
+                            "name": "veth8b5d96b4",
+                            "special": true,
+                            "type": "ethernet"
+                        },
+                        {
+                            "name": "veth9e56ba7c",
+                            "special": true,
+                            "type": "ethernet"
+                        },
+                        {
+                            "name": "vethb6c5ee2c",
+                            "special": true,
+                            "type": "ethernet"
+                        },
+                        {
+                            "name": "vethc0a1a812",
+                            "special": true,
+                            "type": "ethernet"
+                        },
+                        {
+                            "name": "vethd19f2983",
+                            "special": true,
+                            "type": "ethernet"
                         },
                         {
                             "name": "virbr0",
@@ -996,7 +1086,7 @@
                 "compute_id": "local",
                 "console": null,
                 "console_auto_start": false,
-                "console_type": null,
+                "console_type": "none",
                 "custom_adapters": [],
                 "first_port_name": null,
                 "height": 71,
@@ -1016,12 +1106,22 @@
                 "properties": {
                     "interfaces": [
                         {
+                            "name": "cni0",
+                            "special": false,
+                            "type": "ethernet"
+                        },
+                        {
                             "name": "docker0",
                             "special": true,
                             "type": "ethernet"
                         },
                         {
                             "name": "eno1",
+                            "special": false,
+                            "type": "ethernet"
+                        },
+                        {
+                            "name": "flannel.1",
                             "special": false,
                             "type": "ethernet"
                         },
@@ -1044,6 +1144,41 @@
                             "name": "tap2",
                             "special": false,
                             "type": "tap"
+                        },
+                        {
+                            "name": "veth1b0f7040",
+                            "special": true,
+                            "type": "ethernet"
+                        },
+                        {
+                            "name": "veth79809a49",
+                            "special": true,
+                            "type": "ethernet"
+                        },
+                        {
+                            "name": "veth8b5d96b4",
+                            "special": true,
+                            "type": "ethernet"
+                        },
+                        {
+                            "name": "veth9e56ba7c",
+                            "special": true,
+                            "type": "ethernet"
+                        },
+                        {
+                            "name": "vethb6c5ee2c",
+                            "special": true,
+                            "type": "ethernet"
+                        },
+                        {
+                            "name": "vethc0a1a812",
+                            "special": true,
+                            "type": "ethernet"
+                        },
+                        {
+                            "name": "vethd19f2983",
+                            "special": true,
+                            "type": "ethernet"
                         },
                         {
                             "name": "virbr0",
