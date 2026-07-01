@@ -1,0 +1,40 @@
+# Two-replica HTTP echo service pinned to 172.16.10.10. Each response includes
+# the pod hostname, so repeated curls show kube-proxy distributing connections
+# across both pods behind a single BGP-advertised VIP.
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: whoami
+  labels:
+    app: whoami
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: whoami
+  template:
+    metadata:
+      labels:
+        app: whoami
+    spec:
+      containers:
+        - name: whoami
+          image: traefik/whoami:v1.10
+          ports:
+            - containerPort: 80
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: whoami
+  annotations:
+    metallb.io/loadBalancerIPs: 172.16.10.10
+spec:
+  type: LoadBalancer
+  selector:
+    app: whoami
+  ports:
+    - name: http
+      port: 80
+      targetPort: 80

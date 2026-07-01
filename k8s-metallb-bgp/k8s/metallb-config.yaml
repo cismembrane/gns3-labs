@@ -1,0 +1,47 @@
+# MetalLB BGP configuration. Applied after the metallb Helm release is up.
+#
+# One address pool, one BGP advertisement, and two eBGP peers (R1 and R4).
+# The default aggregation-length of 32 means every LoadBalancer service is
+# advertised as a host route, which is what shows up in the routers' BGP
+# tables as 172.16.10.x/32 entries with AS_PATH ending in 65100.
+---
+apiVersion: metallb.io/v1beta1
+kind: IPAddressPool
+metadata:
+  name: lab-services
+  namespace: metallb-system
+spec:
+  addresses:
+    - 172.16.10.0/24
+  autoAssign: true
+---
+apiVersion: metallb.io/v1beta1
+kind: BGPAdvertisement
+metadata:
+  name: lab-services
+  namespace: metallb-system
+spec:
+  ipAddressPools:
+    - lab-services
+---
+apiVersion: metallb.io/v1beta2
+kind: BGPPeer
+metadata:
+  name: r1
+  namespace: metallb-system
+spec:
+  myASN: 65100
+  peerASN: 65001
+  peerAddress: 10.0.5.1
+  sourceAddress: 10.0.5.5
+---
+apiVersion: metallb.io/v1beta2
+kind: BGPPeer
+metadata:
+  name: r4
+  namespace: metallb-system
+spec:
+  myASN: 65100
+  peerASN: 65004
+  peerAddress: 10.0.6.4
+  sourceAddress: 10.0.6.5

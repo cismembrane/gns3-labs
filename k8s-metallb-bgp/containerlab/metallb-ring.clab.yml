@@ -1,0 +1,50 @@
+# Headless FRR counterpart of the IOSv ring (CI-testable target), same
+# pattern as ospfv3-dualstack-af-ipsec. The two host links surface as veth
+# interfaces k3s-r1 and k3s-r4 on the host, where k3s + MetalLB run and peer
+# with r1 and r4 exactly like the GNS3 lab. Addressing matches the IOS lab,
+# so k8s/metallb-config.yaml is reused unchanged.
+
+name: metallb-ring
+
+topology:
+  kinds:
+    linux:
+      image: quay.io/frrouting/frr:9.1.0
+
+  nodes:
+    r1:
+      kind: linux
+      binds:
+        - r1/frr.conf:/etc/frr/frr.conf
+        - daemons:/etc/frr/daemons
+      sysctls:
+        net.ipv4.ip_forward: 1
+    r2:
+      kind: linux
+      binds:
+        - r2/frr.conf:/etc/frr/frr.conf
+        - daemons:/etc/frr/daemons
+      sysctls:
+        net.ipv4.ip_forward: 1
+    r3:
+      kind: linux
+      binds:
+        - r3/frr.conf:/etc/frr/frr.conf
+        - daemons:/etc/frr/daemons
+      sysctls:
+        net.ipv4.ip_forward: 1
+    r4:
+      kind: linux
+      binds:
+        - r4/frr.conf:/etc/frr/frr.conf
+        - daemons:/etc/frr/daemons
+      sysctls:
+        net.ipv4.ip_forward: 1
+
+  links:
+    - endpoints: ["r1:eth1", "r2:eth1"]   # 10.0.1.0/29
+    - endpoints: ["r2:eth2", "r3:eth1"]   # 10.0.2.0/29
+    - endpoints: ["r3:eth2", "r4:eth1"]   # 10.0.3.0/29
+    - endpoints: ["r4:eth2", "r1:eth2"]   # 10.0.4.0/29
+    - endpoints: ["r1:eth3", "host:k3s-r1"]   # 10.0.5.0/29
+    - endpoints: ["r4:eth3", "host:k3s-r4"]   # 10.0.6.0/29

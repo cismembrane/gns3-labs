@@ -6,3 +6,6 @@ __pycache__/
 *.bak
 *.swp
 *~
+
+# GNS3 runtime state — regenerated when the project runs
+gns3/*/project-files/
