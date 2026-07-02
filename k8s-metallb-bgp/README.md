@@ -70,13 +70,15 @@ graph TD
 
 ## Prerequisites
 
-**GNS3 path**
+### GNS3 path
+
 - GNS3 with the four-router IOSv topology built (see [`gns3/README.md`](gns3/README.md))
 - Ansible with the `cisco.ios` collection
 - Python 3
 - `curl`, `sudo`, and `helm` on the Linux GNS3 host
 
-**containerlab path**
+### containerlab path
+
 - Docker and containerlab
 - Python 3 (for `verify_bgp.py`)
 - The same `curl`/`sudo` tooling to install k3s and MetalLB
