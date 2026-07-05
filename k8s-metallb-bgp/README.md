@@ -29,18 +29,16 @@ graph TD
         R4 ---|10.0.4.0/29| R1
     end
 
-    K3S["k3s node + MetalLB<br/>AS 65100"]
-    R1 ---|"10.0.5.0/29 (uplink, preferred)"| K3S
-    R4 ---|"10.0.6.0/29 (uplink, backup)"| K3S
-
-    K3S -.->|"advertises /32"| POOL["IPAddressPool 172.16.10.0/24<br/>whoami .10 · nginx-hello .20"]
+    K3S["k3s node + MetalLB<br/>AS 65100<br/>pool 172.16.10.0/24"]
+    R1 ---|"10.0.5.0/29 · eBGP, VIPs as /32"| K3S
+    R4 ---|"10.0.6.0/29 · eBGP, VIPs as /32"| K3S
 ```
 
-**Data flow.** A client routed into the ring sends traffic toward a service VIP (e.g. `172.16.10.10/32`). Each router forwards along its BGP best path toward AS 65100. The packet reaches the k3s node over R1 (preferred) or R4 (backup), where kube-proxy DNATs the VIP to a backing pod. Return traffic follows host routes installed on the node, which prefer the R1 uplink.
+**Data flow.** A client routed into the ring sends traffic toward a service VIP (e.g. `172.16.10.10/32`). Each router forwards along its BGP best path toward AS 65100. Inbound traffic enters the cluster through whichever edge router sits on the shortest AS path from its entry point: R1 for traffic arriving at R1 or R2, R4 for traffic arriving at R3 or R4. No routing policy prefers one uplink over the other for inbound traffic. On the node, kube-proxy DNATs the VIP to a backing pod. Return traffic follows static host routes that prefer the R1 uplink (metric 100 via tap1, metric 200 via tap2). That preference applies to replies only, and it covers host-side TAP loss rather than R1 failure, as noted in `scripts/setup-taps.sh`.
 
 **Path selection.** R3 sits two AS hops from the cluster in either direction. Its BGP table holds two paths for each service route — `65002 65001 65100` via R1 and `65004 65100` via R4 — and it selects the shorter one (via R4) as best.
 
-**Failover.** Shutting R4's cluster-facing interface (GigabitEthernet0/5) withdraws the direct MetalLB session, and R4 falls back to the route it learns from R1 around the ring, re-advertising it to R3 as `65004 65001 65100`. R3 now holds two three-hop paths, so AS path length no longer decides. The oldest-external-path tiebreaker keeps R3's best path pointed at R4, and traffic reroutes to R3 → R4 → R1 → cluster without a next-hop change on R3. The failover is visible on R4, where the route source flips from the direct AS 65100 session to the R1 ring session, and on R2, where the path via R1 (`65001 65100`) remains two hops and stays best throughout. Service traffic continues uninterrupted either way. Restoring the link re-establishes the MetalLB session and R3's path via R4 returns to `65004 65100`.
+**Failover.** Shutting R4's cluster-facing interface (GigabitEthernet0/5) tears down the direct MetalLB session and withdraws the routes R4 originated. R4 then learns the VIP from R1 around the ring and re-advertises it to R3 as `65004 65001 65100`. R3 now holds two three-hop paths: `65002 65001 65100` from R2, present in its table since before the failure, and the new `65004 65001 65100` from R4. With path lengths tied, the oldest-external tiebreaker selects the path received first, so R3's best path becomes `65002 65001 65100` via R2 (`10.0.2.2`) and traffic reroutes through R2 and R1 to the cluster. Service traffic continues uninterrupted. Restoring the link re-establishes the MetalLB session, and R3's best path returns to `65004 65100`.
 
 **Reverse-path filtering.** The node receives traffic on both uplinks but always prefers `tap1`/`k3s-r1` for replies. With strict `rp_filter`, replies to packets that arrived on the backup interface would be dropped, so the lab sets loose RPF (`rp_filter=2`) on both interfaces.
 
