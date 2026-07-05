@@ -14,7 +14,7 @@ This lab builds the routing layer underneath a bare-metal Kubernetes `LoadBalanc
 
 ## Architecture
 
-The four routers form an eBGP ring, each in its own AS (65001–65004). The k3s host attaches to R1 and R4 over two transit links and runs MetalLB as AS 65100. MetalLB opens one eBGP session to each of R1 and R4 and advertises every `LoadBalancer` service IP as a /32. R2 and R3 never peer with the cluster directly — they learn the service routes through standard eBGP propagation around the ring, which is what makes the path-selection and failover behavior observable from the far side.
+The four routers form an eBGP ring, each in its own AS (65001–65004). The k3s host attaches to R1 and R4 over two transit links and runs MetalLB as AS 65100. MetalLB opens one eBGP session to each of R1 and R4 and advertises every `LoadBalancer` service IP as a /32. R2 and R3 never peer with the cluster directly. They learn the service routes through standard eBGP propagation around the ring, which is what makes the path-selection and failover behavior observable from the far side.
 
 ```mermaid
 graph TD
@@ -34,13 +34,13 @@ graph TD
     R4 ---|"10.0.6.0/29 · eBGP, VIPs as /32"| K3S
 ```
 
-**Data flow.** A client routed into the ring sends traffic toward a service VIP (e.g. `172.16.10.10/32`). Each router forwards along its BGP best path toward AS 65100. Inbound traffic enters the cluster through whichever edge router sits on the shortest AS path from its entry point: R1 for traffic arriving at R1 or R2, R4 for traffic arriving at R3 or R4. No routing policy prefers one uplink over the other for inbound traffic. On the node, kube-proxy DNATs the VIP to a backing pod. Return traffic follows static host routes that prefer the R1 uplink (metric 100 via tap1, metric 200 via tap2). That preference applies to replies only, and it covers host-side TAP loss rather than R1 failure, as noted in `scripts/setup-taps.sh`.
+**Data flow.** A client routed into the ring sends traffic toward a service VIP (e.g. `172.16.10.10/32`). Each router forwards along its BGP best path toward AS 65100. Inbound traffic enters the cluster through whichever edge router sits on the shortest AS path from its entry point: R1 for traffic arriving at R1 or R2, R4 for traffic arriving at R3 or R4. No routing policy prefers one uplink over the other for inbound traffic. On the node, kube-proxy DNATs the VIP to a backing pod. Return traffic follows static host routes that prefer the R1 uplink. That preference applies to replies only, and it covers host-side TAP loss rather than R1 failure, as noted in `scripts/setup-taps.sh`.
 
 **Path selection.** R3 sits two AS hops from the cluster in either direction. Its BGP table holds two paths for each service route — `65002 65001 65100` via R1 and `65004 65100` via R4 — and it selects the shorter one (via R4) as best.
 
 **Failover.** Shutting R4's cluster-facing interface (GigabitEthernet0/5) tears down the direct MetalLB session and withdraws the routes R4 originated. R4 then learns the VIP from R1 around the ring and re-advertises it to R3 as `65004 65001 65100`. R3 now holds two three-hop paths: `65002 65001 65100` from R2, present in its table since before the failure, and the new `65004 65001 65100` from R4. With path lengths tied, the oldest-external tiebreaker selects the path received first, so R3's best path becomes `65002 65001 65100` via R2 (`10.0.2.2`) and traffic reroutes through R2 and R1 to the cluster. Service traffic continues uninterrupted. Restoring the link re-establishes the MetalLB session, and R3's best path returns to `65004 65100`.
 
-**Reverse-path filtering.** The node receives traffic on both uplinks but always prefers `tap1`/`k3s-r1` for replies. With strict `rp_filter`, replies to packets that arrived on the backup interface would be dropped, so the lab sets loose RPF (`rp_filter=2`) on both interfaces.
+**Reverse-path filtering.** The node receives traffic on both uplinks but always prefers `tap1`/`k3s-r1` for replies. With strict `rp_filter`, replies to packets that arrived on the backup interface would be dropped, so both uplinks need loose RPF (`rp_filter=2`). The containerlab host script (`setup-host-links.sh`) sets this automatically; on the GNS3 host, set it manually on `tap1`/`tap2`.
 
 ## Technologies Used
 
@@ -82,7 +82,8 @@ k8s-metallb-bgp/
 ├── verify.yml               # ring-only BGP session + cross-ring ping checks
 ├── verify-k8s-routes.yml    # MetalLB session + service-route assertions
 ├── inventory.yml            # R1–R4 at 192.168.0.1–.4
-├── group_vars/routers.yml   # connection vars (paramiko, admin/admin)
+├── ansible.cfg              # inventory path, paramiko ssh_type, host-key checking off
+├── group_vars/routers.yml   # connection vars (network_cli, admin/admin; paramiko ssh_type in ansible.cfg)
 ├── host_vars/R1–R4.yml      # per-router AS, interfaces, BGP neighbors
 ├── templates/
 │   ├── interfaces.j2        # hostname + interface addressing
@@ -98,6 +99,8 @@ k8s-metallb-bgp/
 ├── images/                  # topology and validation screenshots
 ├── containerlab/            # headless FRR 9.1.0 variant (same addressing)
 │   ├── metallb-ring.clab.yml
+│   ├── daemons              # FRR daemon toggles
+│   ├── r1..r4/frr.conf      # per-router FRR configs (mirror host_vars)
 │   ├── setup-host-links.sh
 │   └── verify_bgp.py        # vtysh JSON session + route checks
 └── gns3/README.md           # physical link map, neighbor + management tables
@@ -149,7 +152,7 @@ A few implementation notes worth knowing before you run it:
 - **TAPs are not persistent.** `setup-taps.sh` must be rerun after a host reboot, and you must bind `tap0`/`tap1`/`tap2` to their GNS3 Cloud nodes before continuing.
 - **ServiceLB must be disabled.** `install-k3s.sh` installs k3s with `--disable servicelb --disable traefik`; otherwise k3s's built-in load balancer claims every `LoadBalancer` service before MetalLB can.
 - **Sessions bind to the right interface.** Each `BGPPeer` sets `sourceAddress` explicitly so the MetalLB speaker originates its TCP session from the correct TAP.
-- **Loose RPF is required** on the cluster uplinks (`rp_filter=2`) so replies to traffic that arrived on the backup interface are not dropped.
+- **Loose RPF is required** on the cluster uplinks (`rp_filter=2`) so replies to traffic that arrived on the backup interface are not dropped. `setup-taps.sh` does not set this — apply it manually on `tap1`/`tap2` (the containerlab `setup-host-links.sh` does it automatically).
 
 ## Deployment (containerlab)
 

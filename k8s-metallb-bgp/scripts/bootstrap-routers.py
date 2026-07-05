@@ -7,8 +7,8 @@ stdlib in Python 3.13), waits for each router to finish booting, declines the
 initial-config dialog, and pastes the SSH bootstrap: hostname, domain, RSA
 keys, admin/admin credentials, vty SSH, and the Gi0/4 management address.
 
-Console ports are discovered from the GNS3 API, so run build-topology.py
-(or have the project open) first.
+Console ports are discovered from the GNS3 API, so open the lab project in
+GNS3 (with the four router nodes created) first.
 
 Usage:
     ./bootstrap-routers.py [--server http://127.0.0.1:3080] [--routers R1 R2] [--debug]
