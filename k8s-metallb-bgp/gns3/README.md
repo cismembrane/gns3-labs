@@ -34,13 +34,15 @@ The k3s node is the GNS3 host itself, attached through TAP interfaces. It holds 
 
 Management, same pattern as the other labs:
 
-| Link         | Interface          | Switch Interface |
-|--------------|--------------------|------------------|
-| R1 to SW1    | GigabitEthernet0/4 | Ethernet0        |
-| R2 to SW1    | GigabitEthernet0/4 | Ethernet1        |
-| R3 to SW1    | GigabitEthernet0/4 | Ethernet2        |
-| R4 to SW1    | GigabitEthernet0/4 | Ethernet3        |
-| Cloud1 to SW1 | tap0              | Ethernet4        |
+| Link          | Interface          | Switch Interface |
+|---------------|--------------------|------------------|
+| R1 to SW1     | GigabitEthernet0/4 | Ethernet0        |
+| R2 to SW1     | GigabitEthernet0/4 | Ethernet1        |
+| R3 to SW1     | GigabitEthernet0/4 | Ethernet2        |
+| R4 to SW1     | GigabitEthernet0/4 | Ethernet3        |
+| Cloud1 to SW1 | tap0               | Ethernet4        |
+| Cloud2 to R1  | tap1               | Ethernet5        |
+| Cloud3 to R2  | tap2               | Ethernet6        |
 
 ## BGP Neighbor Map
 
@@ -67,14 +69,21 @@ Management, same pattern as the other labs:
 | R4       | GigabitEthernet0/4   | 192.168.0.4/24   |
 | k3s host | tap0                 | 192.168.0.100/24 |
 
+## k3s Transit Links
+
+| Interface | IP           | Peers | Router IP  |
+|-----------|--------------|-------|------------|
+| tap1      | 10.0.5.5/29  | R1    | 10.0.5.1   |
+| tap2      | 10.0.6.5/29  | R4    | 10.0.6.4   |
+
 ---
 
 ## Requirements
 
-- Four IOSv router nodes named `R1` through `R4`, with at least six network adapters each (Gi0/0 through Gi0/5). Bump the adapter count in the IOSv template if your default is lower.
+- Four IOSv router nodes named `R1` through `R4`, with at least six network adapters each (Gi0/0 through Gi0/5).
 - One GNS3 Ethernet Switch `SW1` for the management segment.
 - Three GNS3 Cloud nodes: `Cloud1` (tap0, management), `Cloud2` (tap1, R1 transit), `Cloud3` (tap2, R4 transit).
-- A Linux GNS3 host that will run k3s. 2 GB of free RAM is enough for single-node k3s plus MetalLB and the demo pods.
+- A Linux GNS3 host that will run k3s.
 
 ## Host Connectivity
 
