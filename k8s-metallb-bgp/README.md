@@ -4,21 +4,13 @@ A single-node k3s cluster advertises Kubernetes `LoadBalancer` services into a f
 
 The lab is built two ways from the same addressing and BGP design: a full **GNS3 / Cisco IOSv** topology configured with Ansible, and a headless **containerlab / FRR** variant that runs without a GUI and is suitable for CI.
 
+![GNS3 topology](images/gns3-topology.png)
+
 ---
 
 ## Overview
 
 This lab builds the routing layer underneath a bare-metal Kubernetes `LoadBalancer`: how a cluster gets a routable service IP and how that IP behaves under link failure. MetalLB originates a BGP route for each service; the surrounding routers treat the cluster as just another autonomous system. It demonstrates three things end to end and reproducibly: **service IP advertisement** (a Kubernetes service becoming a real route in a router's table), **eBGP path selection** (the ring picking the shorter AS path to the cluster), and **routed failover** (traffic surviving the loss of an uplink without touching Kubernetes).
-
-## Skills Demonstrated
-
-- **Networking / BGP** — multi-AS eBGP design, AS-path selection, /32 host-route advertisement, redundant peering, convergence and failover testing.
-- **Kubernetes** — single-node k3s, `LoadBalancer` service type, MetalLB in BGP mode, Helm-based component install, kube-proxy DNAT behavior.
-- **Infrastructure as Code** — idempotent router configuration with Ansible (templated interfaces and BGP), declarative MetalLB config, declarative containerlab topology.
-- **Automation / Python** — console bootstrap over raw TCP against the GNS3 API; programmatic BGP verification via `vtysh` JSON.
-- **Linux networking** — TAP/veth interfaces, policy routing with metrics, reverse-path filtering (`rp_filter`), IP forwarding.
-- **Bash** — staged, resumable deployment orchestration.
-- **Verification as code** — Ansible assertions and a Python checker that validate session state and route origination rather than relying on manual inspection.
 
 ## Architecture
 
@@ -44,11 +36,11 @@ graph TD
     K3S -.->|"advertises /32"| POOL["IPAddressPool 172.16.10.0/24<br/>whoami .10 · nginx-hello .20"]
 ```
 
-**Data flow.** A client routed into the ring sends traffic toward a service VIP (e.g. `172.16.10.10/32`). Each router forwards along its BGP best path toward AS 65100. The packet reaches the k3s node over R1 (preferred) or R4 (backup), where kube-proxy DNATs the VIP to a backing pod. Return traffic follows host routes installed on the node, which prefer the R1 uplink (lower metric).
+**Data flow.** A client routed into the ring sends traffic toward a service VIP (e.g. `172.16.10.10/32`). Each router forwards along its BGP best path toward AS 65100. The packet reaches the k3s node over R1 (preferred) or R4 (backup), where kube-proxy DNATs the VIP to a backing pod. Return traffic follows host routes installed on the node, which prefer the R1 uplink.
 
 **Path selection.** R3 sits two AS hops from the cluster in either direction. Its BGP table holds two paths for each service route — `65002 65001 65100` via R1 and `65004 65100` via R4 — and it selects the shorter one (via R4) as best.
 
-**Failover.** Shutting R4's cluster-facing interface withdraws the R4 session. R3's best path shifts to `65002 65001 65100` via R1, and service traffic continues uninterrupted. Restoring the link flips the best path back.
+**Failover.** Shutting R4's cluster-facing interface (GigabitEthernet0/5) withdraws the direct MetalLB session, and R4 falls back to the route it learns from R1 around the ring, re-advertising it to R3 as `65004 65001 65100`. R3 now holds two three-hop paths, so AS path length no longer decides. The oldest-external-path tiebreaker keeps R3's best path pointed at R4, and traffic reroutes to R3 → R4 → R1 → cluster without a next-hop change on R3. The failover is visible on R4, where the route source flips from the direct AS 65100 session to the R1 ring session, and on R2, where the path via R1 (`65001 65100`) remains two hops and stays best throughout. Service traffic continues uninterrupted either way. Restoring the link re-establishes the MetalLB session and R3's path via R4 returns to `65004 65100`.
 
 **Reverse-path filtering.** The node receives traffic on both uplinks but always prefers `tap1`/`k3s-r1` for replies. With strict `rp_filter`, replies to packets that arrived on the backup interface would be dropped, so the lab sets loose RPF (`rp_filter=2`) on both interfaces.
 
@@ -75,7 +67,7 @@ graph TD
 - GNS3 with the four-router IOSv topology built (see [`gns3/README.md`](gns3/README.md))
 - Ansible with the `cisco.ios` collection
 - Python 3
-- `curl`, `sudo`, and `helm` on the Linux GNS3 host
+- `curl` and `helm` on the Linux GNS3 host
 
 ### containerlab path
 
@@ -105,6 +97,7 @@ k8s-metallb-bgp/
 │   ├── setup-taps.sh        # creates tap0/1/2 + return routes (GNS3)
 │   ├── install-k3s.sh       # k3s + Helm + MetalLB chart
 │   └── bootstrap-routers.py # console bootstrap via the GNS3 API
+├── images/                  # topology and validation screenshots
 ├── containerlab/            # headless FRR 9.1.0 variant (same addressing)
 │   ├── metallb-ring.clab.yml
 │   ├── setup-host-links.sh
@@ -177,11 +170,15 @@ python3 verify_bgp.py               # full check after MetalLB is up
 
 **BGP sessions.** On R1, `show ip bgp summary` shows three neighbors: R2 (`10.0.1.2`), R4 (`10.0.4.4`), and the cluster (`10.0.5.5`, AS 65100). The MetalLB peer's `PfxRcd` equals the number of advertised services (2 with both demos deployed).
 
+![R1 BGP summary with MetalLB peer established](images/show-ip-bgp-summary.png)
+
 **Path selection.** On R3, two AS hops from the cluster either way:
 
 ```bash
 show ip bgp 172.16.10.10/32   # two paths: 65002 65001 65100 and 65004 65100; shorter via R4 is best
 ```
+
+![R3 steady state: 65004 65100 best on AS path length](images/show-ip-bgp-r3.png)
 
 **Service reachability.** VIPs do not answer ICMP — the /32 exists in the routers' tables, but on the node it is only a kube-proxy DNAT rule, not an interface address. Test over TCP:
 
@@ -190,44 +187,47 @@ curl http://172.16.10.10   # alternates between pod hostnames across repeated re
 curl http://172.16.10.20
 ```
 
-**Failover.** Shut R4's cluster-facing interface and watch the path move without dropping the service:
+To watch continuity through a failover test, run a monitoring loop that prints the responding pod hostname each second (it also demonstrates the pod alternation claim above):
+
+```bash
+while :; do
+  printf '%s  %s\n' "$(date +%T)" \
+    "$(curl -sf --max-time 2 http://172.16.10.10 | awk '/Hostname/{print $2}')" \
+    || printf '%s  FAIL\n' "$(date +%T)"
+  sleep 1
+done
+```
+
+**Failover.** With the curl loop running, shut R4's cluster-facing interface:
 
 ```text
 R4(config)# interface GigabitEthernet0/5
-R4(config-if)# shutdown          # R3 best path → 65002 65001 65100 via R1; curl keeps responding
-R4(config-if)# no shutdown       # path flips back to R4
+R4(config-if)# shutdown          # R4 re-advertises via R1: R3 sees 65004 65001 65100, best path unchanged (oldest external); curl keeps responding
+R4(config-if)# no shutdown       # MetalLB session re-establishes (~30-60s); R3 best path returns to 65004 65100
 ```
 
+BGP fast external fallover tears down the MetalLB session the instant the interface flaps, and R4 switches locally to the path it already holds from R1. R3 sees the updated `65004 65001 65100` path within the eBGP advertisement interval (30 seconds worst case, usually single digits).
+
+![R3 during failover: both paths three hops, best held by oldest external](images/show-ip-bgp-r3-after-interface-shutdown.png)
+
+Note that R3 alone cannot detect a failed R4 uplink — the tiebreaker leaves its best path and next hop unchanged. Convergence is observable on R4, where `show ip bgp 172.16.10.10/32` shows the route source flip from the direct AS 65100 session to the R1 ring session, and on R2, where the two-hop path via R1 stays best throughout. This is also why `verify-k8s-routes.yml` asserts both MetalLB sessions Established directly rather than inferring health from downstream route state.
+
 The Ansible playbooks and `verify_bgp.py` automate the session-state and route-origination checks so validation does not depend on reading CLI output by hand.
-
-## Lessons Learned
-
-- **MetalLB is a BGP speaker, not magic.** A `LoadBalancer` IP on bare metal is only reachable because a real BGP session advertises it; treating MetalLB as just another AS makes the integration with an existing network straightforward to reason about.
-- **The data path and the control path can disagree.** Routers learn the /32 and forward toward it, but the VIP is a DNAT rule on the node, not an addressable interface — which is why it answers TCP but not ICMP.
-- **Redundancy lives in the routing layer.** Failover here is pure eBGP withdrawal and reconvergence; Kubernetes is unaware a link went down.
-- **Host networking is half the lab.** Reverse-path filtering, return-route metrics, and per-session `sourceAddress` binding are the difference between a working asymmetric path and silent drops.
-- **k3s startup is racy.** The systemd unit returns before the API server is serving; polling for the node object before `kubectl wait` avoids a "no matching resources" failure.
 
 ## Future Improvements
 
 - **CI for the containerlab variant** — wire `verify_bgp.py` into GitHub Actions so the FRR path is tested on every push (the headless design already supports it).
-- **BFD** on the MetalLB peerings for sub-second failover instead of relying on BGP hold timers.
 - **Observability** — scrape the MetalLB speaker and FRR/IOSv with Prometheus and add a Grafana view of session state and advertised prefixes.
-- **L2 mode comparison** — a parallel MetalLB L2 configuration to contrast ARP-based failover with BGP.
 - **Idempotent teardown** — a `destroy` stage that removes TAPs, routes, and the k3s install cleanly.
 - **Secrets hygiene** — replace the `admin`/`admin` lab credentials and world-readable kubeconfig with something closer to production practice (documented as a deliberate lab shortcut today).
 
 ## Screenshots
 
-The repository currently ships no images. The following would make the README far more compelling to a reviewer skimming on GitHub, and would prove the lab actually runs:
+Remaining captures that would strengthen the README:
 
-1. **GNS3 topology canvas** — the four routers, switch, and three Cloud nodes wired up. Insert near the top, under the title.
-2. **`show ip bgp summary` on R1** — three neighbors Established, including AS 65100 with a non-zero `PfxRcd`. Place in Validation.
-3. **`show ip bgp 172.16.10.10/32` on R3** — the two AS paths with the shorter one marked best. Place in Validation under "Path selection."
-4. **Failover side-by-side** — R3's best path before and after shutting R4's uplink, with a `curl` loop still responding. Place in Validation under "Failover."
-5. **`kubectl get svc` + MetalLB speaker logs** — the two services with their external IPs and the speaker announcing the /32s. Place under Deployment.
-
-A short terminal recording (asciinema/GIF) of the failover would be the single highest-impact addition.
+1. **`kubectl get svc` + MetalLB speaker logs** — the two services with their external IPs and the speaker announcing the /32s. Place under Deployment.
+2. **R4 during failover** — `show ip bgp 172.16.10.10/32` showing the route source flipped from the direct AS 65100 session to the R1 ring session, the router where convergence is actually visible.
+3. **Curl loop during failover** — timestamped responses straight through the shut/no shut cycle, proving zero-drop failover.
 
 ---
 
