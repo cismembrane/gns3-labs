@@ -42,7 +42,7 @@ Management, same pattern as the other labs:
 | R4 to SW1     | GigabitEthernet0/4 | Ethernet3        |
 | Cloud1 to SW1 | tap0               | Ethernet4        |
 | Cloud2 to R1  | tap1               | Ethernet5        |
-| Cloud3 to R2  | tap2               | Ethernet6        |
+| Cloud3 to R4  | tap2               | Ethernet6        |
 
 ## BGP Neighbor Map
 
