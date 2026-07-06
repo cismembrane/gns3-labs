@@ -220,7 +220,7 @@ R4(config-if)# no shutdown       # MetalLB session re-establishes (~30-60s); R3 
 
 BGP fast external fallover tears down the MetalLB session the instant the interface flaps, and R4 switches locally to the path it already holds from R1. R3 sees the updated `65004 65001 65100` path within the eBGP advertisement interval (30 seconds worst case, usually single digits).
 
-![R3 during failover: both paths three hops, best held by oldest external](images/show-ip-bgp-r3-after-interface-shutdown.png)
+![R3 during failover: both paths three hops, best held by oldest external](images/show-ip-bgp-r3-after-shutdown.png)
 
 Note that R3 alone cannot detect a failed R4 uplink — the tiebreaker leaves its best path and next hop unchanged. Convergence is observable on R4, where `show ip bgp 172.16.10.10/32` shows the route source flip from the direct AS 65100 session to the R1 ring session, and on R2, where the two-hop path via R1 stays best throughout. This is also why `verify-k8s-routes.yml` asserts both MetalLB sessions Established directly rather than inferring health from downstream route state.
 
