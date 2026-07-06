@@ -2,7 +2,7 @@
 
 A single-node k3s cluster advertises Kubernetes `LoadBalancer` services into a four-router eBGP ring using MetalLB in native BGP mode. The cluster runs as AS 65100 and peers with two routers (R1 and R4) over redundant uplinks. Each service is announced as a /32 host route and propagates across the ring through normal eBGP. Shutting down either uplink reroutes traffic over the surviving path with no change to the cluster — the failover happens entirely in the routing layer.
 
-The lab is built two ways from the same addressing and BGP design: a full **GNS3 / Cisco IOSv** topology configured with Ansible, and a headless **containerlab / FRR** variant that runs without a GUI and is suitable for CI.
+The lab is built two ways from the same addressing and BGP design: a full **GNS3 / Cisco IOSv** topology configured with Ansible, and a headless **containerlab / FRR** variant.
 
 ![GNS3 topology](images/gns3-topology.png)
 
@@ -10,11 +10,11 @@ The lab is built two ways from the same addressing and BGP design: a full **GNS3
 
 ## Overview
 
-This lab builds the routing layer underneath a bare-metal Kubernetes `LoadBalancer`: how a cluster gets a routable service IP and how that IP behaves under link failure. MetalLB originates a BGP route for each service; the surrounding routers treat the cluster as just another autonomous system. It demonstrates three things end to end and reproducibly: **service IP advertisement** (a Kubernetes service becoming a real route in a router's table), **eBGP path selection** (the ring picking the shorter AS path to the cluster), and **routed failover** (traffic surviving the loss of an uplink without touching Kubernetes).
+This lab builds the routing layer underneath a bare-metal Kubernetes `LoadBalancer`. The surrounding routers treat the cluster as just another autonomous system. It demonstrates three things end to end: **service IP advertisement** (a Kubernetes service becoming a real route in a router's table), **eBGP path selection** (the ring picking the shorter AS path to the cluster), and **routed failover** (traffic surviving the loss of an uplink).
 
 ## Architecture
 
-The four routers form an eBGP ring, each in its own AS (65001–65004). The k3s host attaches to R1 and R4 over two transit links and runs MetalLB as AS 65100. MetalLB opens one eBGP session to each of R1 and R4 and advertises every `LoadBalancer` service IP as a /32. R2 and R3 never peer with the cluster directly. They learn the service routes through standard eBGP propagation around the ring, which is what makes the path-selection and failover behavior observable from the far side.
+The four routers form an eBGP ring, each in its own AS (65001–65004). The k3s host attaches to R1 and R4 over two transit links and runs MetalLB as AS 65100. MetalLB opens one eBGP session to each of R1 and R4 and advertises every `LoadBalancer` service IP as a /32. R2 and R3 never peer with the cluster directly. They learn the service routes through standard eBGP propagation around the ring.
 
 ```mermaid
 graph TD
@@ -36,11 +36,45 @@ graph TD
 
 **Data flow.** A client routed into the ring sends traffic toward a service VIP (e.g. `172.16.10.10/32`). Each router forwards along its BGP best path toward AS 65100. Inbound traffic enters the cluster through whichever edge router sits on the shortest AS path from its entry point: R1 for traffic arriving at R1 or R2, R4 for traffic arriving at R3 or R4. No routing policy prefers one uplink over the other for inbound traffic. On the node, kube-proxy DNATs the VIP to a backing pod. Return traffic follows static host routes that prefer the R1 uplink. That preference applies to replies only, and it covers host-side TAP loss rather than R1 failure, as noted in `scripts/setup-taps.sh`.
 
-**Path selection.** R3 sits two AS hops from the cluster in either direction. Its BGP table holds two paths for each service route — `65002 65001 65100` via R1 and `65004 65100` via R4 — and it selects the shorter one (via R4) as best.
+**Path selection.** R3 hears the cluster from both sides of the ring at unequal distances: two AS hops via R4 (`65004 65100`) and three the long way around (65002 65001 65100). It selects the shorter path via R4 as best.
 
-**Failover.** Shutting R4's cluster-facing interface (GigabitEthernet0/5) tears down the direct MetalLB session and withdraws the routes R4 originated. R4 then learns the VIP from R1 around the ring and re-advertises it to R3 as `65004 65001 65100`. R3 now holds two three-hop paths: `65002 65001 65100` from R2, present in its table since before the failure, and the new `65004 65001 65100` from R4. With path lengths tied, the oldest-external tiebreaker selects the path received first, so R3's best path becomes `65002 65001 65100` via R2 (`10.0.2.2`) and traffic reroutes through R2 and R1 to the cluster. Service traffic continues uninterrupted. Restoring the link re-establishes the MetalLB session, and R3's best path returns to `65004 65100`.
+```
+R3# show ip bgp 172.16.10.10/32
+BGP routing table entry for 172.16.10.10/32, version 47
+Paths: (2 available, best #2, table default)
+  Advertised to update-groups:
+     1         
+  Refresh Epoch 1
+  65002 65001 65100
+    10.0.2.2 from 10.0.2.2 (2.2.2.2)
+      Origin IGP, localpref 100, valid, external
+      rx pathid: 0, tx pathid: 0
+  Refresh Epoch 1
+  65004 65100
+    10.0.3.4 from 10.0.3.4 (4.4.4.4)
+      Origin IGP, localpref 100, valid, external, best
+      rx pathid: 0, tx pathid: 0x0
+```
 
-**Reverse-path filtering.** The node receives traffic on both uplinks but always prefers `tap1`/`k3s-r1` for replies. With strict `rp_filter`, replies to packets that arrived on the backup interface would be dropped, so both uplinks need loose RPF (`rp_filter=2`). The containerlab host script (`setup-host-links.sh`) sets this automatically; on the GNS3 host, set it manually on `tap1`/`tap2`.
+**Failover.** Shutting R4's cluster-facing interface (GigabitEthernet0/5) tears down the direct MetalLB session and withdraws the routes R4 originated. R4 then learns the VIP from R1 around the ring and re-advertises it to R3 as `65004 65001 65100`. R3 now holds two three-hop paths: `65002 65001 65100` from R2, present in its table since before the failure, and the new `65004 65001 65100` from R4. With path lengths tied, the path-age tiebreaker keeps R3's best path on the R4 session: `65004 65001 65100`, next hop `10.0.3.4` unchanged. Traffic reaches the cluster through R4 and R1, entering via R1's uplink. Service traffic continues uninterrupted. Restoring the link re-establishes the MetalLB session, and R3's best path returns to `65004 65100`.
+
+```
+R3# show ip bgp 172.16.10.10/32
+BGP routing table entry for 172.16.10.10/32, version 49
+Paths: (2 available, best #2, table default)
+  Advertised to update-groups:
+     1         
+  Refresh Epoch 1
+  65002 65001 65100
+    10.0.2.2 from 10.0.2.2 (2.2.2.2)
+      Origin IGP, localpref 100, valid, external
+      rx pathid: 0, tx pathid: 0
+  Refresh Epoch 1
+  65004 65001 65100
+    10.0.3.4 from 10.0.3.4 (4.4.4.4)
+      Origin IGP, localpref 100, valid, external, best
+      rx pathid: 0, tx pathid: 0x0
+```
 
 ## Technologies Used
 
@@ -71,7 +105,6 @@ graph TD
 
 - Docker and containerlab
 - Python 3 (for `verify_bgp.py`)
-- The same `curl`/`sudo` tooling to install k3s and MetalLB
 
 ## Project Structure
 
@@ -135,7 +168,7 @@ Resume after a failure at any stage:
 ./deploy-lab.sh --from <stage>     # taps → bootstrap → routers → cluster → services → verify
 ```
 
-Step by step, if you prefer:
+Step by step:
 
 ```bash
 ./scripts/setup-taps.sh                                   # 1. host TAPs + return routes
@@ -149,10 +182,10 @@ ansible-playbook verify-k8s-routes.yml                    # 7. end-to-end route 
 
 A few implementation notes worth knowing before you run it:
 
-- **TAPs are not persistent.** `setup-taps.sh` must be rerun after a host reboot, and you must bind `tap0`/`tap1`/`tap2` to their GNS3 Cloud nodes before continuing.
+- **TAPs are not persistent.** `setup-taps.sh` must be rerun after a host reboot, and you MUST bind `tap0`/`tap1`/`tap2` to their GNS3 Cloud nodes.
 - **ServiceLB must be disabled.** `install-k3s.sh` installs k3s with `--disable servicelb --disable traefik`; otherwise k3s's built-in load balancer claims every `LoadBalancer` service before MetalLB can.
 - **Sessions bind to the right interface.** Each `BGPPeer` sets `sourceAddress` explicitly so the MetalLB speaker originates its TCP session from the correct TAP.
-- **Loose RPF is required** on the cluster uplinks (`rp_filter=2`) so replies to traffic that arrived on the backup interface are not dropped. `setup-taps.sh` does not set this — apply it manually on `tap1`/`tap2` (the containerlab `setup-host-links.sh` does it automatically).
+- **Loose RPF is required** Traffic can arrive on the backup uplink (tap2) while replies to ring sources leave via tap1. With strict rp_filter the kernel drops those arriving packets at the interface. setup-taps.sh does not set this; apply rp_filter=2 manually on tap1/tap2. The containerlab setup-host-links.sh sets it automatically.
 
 ## Deployment (containerlab)
 
@@ -171,9 +204,9 @@ python3 verify_bgp.py               # full check after MetalLB is up
 
 **BGP sessions.** On R1, `show ip bgp summary` shows three neighbors: R2 (`10.0.1.2`), R4 (`10.0.4.4`), and the cluster (`10.0.5.5`, AS 65100). The MetalLB peer's `PfxRcd` equals the number of advertised services (2 with both demos deployed).
 
-![R1 BGP summary with MetalLB peer established](images/show-ip-bgp-summary.png)
+![R1 BGP summary with MetalLB peer established](images/show-ip-bgp-summary-r1.png)
 
-**Path selection.** On R3, two AS hops from the cluster either way:
+**Path selection.**  On R3, the cluster is visible from both directions at unequal distance: two AS hops via R4, three via R2 - R1. The shorter AS path wins:
 
 ```bash
 show ip bgp 172.16.10.10/32   # two paths: 65002 65001 65100 and 65004 65100; shorter via R4 is best
@@ -181,7 +214,7 @@ show ip bgp 172.16.10.10/32   # two paths: 65002 65001 65100 and 65004 65100; sh
 
 ![R3 steady state: 65004 65100 best on AS path length](images/show-ip-bgp-r3.png)
 
-**Service reachability.** VIPs do not answer ICMP — the /32 exists in the routers' tables, but on the node it is only a kube-proxy DNAT rule, not an interface address. Test over TCP:
+**Service reachability.** VIPs do not answer ICMP. The /32 exists in the routers' tables, but on the node it is only a kube-proxy DNAT rule, not an interface address. Test over TCP:
 
 ```bash
 curl http://172.16.10.10   # alternates between pod hostnames across repeated requests
