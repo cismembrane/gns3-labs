@@ -16,6 +16,10 @@ This lab builds the routing layer underneath a bare-metal Kubernetes `LoadBalanc
 
 The four routers form an eBGP ring, each in its own AS (65001–65004). The k3s host attaches to R1 and R4 over two transit links and runs MetalLB as AS 65100. MetalLB opens one eBGP session to each of R1 and R4 and advertises every `LoadBalancer` service IP as a /32. R2 and R3 never peer with the cluster directly. They learn the service routes through standard eBGP propagation around the ring.
 
+R1's session table shows all three neighbors up, with the MetalLB session (`10.0.5.5`, AS 65100) delivering the two service /32s:
+
+![show ip bgp summary on R1](images/show-ip-bgp-summary-r1.png)
+
 ```mermaid
 graph TD
     subgraph Ring["eBGP Ring"]
@@ -36,45 +40,13 @@ graph TD
 
 **Data flow.** A client routed into the ring sends traffic toward a service VIP (e.g. `172.16.10.10/32`). Each router forwards along its BGP best path toward AS 65100. Inbound traffic enters the cluster through whichever edge router sits on the shortest AS path from its entry point: R1 for traffic arriving at R1 or R2, R4 for traffic arriving at R3 or R4. No routing policy prefers one uplink over the other for inbound traffic. On the node, kube-proxy DNATs the VIP to a backing pod. Return traffic follows static host routes that prefer the R1 uplink. That preference applies to replies only, and it covers host-side TAP loss rather than R1 failure, as noted in `scripts/setup-taps.sh`.
 
-**Path selection.** R3 hears the cluster from both sides of the ring at unequal distances: two AS hops via R4 (`65004 65100`) and three the long way around (65002 65001 65100). It selects the shorter path via R4 as best.
+**Path selection.** R3 hears the cluster from both sides of the ring at unequal distances: two AS hops via R4 (`65004 65100`) and three the long way around (`65002 65001 65100`). It selects the shorter path via R4 as best.
 
-```
-R3# show ip bgp 172.16.10.10/32
-BGP routing table entry for 172.16.10.10/32, version 47
-Paths: (2 available, best #2, table default)
-  Advertised to update-groups:
-     1         
-  Refresh Epoch 1
-  65002 65001 65100
-    10.0.2.2 from 10.0.2.2 (2.2.2.2)
-      Origin IGP, localpref 100, valid, external
-      rx pathid: 0, tx pathid: 0
-  Refresh Epoch 1
-  65004 65100
-    10.0.3.4 from 10.0.3.4 (4.4.4.4)
-      Origin IGP, localpref 100, valid, external, best
-      rx pathid: 0, tx pathid: 0x0
-```
+![show ip bgp on R3, baseline](images/show-ip-bgp-r3.png)
 
 **Failover.** Shutting R4's cluster-facing interface (GigabitEthernet0/5) tears down the direct MetalLB session and withdraws the routes R4 originated. R4 then learns the VIP from R1 around the ring and re-advertises it to R3 as `65004 65001 65100`. R3 now holds two three-hop paths: `65002 65001 65100` from R2, present in its table since before the failure, and the new `65004 65001 65100` from R4. With path lengths tied, the path-age tiebreaker keeps R3's best path on the R4 session: `65004 65001 65100`, next hop `10.0.3.4` unchanged. Traffic reaches the cluster through R4 and R1, entering via R1's uplink. Service traffic continues uninterrupted. Restoring the link re-establishes the MetalLB session, and R3's best path returns to `65004 65100`.
 
-```
-R3# show ip bgp 172.16.10.10/32
-BGP routing table entry for 172.16.10.10/32, version 49
-Paths: (2 available, best #2, table default)
-  Advertised to update-groups:
-     1         
-  Refresh Epoch 1
-  65002 65001 65100
-    10.0.2.2 from 10.0.2.2 (2.2.2.2)
-      Origin IGP, localpref 100, valid, external
-      rx pathid: 0, tx pathid: 0
-  Refresh Epoch 1
-  65004 65001 65100
-    10.0.3.4 from 10.0.3.4 (4.4.4.4)
-      Origin IGP, localpref 100, valid, external, best
-      rx pathid: 0, tx pathid: 0x0
-```
+![show ip bgp on R3 after shutting R4's cluster uplink](images/show-ip-bgp-r3-after-shutdown.png)
 
 ## Technologies Used
 
@@ -129,14 +101,20 @@ k8s-metallb-bgp/
 │   ├── setup-taps.sh        # creates tap0/1/2 + return routes (GNS3)
 │   ├── install-k3s.sh       # k3s + Helm + MetalLB chart
 │   └── bootstrap-routers.py # console bootstrap via the GNS3 API
-├── images/                  # topology and validation screenshots
+├── images/
+│   ├── gns3-topology.png            # topology canvas
+│   ├── show-ip-bgp-summary-r1.png   # R1 sessions incl. MetalLB peer
+│   ├── show-ip-bgp-r3.png           # baseline best path via R4
+│   └── show-ip-bgp-r3-after-shutdown.png  # failover best path
 ├── containerlab/            # headless FRR 9.1.0 variant (same addressing)
 │   ├── metallb-ring.clab.yml
 │   ├── daemons              # FRR daemon toggles
 │   ├── r1..r4/frr.conf      # per-router FRR configs (mirror host_vars)
 │   ├── setup-host-links.sh
 │   └── verify_bgp.py        # vtysh JSON session + route checks
-└── gns3/README.md           # physical link map, neighbor + management tables
+└── gns3/
+    ├── README.md            # physical link map, neighbor + management tables
+    └── k8s-metallb-bgp/     # importable GNS3 project (topology + project files)
 ```
 
 ## Addressing
