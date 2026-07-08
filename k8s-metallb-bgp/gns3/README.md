@@ -80,6 +80,7 @@ Management, same pattern as the other labs:
 
 ## Requirements
 
+- A Cisco IOSv qcow2 image registered as a GNS3 QEMU appliance. The project references it as `virtioa.qcow2`. IOSv is licensed Cisco software and is not in this repo; supply your own and register it before importing the project.
 - Four IOSv router nodes named `R1` through `R4`, with at least six network adapters each (Gi0/0 through Gi0/5).
 - One GNS3 Ethernet Switch `SW1` for the management segment.
 - Three GNS3 Cloud nodes: `Cloud1` (tap0, management), `Cloud2` (tap1, R1 transit), `Cloud3` (tap2, R4 transit).

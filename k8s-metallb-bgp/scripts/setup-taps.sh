@@ -34,11 +34,17 @@ make_tap tap0 192.168.0.100/24
 make_tap tap1 10.0.5.5/29
 make_tap tap2 10.0.6.5/29
 
+# Loose reverse-path filtering on the transit taps. Failover traffic can arrive
+# on tap2 while replies to ring sources leave via tap1; strict rp_filter drops
+# those packets at the interface.
+sudo sysctl -qw net.ipv4.conf.tap1.rp_filter=2 net.ipv4.conf.tap2.rp_filter=2
+
 # Return routes into the ring, scoped to what actually lives behind it:
 # the four inter-router transit /29s and the four router loopback /32s.
-# Deliberately NOT 10.0.0.0/16 -- a /16 can swallow the MetalLB service pool
-# and hairpin host-originated service traffic out to R1. Directly connected
-# segments (192.168.0.0/24, 10.0.5.0/29, 10.0.6.0/29) need no route here.
+# Enumerated on purpose rather than a blanket 10.0.0.0/16: a /16 would also
+# cover the directly connected transit segments and anything else in 10.0/16,
+# so keeping the list tight avoids surprising host routing decisions. Directly
+# connected segments (192.168.0.0/24, 10.0.5.0/29, 10.0.6.0/29) need no route here.
 # Primary via R1 (tap1, metric 100); backup via R4 (tap2, metric 200),
 # subject to the failover caveat above.
 ring_dests=(

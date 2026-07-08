@@ -163,7 +163,7 @@ A few implementation notes worth knowing before you run it:
 - **TAPs are not persistent.** `setup-taps.sh` must be rerun after a host reboot, and you MUST bind `tap0`/`tap1`/`tap2` to their GNS3 Cloud nodes.
 - **ServiceLB must be disabled.** `install-k3s.sh` installs k3s with `--disable servicelb --disable traefik`; otherwise k3s's built-in load balancer claims every `LoadBalancer` service before MetalLB can.
 - **Sessions bind to the right interface.** Each `BGPPeer` sets `sourceAddress` explicitly so the MetalLB speaker originates its TCP session from the correct TAP.
-- **Loose RPF is required** Traffic can arrive on the backup uplink (tap2) while replies to ring sources leave via tap1. With strict rp_filter the kernel drops those arriving packets at the interface. setup-taps.sh does not set this; apply rp_filter=2 manually on tap1/tap2. The containerlab setup-host-links.sh sets it automatically.
+- **Loose RPF is required.** Traffic can arrive on the backup uplink (tap2) while replies to ring sources leave via tap1. With strict rp_filter the kernel drops those arriving packets at the interface. Both setup-taps.sh and the containerlab setup-host-links.sh set rp_filter=2 on the transit interfaces automatically.
 
 ## Deployment (containerlab)
 
@@ -222,7 +222,7 @@ BGP fast external fallover tears down the MetalLB session the instant the interf
 
 ![R3 during failover: both paths three hops, best held by oldest external](images/show-ip-bgp-r3-after-shutdown.png)
 
-Note that R3 alone cannot detect a failed R4 uplink — the tiebreaker leaves its best path and next hop unchanged. Convergence is observable on R4, where `show ip bgp 172.16.10.10/32` shows the route source flip from the direct AS 65100 session to the R1 ring session, and on R2, where the two-hop path via R1 stays best throughout. This is also why `verify-k8s-routes.yml` asserts both MetalLB sessions Established directly rather than inferring health from downstream route state.
+Note that R3 alone cannot detect a failed R4 uplink due to the tiebreaker leaving its best path and next hop unchanged. Convergence is observable on R4, where `show ip bgp 172.16.10.10/32` shows the route source flip from the direct AS 65100 session to the R1 ring session, and on R2, where the two-hop path via R1 stays best throughout. This is also why `verify-k8s-routes.yml` asserts both MetalLB sessions Established directly rather than inferring health from downstream route state.
 
 The Ansible playbooks and `verify_bgp.py` automate the session-state and route-origination checks so validation does not depend on reading CLI output by hand.
 

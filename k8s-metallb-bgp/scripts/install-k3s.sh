@@ -10,11 +10,13 @@
 # credentials to any local user, which is acceptable for a throwaway lab only.
 set -euo pipefail
 METALLB_CHART_VERSION="${METALLB_CHART_VERSION:-0.15.2}"
+K3S_VERSION="${K3S_VERSION:-v1.36.2+k3s1}"
 export KUBECONFIG=/etc/rancher/k3s/k3s.yaml
 
 # --- k3s ---
 if ! command -v k3s &>/dev/null; then
   curl -sfL https://get.k3s.io | \
+    INSTALL_K3S_VERSION="$K3S_VERSION" \
     INSTALL_K3S_EXEC="--disable servicelb --disable traefik --write-kubeconfig-mode 644" sh -
 fi
 

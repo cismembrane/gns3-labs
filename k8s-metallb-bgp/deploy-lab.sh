@@ -40,6 +40,9 @@ wait_for_ssh() {
 
 if run_stage taps; then
   ./scripts/setup-taps.sh
+  echo
+  echo "Now bind tap0/tap1/tap2 to Cloud1/Cloud2/Cloud3 in the GNS3 GUI."
+  read -rp "Press Enter once the Cloud nodes are wired up to continue... "
 fi
 
 if run_stage bootstrap; then
