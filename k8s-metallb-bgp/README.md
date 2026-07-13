@@ -36,9 +36,12 @@ graph TD
     K3S["k3s node + MetalLB<br/>AS 65100<br/>pool 172.16.10.0/24"]
     R1 ---|"10.0.5.0/29 · eBGP, VIPs as /32"| K3S
     R4 ---|"10.0.6.0/29 · eBGP, VIPs as /32"| K3S
+
+    CLIENT["test client<br/>(netns, no BGP)"]
+    R3 ---|10.0.7.0/29| CLIENT
 ```
 
-**Data flow.** A client routed into the ring sends traffic toward a service VIP (e.g. `172.16.10.10/32`). Each router forwards along its BGP best path toward AS 65100. Inbound traffic enters the cluster through whichever edge router sits on the shortest AS path from its entry point: R1 for traffic arriving at R1 or R2, R4 for traffic arriving at R3 or R4. No routing policy prefers one uplink over the other for inbound traffic. On the node, kube-proxy DNATs the VIP to a backing pod. Return traffic follows static host routes that prefer the R1 uplink. That preference applies to replies only, and it covers host-side TAP loss rather than R1 failure, as noted in `scripts/setup-taps.sh`.
+**Data flow.** The test client — a network namespace attached behind R3 (`10.0.7.2/29`, default route to R3) — sends traffic toward a service VIP (e.g. `172.16.10.10/32`). The client lives in its own namespace deliberately: curl run on the k3s node itself is DNAT'd to the pod by kube-proxy's nat `OUTPUT` rules before routing ever happens, so node-local traffic never touches the ring and proves nothing about BGP. Namespace traffic enters at R3 and forwards hop by hop like any external client's. Each router forwards along its BGP best path toward AS 65100. Inbound traffic enters the cluster through whichever edge router sits on the shortest AS path from its entry point: R1 for traffic arriving at R1 or R2, R4 for traffic arriving at R3 or R4. No routing policy prefers one uplink over the other for inbound traffic. On the node, kube-proxy DNATs the VIP to a backing pod. Return traffic follows static host routes that prefer the R1 uplink. That preference applies to replies only, and it covers host-side TAP loss rather than R1 failure, as noted in `scripts/setup-taps.sh`.
 
 **Path selection.** R3 hears the cluster from both sides of the ring at unequal distances: two AS hops via R4 (`65004 65100`) and three the long way around (`65002 65001 65100`). It selects the shorter path via R4 as best.
 
@@ -99,6 +102,7 @@ k8s-metallb-bgp/
 │   └── nginx-hello.yaml     # 1-replica nginx at 172.16.10.20
 ├── scripts/
 │   ├── setup-taps.sh        # creates tap0/1/2 + return routes (GNS3)
+│   ├── setup-client-netns.sh # test client netns behind R3 (tap3/Cloud4)
 │   ├── install-k3s.sh       # k3s + Helm + MetalLB chart
 │   └── bootstrap-routers.py # console bootstrap via the GNS3 API
 ├── images/
@@ -107,7 +111,7 @@ k8s-metallb-bgp/
 │   ├── show-ip-bgp-r3.png           # baseline best path via R4
 │   └── show-ip-bgp-r3-after-shutdown.png  # failover best path
 ├── containerlab/            # headless FRR 9.1.0 variant (same addressing)
-│   ├── metallb-ring.clab.yml
+│   ├── metallb-ring.clab.yml  # ring + alpine test client behind r3
 │   ├── daemons              # FRR daemon toggles
 │   ├── r1..r4/frr.conf      # per-router FRR configs (mirror host_vars)
 │   ├── setup-host-links.sh
@@ -127,6 +131,7 @@ k8s-metallb-bgp/
 | R4 ↔ R1 | 10.0.4.0/29 | R4 Gi0/3 = .4, R1 Gi0/3 = .1 |
 | R1 ↔ k3s | 10.0.5.0/29 | R1 Gi0/5 = .1, node tap1 = .5 |
 | R4 ↔ k3s | 10.0.6.0/29 | R4 Gi0/5 = .4, node tap2 = .5 |
+| R3 ↔ client | 10.0.7.0/29 | R3 Gi0/5 = .3, client netns = .2 (via tap3) |
 | Management | 192.168.0.0/24 | R1–R4 = .1–.4, host tap0 = .100 |
 | MetalLB pool | 172.16.10.0/24 | whoami = .10, nginx-hello = .20 |
 
@@ -150,6 +155,7 @@ Step by step:
 
 ```bash
 ./scripts/setup-taps.sh                                   # 1. host TAPs + return routes
+./scripts/setup-client-netns.sh                           # 1b. test client netns behind R3
 python3 scripts/bootstrap-routers.py                      # 2. console-bootstrap SSH on R1–R4
 ansible-playbook deploy.yml && ansible-playbook verify.yml # 3. configure + verify the ring
 ./scripts/install-k3s.sh                                  # 4. k3s + Helm + MetalLB
@@ -160,7 +166,8 @@ ansible-playbook verify-k8s-routes.yml                    # 7. end-to-end route 
 
 A few implementation notes worth knowing before you run it:
 
-- **TAPs are not persistent.** `setup-taps.sh` must be rerun after a host reboot, and you MUST bind `tap0`/`tap1`/`tap2` to their GNS3 Cloud nodes.
+- **TAPs are not persistent.** `setup-taps.sh` and `setup-client-netns.sh` must be rerun after a host reboot, and you MUST bind `tap0`/`tap1`/`tap2`/`tap3` to their GNS3 Cloud nodes (`tap3` → Cloud4, linked to R3 Gi0/5).
+- **Data-plane tests run from the client netns, never from the node.** kube-proxy hooks LoadBalancer VIPs into the nat `OUTPUT` chain, so curl run on the k3s node is DNAT'd locally and succeeds even with BGP fully down — it proves nothing. `setup-client-netns.sh` builds an isolated client behind R3 whose traffic actually crosses the ring. It also adds a scoped `NOTRACK` exemption: k3s sets `bridge-nf-call-iptables=1`, which would otherwise let KUBE-SERVICES DNAT the client's traffic inside the host bridge on its way to GNS3.
 - **ServiceLB must be disabled.** `install-k3s.sh` installs k3s with `--disable servicelb --disable traefik`; otherwise k3s's built-in load balancer claims every `LoadBalancer` service before MetalLB can.
 - **Sessions bind to the right interface.** Each `BGPPeer` sets `sourceAddress` explicitly so the MetalLB speaker originates its TCP session from the correct TAP.
 - **Loose RPF is required.** Traffic can arrive on the backup uplink (tap2) while replies to ring sources leave via tap1. With strict rp_filter the kernel drops those arriving packets at the interface. Both setup-taps.sh and the containerlab setup-host-links.sh set rp_filter=2 on the transit interfaces automatically.
@@ -176,6 +183,10 @@ sudo ./setup-host-links.sh          # address k3s-r1/k3s-r4, return routes, rp_f
 # then install k3s, apply metallb-config.yaml, and deploy services (GNS3 steps 4–6)
 python3 verify_bgp.py --ring-only   # ring sessions before the cluster is up
 python3 verify_bgp.py               # full check after MetalLB is up
+
+# data-plane check from the client container behind r3 (host curls are
+# short-circuited by kube-proxy's OUTPUT DNAT and prove nothing):
+docker exec clab-metallb-ring-client wget -qO- http://172.16.10.10
 ```
 
 ## Validation
@@ -192,20 +203,22 @@ show ip bgp 172.16.10.10/32   # two paths: 65002 65001 65100 and 65004 65100; sh
 
 ![R3 steady state: 65004 65100 best on AS path length](images/show-ip-bgp-r3.png)
 
-**Service reachability.** VIPs do not answer ICMP. The /32 exists in the routers' tables, but on the node it is only a kube-proxy DNAT rule, not an interface address. Test over TCP:
+**Service reachability.** VIPs do not answer ICMP. The /32 exists in the routers' tables, but on the node it is only a kube-proxy DNAT rule, not an interface address. Test over TCP — from the client netns, so the traffic actually crosses the ring (a node-local curl short-circuits through kube-proxy's `OUTPUT` DNAT and passes even with BGP down):
 
 ```bash
-curl http://172.16.10.10   # alternates between pod hostnames across repeated requests
-curl http://172.16.10.20
+sudo ip netns exec client curl http://172.16.10.10   # alternates between pod hostnames
+sudo ip netns exec client curl http://172.16.10.20
 ```
 
 To watch continuity through a failover test, run a monitoring loop that prints the responding pod hostname each second (it also demonstrates the pod alternation claim above):
 
 ```bash
 while :; do
-  printf '%s  %s\n' "$(date +%T)" \
-    "$(curl -sf --max-time 2 http://172.16.10.10 | awk '/Hostname/{print $2}')" \
-    || printf '%s  FAIL\n' "$(date +%T)"
+  if out=$(sudo ip netns exec client curl -sf --max-time 2 http://172.16.10.10); then
+    printf '%s  %s\n' "$(date +%T)" "$(awk '/Hostname/{print $2}' <<<"$out")"
+  else
+    printf '%s  FAIL\n' "$(date +%T)"
+  fi
   sleep 1
 done
 ```
@@ -214,11 +227,11 @@ done
 
 ```text
 R4(config)# interface GigabitEthernet0/5
-R4(config-if)# shutdown          # R4 re-advertises via R1: R3 sees 65004 65001 65100, best path unchanged (oldest external); curl keeps responding
+R4(config-if)# shutdown          # R4 re-advertises via R1: R3 sees 65004 65001 65100, best path unchanged (oldest external)
 R4(config-if)# no shutdown       # MetalLB session re-establishes (~30-60s); R3 best path returns to 65004 65100
 ```
 
-BGP fast external fallover tears down the MetalLB session the instant the interface flaps, and R4 switches locally to the path it already holds from R1. R3 sees the updated `65004 65001 65100` path within the eBGP advertisement interval (30 seconds worst case, usually single digits).
+BGP fast external fallover tears down the MetalLB session the instant the interface flaps, and R4 switches locally to the path it already holds from R1 — so the client's forwarding path (R3 → R4 → R1 → node) repairs as fast as R4's local best-path rerun, and the curl loop shows at most a brief gap. R3 sees the updated `65004 65001 65100` path within the eBGP advertisement interval (30 seconds worst case, usually single digits), but its next hop never changes, so R3's table lag does not affect the data plane. Because the loop runs from the client netns, a real forwarding break would show as `FAIL` lines — this test can actually fail, which is what makes it worth running.
 
 ![R3 during failover: both paths three hops, best held by oldest external](images/show-ip-bgp-r3-after-shutdown.png)
 
@@ -239,7 +252,7 @@ Remaining captures that would strengthen the README:
 
 1. **`kubectl get svc` + MetalLB speaker logs** — the two services with their external IPs and the speaker announcing the /32s. Place under Deployment.
 2. **R4 during failover** — `show ip bgp 172.16.10.10/32` showing the route source flipped from the direct AS 65100 session to the R1 ring session, the router where convergence is actually visible.
-3. **Curl loop during failover** — timestamped responses straight through the shut/no shut cycle, proving zero-drop failover.
+3. **Curl loop during failover** — timestamped responses from the client netns straight through the shut/no shut cycle, showing the measured convergence gap (if any).
 
 ---
 

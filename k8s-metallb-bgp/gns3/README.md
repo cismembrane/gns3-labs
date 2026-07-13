@@ -15,9 +15,10 @@ The topology is the same four-router IOSv eBGP ring used in `bgp-grafana-monitor
 
         R1 Gi0/5 <-> Cloud2 (tap1) <-> k3s node (AS 65100)
         R4 Gi0/5 <-> Cloud3 (tap2) <-> k3s node (AS 65100)
+        R3 Gi0/5 <-> Cloud4 (tap3) <-> client netns (no BGP)
 ```
 
-The k3s node is the GNS3 host itself, attached through TAP interfaces. It holds one eBGP session to R1 and one to R4, both originated by MetalLB.
+The k3s node is the GNS3 host itself, attached through TAP interfaces. It holds one eBGP session to R1 and one to R4, both originated by MetalLB. The client is a network namespace on the same host, attached behind R3 via `tap3`/Cloud4 — it exists so data-plane tests originate outside the node (node-local curls are DNAT'd by kube-proxy before routing and never cross the ring).
 
 ---
 
@@ -31,6 +32,7 @@ The k3s node is the GNS3 host itself, attached through TAP interfaces. It holds 
 | R4 to R1  | R4       | GigabitEthernet0/3 | 10.0.4.4/29 | R1              | GigabitEthernet0/3 | 10.0.4.1/29 | 10.0.4.0/29    |
 | R1 to k3s | R1       | GigabitEthernet0/5 | 10.0.5.1/29 | k3s host        | tap1               | 10.0.5.5/29 | 10.0.5.0/29    |
 | R4 to k3s | R4       | GigabitEthernet0/5 | 10.0.6.4/29 | k3s host        | tap2               | 10.0.6.5/29 | 10.0.6.0/29    |
+| R3 to client | R3    | GigabitEthernet0/5 | 10.0.7.3/29 | client netns    | tap3 (br-client)   | 10.0.7.2/29 | 10.0.7.0/29    |
 
 Management, same pattern as the other labs:
 
@@ -43,6 +45,7 @@ Management, same pattern as the other labs:
 | Cloud1 to SW1 | tap0               | Ethernet4        |
 | Cloud2 to R1  | tap1               | Ethernet5        |
 | Cloud3 to R4  | tap2               | Ethernet6        |
+| Cloud4 to R3  | tap3               | (direct to R3 Gi0/5) |
 
 ## BGP Neighbor Map
 
@@ -83,14 +86,14 @@ Management, same pattern as the other labs:
 - A Cisco IOSv qcow2 image registered as a GNS3 QEMU appliance. The project references it as `virtioa.qcow2`. IOSv is licensed Cisco software and is not in this repo; supply your own and register it before importing the project.
 - Four IOSv router nodes named `R1` through `R4`, with at least six network adapters each (Gi0/0 through Gi0/5).
 - One GNS3 Ethernet Switch `SW1` for the management segment.
-- Three GNS3 Cloud nodes: `Cloud1` (tap0, management), `Cloud2` (tap1, R1 transit), `Cloud3` (tap2, R4 transit).
+- Four GNS3 Cloud nodes: `Cloud1` (tap0, management), `Cloud2` (tap1, R1 transit), `Cloud3` (tap2, R4 transit), `Cloud4` (tap3, R3 client segment).
 - A Linux GNS3 host that will run k3s.
 
 ## Host Connectivity
 
-`../scripts/setup-taps.sh` creates all three TAP interfaces, addresses them, and installs the return routes into the ring. Run it, then bind each TAP to its Cloud node in GNS3 and wire the links per the tables above.
+`../scripts/setup-taps.sh` creates the three k3s-side TAP interfaces, addresses them, and installs the return routes into the ring. `../scripts/setup-client-netns.sh` creates `tap3`, the `br-client` bridge, and the client namespace behind R3. Run both, then bind each TAP to its Cloud node in GNS3 and wire the links per the tables above.
 
-TAPs created this way do not survive a reboot. Rerun the script after restarting the host.
+TAPs and the client namespace do not survive a reboot. Rerun both scripts after restarting the host.
 
 Validate before moving on:
 
@@ -98,6 +101,7 @@ Validate before moving on:
 ping 192.168.0.1   # R1 management via tap0
 ping 10.0.5.1      # R1 transit via tap1 (after deploy.yml has run)
 ping 10.0.6.4      # R4 transit via tap2 (after deploy.yml has run)
+sudo ip netns exec client ping 10.0.7.3   # R3 from the client (after deploy.yml has run)
 ```
 
 ## Bootstrap

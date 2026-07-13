@@ -40,8 +40,10 @@ wait_for_ssh() {
 
 if run_stage taps; then
   ./scripts/setup-taps.sh
+  ./scripts/setup-client-netns.sh
   echo
-  echo "Now bind tap0/tap1/tap2 to Cloud1/Cloud2/Cloud3 in the GNS3 GUI."
+  echo "Now bind tap0/tap1/tap2 to Cloud1/Cloud2/Cloud3 in the GNS3 GUI,"
+  echo "and tap3 to Cloud4 (linked to R3 Gi0/5)."
   read -rp "Press Enter once the Cloud nodes are wired up to continue... "
 fi
 
@@ -72,8 +74,12 @@ fi
 
 if run_stage verify; then
   ansible-playbook verify-k8s-routes.yml
-  echo "== HTTP checks"
-  curl -fsS --max-time 5 http://172.16.10.10 | head -5
-  curl -fsS --max-time 5 http://172.16.10.20 | head -5
+  # HTTP checks run from the client netns behind R3, NOT from this host.
+  # Host-originated curls are DNAT'd by kube-proxy in the OUTPUT chain and
+  # never traverse the ring, so they pass even with BGP down. The netns
+  # client's traffic enters at R3 and follows BGP best path to the node.
+  echo "== HTTP checks (from client netns, across the ring)"
+  sudo ip netns exec client curl -fsS --max-time 5 http://172.16.10.10 | head -5
+  sudo ip netns exec client curl -fsS --max-time 5 http://172.16.10.20 | head -5
   echo "== lab is up"
 fi

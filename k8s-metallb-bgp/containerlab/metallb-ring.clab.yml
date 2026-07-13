@@ -41,6 +41,18 @@ topology:
       sysctls:
         net.ipv4.ip_forward: 1
 
+    # External test client behind r3. Data-plane checks must run from here,
+    # NOT from the host: kube-proxy DNATs VIP traffic in the host's OUTPUT
+    # chain, so host-originated curls never traverse the ring. A container
+    # is its own netns, so its traffic enters at r3 like a real client.
+    client:
+      kind: linux
+      image: alpine:3.20
+      cmd: sleep infinity
+      exec:
+        - ip addr add 10.0.7.2/29 dev eth1
+        - ip route replace default via 10.0.7.3
+
   links:
     - endpoints: ["r1:eth1", "r2:eth1"]   # 10.0.1.0/29
     - endpoints: ["r2:eth2", "r3:eth1"]   # 10.0.2.0/29
@@ -48,3 +60,4 @@ topology:
     - endpoints: ["r4:eth2", "r1:eth2"]   # 10.0.4.0/29
     - endpoints: ["r1:eth3", "host:k3s-r1"]   # 10.0.5.0/29
     - endpoints: ["r4:eth3", "host:k3s-r4"]   # 10.0.6.0/29
+    - endpoints: ["r3:eth3", "client:eth1"]   # 10.0.7.0/29 test client

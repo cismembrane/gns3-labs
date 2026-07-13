@@ -19,6 +19,10 @@ interfaces:
     description: mgmt
     address: 192.168.0.3
     mask: 255.255.255.0
+  - name: GigabitEthernet0/5
+    description: to_client
+    address: 10.0.7.3
+    mask: 255.255.255.248
 
 bgp_neighbors:
   - neighbor: 10.0.2.2
@@ -34,4 +38,6 @@ bgp_networks:
   - prefix: 10.0.2.0
     mask: 255.255.255.248
   - prefix: 10.0.3.0
+    mask: 255.255.255.248
+  - prefix: 10.0.7.0
     mask: 255.255.255.248

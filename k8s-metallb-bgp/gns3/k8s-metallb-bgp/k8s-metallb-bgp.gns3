@@ -413,12 +413,48 @@
                     }
                 ],
                 "suspend": false
+            },
+            {
+                "filters": {},
+                "link_id": "73325cb5-4939-4c97-992e-96838fa9997c",
+                "link_style": {
+                    "color": "#000000",
+                    "type": 1,
+                    "width": 2
+                },
+                "nodes": [
+                    {
+                        "adapter_number": 0,
+                        "label": {
+                            "rotation": 0,
+                            "style": "font-family: TypeWriter;font-size: 10.0;font-weight: bold;fill: #000000;fill-opacity: 1.0;",
+                            "text": "tap3",
+                            "x": 0,
+                            "y": 37
+                        },
+                        "node_id": "22e2e9ce-6e5e-49c8-94aa-2d4dda51017f",
+                        "port_number": 8
+                    },
+                    {
+                        "adapter_number": 5,
+                        "label": {
+                            "rotation": 0,
+                            "style": "font-family: TypeWriter;font-size: 10.0;font-weight: bold;fill: #000000;fill-opacity: 1.0;",
+                            "text": "e5",
+                            "x": 72,
+                            "y": 28
+                        },
+                        "node_id": "00ebd2c8-3c9e-4fba-b589-cd491cc69985",
+                        "port_number": 0
+                    }
+                ],
+                "suspend": false
             }
         ],
         "nodes": [
             {
                 "compute_id": "local",
-                "console": 5000,
+                "console": 5010,
                 "console_auto_start": false,
                 "console_type": "telnet",
                 "custom_adapters": [],
@@ -488,7 +524,7 @@
             },
             {
                 "compute_id": "local",
-                "console": 5002,
+                "console": 5012,
                 "console_auto_start": false,
                 "console_type": "telnet",
                 "custom_adapters": [],
@@ -558,7 +594,7 @@
             },
             {
                 "compute_id": "local",
-                "console": 5004,
+                "console": 5014,
                 "console_auto_start": false,
                 "console_type": "telnet",
                 "custom_adapters": [],
@@ -622,13 +658,13 @@
                 "symbol": ":/symbols/qemu_guest.svg",
                 "template_id": "9a1bc90a-d7b9-40dc-8221-ac63c922d07c",
                 "width": 65,
-                "x": -513,
-                "y": 8,
+                "x": -514,
+                "y": -1,
                 "z": 1
             },
             {
                 "compute_id": "local",
-                "console": 5006,
+                "console": 5016,
                 "console_auto_start": false,
                 "console_type": "telnet",
                 "custom_adapters": [],
@@ -693,12 +729,12 @@
                 "template_id": "9a1bc90a-d7b9-40dc-8221-ac63c922d07c",
                 "width": 65,
                 "x": -151,
-                "y": 7,
+                "y": 2,
                 "z": 1
             },
             {
                 "compute_id": "local",
-                "console": 5008,
+                "console": 5018,
                 "console_auto_start": false,
                 "console_type": "none",
                 "custom_adapters": [],
@@ -772,8 +808,8 @@
                 "symbol": ":/symbols/ethernet_switch.svg",
                 "template_id": "1966b864-93e7-32d5-965f-001384eec461",
                 "width": 72,
-                "x": -788,
-                "y": -101,
+                "x": -731,
+                "y": -104,
                 "z": 1
             },
             {
@@ -825,52 +861,37 @@
                             "type": "ethernet"
                         },
                         {
-                            "name": "tap0",
-                            "special": false,
-                            "type": "tap"
-                        },
-                        {
-                            "name": "tap1",
-                            "special": false,
-                            "type": "tap"
-                        },
-                        {
-                            "name": "tap2",
-                            "special": false,
-                            "type": "tap"
-                        },
-                        {
-                            "name": "veth1b0f7040",
+                            "name": "veth17448595",
                             "special": true,
                             "type": "ethernet"
                         },
                         {
-                            "name": "veth79809a49",
+                            "name": "veth1e2eb2f2",
                             "special": true,
                             "type": "ethernet"
                         },
                         {
-                            "name": "veth8b5d96b4",
+                            "name": "veth351ff654",
                             "special": true,
                             "type": "ethernet"
                         },
                         {
-                            "name": "veth9e56ba7c",
+                            "name": "veth3bbf2b44",
                             "special": true,
                             "type": "ethernet"
                         },
                         {
-                            "name": "vethb6c5ee2c",
+                            "name": "veth6013d151",
                             "special": true,
                             "type": "ethernet"
                         },
                         {
-                            "name": "vethc0a1a812",
+                            "name": "veth7742724d",
                             "special": true,
                             "type": "ethernet"
                         },
                         {
-                            "name": "vethd19f2983",
+                            "name": "vetha34ed873",
                             "special": true,
                             "type": "ethernet"
                         },
@@ -925,8 +946,8 @@
                 "symbol": ":/symbols/cloud.svg",
                 "template_id": "39e257dc-8412-3174-b6b3-0ee3ed6a43e9",
                 "width": 159,
-                "x": -1032,
-                "y": -117,
+                "x": -997,
+                "y": -121,
                 "z": 1
             },
             {
@@ -978,52 +999,37 @@
                             "type": "ethernet"
                         },
                         {
-                            "name": "tap0",
-                            "special": false,
-                            "type": "tap"
-                        },
-                        {
-                            "name": "tap1",
-                            "special": false,
-                            "type": "tap"
-                        },
-                        {
-                            "name": "tap2",
-                            "special": false,
-                            "type": "tap"
-                        },
-                        {
-                            "name": "veth1b0f7040",
+                            "name": "veth17448595",
                             "special": true,
                             "type": "ethernet"
                         },
                         {
-                            "name": "veth79809a49",
+                            "name": "veth1e2eb2f2",
                             "special": true,
                             "type": "ethernet"
                         },
                         {
-                            "name": "veth8b5d96b4",
+                            "name": "veth351ff654",
                             "special": true,
                             "type": "ethernet"
                         },
                         {
-                            "name": "veth9e56ba7c",
+                            "name": "veth3bbf2b44",
                             "special": true,
                             "type": "ethernet"
                         },
                         {
-                            "name": "vethb6c5ee2c",
+                            "name": "veth6013d151",
                             "special": true,
                             "type": "ethernet"
                         },
                         {
-                            "name": "vethc0a1a812",
+                            "name": "veth7742724d",
                             "special": true,
                             "type": "ethernet"
                         },
                         {
-                            "name": "vethd19f2983",
+                            "name": "vetha34ed873",
                             "special": true,
                             "type": "ethernet"
                         },
@@ -1131,52 +1137,37 @@
                             "type": "ethernet"
                         },
                         {
-                            "name": "tap0",
-                            "special": false,
-                            "type": "tap"
-                        },
-                        {
-                            "name": "tap1",
-                            "special": false,
-                            "type": "tap"
-                        },
-                        {
-                            "name": "tap2",
-                            "special": false,
-                            "type": "tap"
-                        },
-                        {
-                            "name": "veth1b0f7040",
+                            "name": "veth17448595",
                             "special": true,
                             "type": "ethernet"
                         },
                         {
-                            "name": "veth79809a49",
+                            "name": "veth1e2eb2f2",
                             "special": true,
                             "type": "ethernet"
                         },
                         {
-                            "name": "veth8b5d96b4",
+                            "name": "veth351ff654",
                             "special": true,
                             "type": "ethernet"
                         },
                         {
-                            "name": "veth9e56ba7c",
+                            "name": "veth3bbf2b44",
                             "special": true,
                             "type": "ethernet"
                         },
                         {
-                            "name": "vethb6c5ee2c",
+                            "name": "veth6013d151",
                             "special": true,
                             "type": "ethernet"
                         },
                         {
-                            "name": "vethc0a1a812",
+                            "name": "veth7742724d",
                             "special": true,
                             "type": "ethernet"
                         },
                         {
-                            "name": "vethd19f2983",
+                            "name": "vetha34ed873",
                             "special": true,
                             "type": "ethernet"
                         },
@@ -1233,6 +1224,204 @@
                 "width": 159,
                 "x": -790,
                 "y": 119,
+                "z": 1
+            },
+            {
+                "compute_id": "local",
+                "console": null,
+                "console_auto_start": false,
+                "console_type": null,
+                "custom_adapters": [],
+                "first_port_name": null,
+                "height": 71,
+                "label": {
+                    "rotation": 0,
+                    "style": "font-family: TypeWriter;font-size: 10.0;font-weight: bold;fill: #000000;fill-opacity: 1.0;",
+                    "text": "Cloud4",
+                    "x": 52,
+                    "y": -25
+                },
+                "locked": false,
+                "name": "Cloud4",
+                "node_id": "22e2e9ce-6e5e-49c8-94aa-2d4dda51017f",
+                "node_type": "cloud",
+                "port_name_format": "Ethernet{0}",
+                "port_segment_size": 0,
+                "properties": {
+                    "interfaces": [
+                        {
+                            "name": "br-client",
+                            "special": false,
+                            "type": "ethernet"
+                        },
+                        {
+                            "name": "client-veth",
+                            "special": false,
+                            "type": "ethernet"
+                        },
+                        {
+                            "name": "cni0",
+                            "special": false,
+                            "type": "ethernet"
+                        },
+                        {
+                            "name": "docker0",
+                            "special": true,
+                            "type": "ethernet"
+                        },
+                        {
+                            "name": "eno1",
+                            "special": false,
+                            "type": "ethernet"
+                        },
+                        {
+                            "name": "flannel.1",
+                            "special": false,
+                            "type": "ethernet"
+                        },
+                        {
+                            "name": "lo",
+                            "special": true,
+                            "type": "ethernet"
+                        },
+                        {
+                            "name": "tap0",
+                            "special": false,
+                            "type": "tap"
+                        },
+                        {
+                            "name": "tap1",
+                            "special": false,
+                            "type": "tap"
+                        },
+                        {
+                            "name": "tap2",
+                            "special": false,
+                            "type": "tap"
+                        },
+                        {
+                            "name": "tap3",
+                            "special": false,
+                            "type": "tap"
+                        },
+                        {
+                            "name": "veth17448595",
+                            "special": true,
+                            "type": "ethernet"
+                        },
+                        {
+                            "name": "veth1e2eb2f2",
+                            "special": true,
+                            "type": "ethernet"
+                        },
+                        {
+                            "name": "veth351ff654",
+                            "special": true,
+                            "type": "ethernet"
+                        },
+                        {
+                            "name": "veth3bbf2b44",
+                            "special": true,
+                            "type": "ethernet"
+                        },
+                        {
+                            "name": "veth6013d151",
+                            "special": true,
+                            "type": "ethernet"
+                        },
+                        {
+                            "name": "veth7742724d",
+                            "special": true,
+                            "type": "ethernet"
+                        },
+                        {
+                            "name": "vetha34ed873",
+                            "special": true,
+                            "type": "ethernet"
+                        },
+                        {
+                            "name": "virbr0",
+                            "special": true,
+                            "type": "ethernet"
+                        },
+                        {
+                            "name": "wlx503dd129c471",
+                            "special": false,
+                            "type": "ethernet"
+                        }
+                    ],
+                    "ports_mapping": [
+                        {
+                            "interface": "br-client",
+                            "name": "br-client",
+                            "port_number": 0,
+                            "type": "ethernet"
+                        },
+                        {
+                            "interface": "client-veth",
+                            "name": "client-veth",
+                            "port_number": 1,
+                            "type": "ethernet"
+                        },
+                        {
+                            "interface": "cni0",
+                            "name": "cni0",
+                            "port_number": 2,
+                            "type": "ethernet"
+                        },
+                        {
+                            "interface": "eno1",
+                            "name": "eno1",
+                            "port_number": 3,
+                            "type": "ethernet"
+                        },
+                        {
+                            "interface": "flannel.1",
+                            "name": "flannel.1",
+                            "port_number": 4,
+                            "type": "ethernet"
+                        },
+                        {
+                            "interface": "tap0",
+                            "name": "tap0",
+                            "port_number": 5,
+                            "type": "tap"
+                        },
+                        {
+                            "interface": "tap1",
+                            "name": "tap1",
+                            "port_number": 6,
+                            "type": "tap"
+                        },
+                        {
+                            "interface": "tap2",
+                            "name": "tap2",
+                            "port_number": 7,
+                            "type": "tap"
+                        },
+                        {
+                            "interface": "tap3",
+                            "name": "tap3",
+                            "port_number": 8,
+                            "type": "tap"
+                        },
+                        {
+                            "interface": "wlx503dd129c471",
+                            "name": "wlx503dd129c471",
+                            "port_number": 9,
+                            "type": "ethernet"
+                        }
+                    ],
+                    "remote_console_host": "",
+                    "remote_console_http_path": "/",
+                    "remote_console_port": 23,
+                    "remote_console_type": "none"
+                },
+                "symbol": ":/symbols/cloud.svg",
+                "template_id": "39e257dc-8412-3174-b6b3-0ee3ed6a43e9",
+                "width": 159,
+                "x": 88,
+                "y": -12,
                 "z": 1
             }
         ]

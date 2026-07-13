@@ -40,7 +40,9 @@ make_tap tap2 10.0.6.5/29
 sudo sysctl -qw net.ipv4.conf.tap1.rp_filter=2 net.ipv4.conf.tap2.rp_filter=2
 
 # Return routes into the ring, scoped to what actually lives behind it:
-# the four inter-router transit /29s and the four router loopback /32s.
+# the four inter-router transit /29s, the four router loopback /32s, and
+# the client segment behind R3 (see setup-client-netns.sh) so pod replies
+# to the test client route back into the ring.
 # Enumerated on purpose rather than a blanket 10.0.0.0/16: a /16 would also
 # cover the directly connected transit segments and anything else in 10.0/16,
 # so keeping the list tight avoids surprising host routing decisions. Directly
@@ -49,6 +51,7 @@ sudo sysctl -qw net.ipv4.conf.tap1.rp_filter=2 net.ipv4.conf.tap2.rp_filter=2
 # subject to the failover caveat above.
 ring_dests=(
   10.0.1.0/29 10.0.2.0/29 10.0.3.0/29 10.0.4.0/29
+  10.0.7.0/29
   1.1.1.1/32 2.2.2.2/32 3.3.3.3/32 4.4.4.4/32
 )
 for dst in "${ring_dests[@]}"; do
