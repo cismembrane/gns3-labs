@@ -1,6 +1,6 @@
 # Kubernetes MetalLB BGP Lab
 
-A single-node k3s cluster advertises Kubernetes `LoadBalancer` services into a four-router eBGP ring using MetalLB in native BGP mode. The cluster runs as AS 65100 and peers with two routers (R1 and R4) over redundant uplinks. Each service is announced as a /32 host route and propagates across the ring through normal eBGP. Shutting down either uplink reroutes traffic over the surviving path with no change to the cluster. The failover happens entirely in the routing layer.
+A single-node k3s cluster advertises Kubernetes LoadBalancer services into a four-router eBGP ring using MetalLB in BGP mode. The cluster runs as AS 65100 and peers with two routers (R1 and R4) over redundant uplinks. Each service is announced as a /32 host route and propagates across the ring through normal eBGP. Shutting down either uplink reroutes traffic over the surviving path with no change to the cluster. The failover happens entirely in the routing layer.
 
 The lab is built two ways from the same addressing and BGP design: a full **GNS3 / Cisco IOSv** topology configured with Ansible, and a headless **containerlab / FRR** variant.
 
@@ -53,14 +53,14 @@ graph TD
 
 Restoring the link re-establishes the MetalLB session, and R3's best path returns to `65004 65100`.
 
-![show ip bgp on R3 after shutting R4's cluster uplink](images/show-ip-bgp-r3-after-no-shutdown.png)
+![show ip bgp on R3 after restoring R4's cluster uplink](images/show-ip-bgp-r3-after-no-shutdown.png)
 
 ## Technologies Used
 
 | Technology | Purpose |
 |---|---|
 | k3s | Lightweight single-node Kubernetes cluster |
-| MetalLB (BGP mode) | Advertises `LoadBalancer` service IPs as BGP routes |
+| MetalLB (BGP mode, FRR) | Advertises `LoadBalancer` service IPs as BGP routes via the FRR speaker backend |
 | Cisco IOSv | Router OS for the GNS3 topology |
 | FRRouting 9.1.0 | Router OS for the headless containerlab variant |
 | GNS3 | Network emulation for the IOSv topology |
@@ -229,7 +229,7 @@ sudo ip netns exec client bash -c '
   done'
 ```
 
-![Script during execution, demostrates pod alternation](images/pod-hostname-alternates.png)
+![Script during execution, demonstrates pod alternation](images/pod-hostname-alternates.png)
 
 **Failover.** With the curl loop running, shut R4's cluster-facing interface:
 
@@ -262,6 +262,3 @@ Remaining captures that would strengthen the README:
 ## containerlab vs. GNS3
 
 `containerlab/` is a headless FRR 9.1.0 counterpart with identical addressing and BGP design. The two cluster uplinks surface as host veth interfaces (`k3s-r1`, `k3s-r4`) instead of TAPs, so the same `k8s/metallb-config.yaml` is reused unchanged. `verify_bgp.py` reads `vtysh` JSON (`show bgp ipv4 unicast summary json`) inside each container to assert session state and route origination; `--ring-only` mirrors what `verify.yml` checks before the cluster is up. This path needs no GUI and is the one to target for CI.
-
-sudo k3s kubectl -n metallb-system logs -l app.kubernetes.io/component=speaker --tail=200 \
-  | grep -E '172\.16\.10\.(10|20)|sessionUp'
