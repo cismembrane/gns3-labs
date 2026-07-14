@@ -245,7 +245,7 @@ In this capture, R4's GigabitEthernet0/5 was shut down at approximately 15:06:04
 
 ![Curl loop failure demonstrated](images/curl-loop-failure.png)
 
-Note that R3 alone cannot detect a failed R4 uplink due to the tiebreaker leaving its best path and next hop unchanged. Convergence is observable on R4, where `show ip bgp 172.16.10.10/32` shows the route source flip from the direct AS 65100 session to the R1 ring session, and on R2, where the two-hop path via R1 stays best throughout. This is also why `verify-k8s-routes.yml` asserts both MetalLB sessions Established directly rather than inferring health from downstream route state.
+R3's best path and next hop never change during the failure, so nothing on R3 signals it promptly; the only trace is the lengthened AS path, and only after the advertisement interval. Convergence is observable on R4, where show ip bgp 172.16.10.10/32 shows the route source flip from the direct AS 65100 session to the R1 ring session. R2 shows the complementary view: its two-hop best path via R1 never moves, so traffic entering at R2 is unaffected. This is also why verify-k8s-routes.yml asserts both MetalLB sessions Established directly rather than inferring health from downstream route state alone.
 
 The Ansible playbooks and `verify_bgp.py` automate the session-state and route-origination checks so validation does not depend on reading CLI output by hand.
 
