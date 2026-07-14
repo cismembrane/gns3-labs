@@ -1,6 +1,6 @@
 # Kubernetes MetalLB BGP Lab
 
-A single-node k3s cluster advertises Kubernetes `LoadBalancer` services into a four-router eBGP ring using MetalLB in native BGP mode. The cluster runs as AS 65100 and peers with two routers (R1 and R4) over redundant uplinks. Each service is announced as a /32 host route and propagates across the ring through normal eBGP. Shutting down either uplink reroutes traffic over the surviving path with no change to the cluster — the failover happens entirely in the routing layer.
+A single-node k3s cluster advertises Kubernetes `LoadBalancer` services into a four-router eBGP ring using MetalLB in native BGP mode. The cluster runs as AS 65100 and peers with two routers (R1 and R4) over redundant uplinks. Each service is announced as a /32 host route and propagates across the ring through normal eBGP. Shutting down either uplink reroutes traffic over the surviving path with no change to the cluster. The failover happens entirely in the routing layer.
 
 The lab is built two ways from the same addressing and BGP design: a full **GNS3 / Cisco IOSv** topology configured with Ansible, and a headless **containerlab / FRR** variant.
 
@@ -171,7 +171,7 @@ ansible-playbook verify-k8s-routes.yml                    # 7. end-to-end route 
 A few implementation notes worth knowing before you run it:
 
 - **TAPs are not persistent.** `setup-taps.sh` and `setup-client-netns.sh` must be rerun after a host reboot, and you MUST bind `tap0`/`tap1`/`tap2`/`tap3` to their GNS3 Cloud nodes (`tap3` → Cloud4, linked to R3 Gi0/5).
-- **Data-plane tests run from the client netns, never from the node.** kube-proxy hooks LoadBalancer VIPs into the nat `OUTPUT` chain, so curl run on the k3s node is DNAT'd locally and succeeds even with BGP fully down — it proves nothing. `setup-client-netns.sh` builds an isolated client behind R3 whose traffic actually crosses the ring. It also adds a scoped `NOTRACK` exemption: k3s sets `bridge-nf-call-iptables=1`, which would otherwise let KUBE-SERVICES DNAT the client's traffic inside the host bridge on its way to GNS3.
+- **Data-plane tests run from the client netns, never from the node.** kube-proxy hooks LoadBalancer VIPs into the nat `OUTPUT` chain, so curl run on the k3s node is DNAT'd locally and succeeds even with BGP fully down. `setup-client-netns.sh` builds an isolated client behind R3 whose traffic actually crosses the ring. It also adds a scoped `NOTRACK` exemption: k3s sets `bridge-nf-call-iptables=1`, which would otherwise let KUBE-SERVICES DNAT the client's traffic inside the host bridge on its way to GNS3.
 - **ServiceLB must be disabled.** `install-k3s.sh` installs k3s with `--disable servicelb --disable traefik`; otherwise k3s's built-in load balancer claims every `LoadBalancer` service before MetalLB can.
 - **Sessions bind to the right interface.** Each `BGPPeer` sets `sourceAddress` explicitly so the MetalLB speaker originates its TCP session from the correct TAP.
 - **Loose RPF is required.** Traffic can arrive on the backup uplink (tap2) while replies to ring sources leave via tap1. With strict rp_filter the kernel drops those arriving packets at the interface. Both setup-taps.sh and the containerlab setup-host-links.sh set rp_filter=2 on the transit interfaces automatically.
@@ -207,7 +207,7 @@ show ip bgp 172.16.10.10/32   # two paths: 65002 65001 65100 and 65004 65100; sh
 
 ![R3 steady state: 65004 65100 best on AS path length](images/show-ip-bgp-r3.png)
 
-**Service reachability.** VIPs do not answer ICMP. The /32 exists in the routers' tables, but on the node it is only a kube-proxy DNAT rule, not an interface address. Test over TCP — from the client netns, so the traffic actually crosses the ring (a node-local curl short-circuits through kube-proxy's `OUTPUT` DNAT and passes even with BGP down):
+**Service reachability.** VIPs do not answer ICMP. The /32 exists in the routers' tables, but on the node it is only a kube-proxy DNAT rule, not an interface address. Test over TCP from the client netns, so the traffic actually crosses the ring (a node-local curl short-circuits through kube-proxy's `OUTPUT` DNAT and passes even with BGP down):
 
 ```bash
 sudo ip netns exec client curl http://172.16.10.10   # alternates between pod hostnames
@@ -226,6 +226,8 @@ while :; do
   sleep 1
 done
 ```
+
+![Script during execution, demostrates the alternation of pods](images/pod-hostname-alternates.png)
 
 **Failover.** With the curl loop running, shut R4's cluster-facing interface:
 
