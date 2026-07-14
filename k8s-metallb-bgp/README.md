@@ -227,38 +227,33 @@ while :; do
 done
 ```
 
-![Script during execution, demostrates the alternation of pods](images/pod-hostname-alternates.png)
+![Script during execution, demostrates pod alternation](images/pod-hostname-alternates.png)
 
 **Failover.** With the curl loop running, shut R4's cluster-facing interface:
 
 ```text
 R4(config)# interface GigabitEthernet0/5
 R4(config-if)# shutdown          # R4 re-advertises via R1: R3 sees 65004 65001 65100, best path unchanged (oldest external)
-R4(config-if)# no shutdown       # MetalLB session re-establishes (~30-60s); R3 best path returns to 65004 65100
+R4(config-if)# no shutdown       # MetalLB session re-establishes; R3 best path returns to 65004 65100
 ```
 
-BGP fast external fallover tears down the MetalLB session the instant the interface flaps, and R4 switches locally to the path it already holds from R1 — so the client's forwarding path (R3 → R4 → R1 → node) repairs as fast as R4's local best-path rerun, and the curl loop shows at most a brief gap. R3 sees the updated `65004 65001 65100` path within the eBGP advertisement interval (30 seconds worst case, usually single digits), but its next hop never changes, so R3's table lag does not affect the data plane. Because the loop runs from the client netns, a real forwarding break would show as `FAIL` lines — this test can actually fail, which is what makes it worth running.
+When the interface goes down, BGP fast external fallover drops the MetalLB session immediately. R4 already holds a backup path to the VIP through R1, so it converges as soon as its local best-path calculation reruns, and the client's forwarding path (R3 → R4 → R1 → node) repairs. The curl loop shows a brief gap at most. R3 learns the new 65004 65001 65100 path within the eBGP advertisement interval, but its next hop stays the same throughout, so the lag in R3's table never touches the data plane. Since the loop runs from the client netns, a real forwarding break prints as FAIL lines. A node-local curl would pass no matter what; this test can fail, and that is the point of running it.
 
 ![R3 during failover: both paths three hops, best held by oldest external](images/show-ip-bgp-r3-after-shutdown.png)
+
+In this capture, R4's GigabitEthernet0/5 was shut down at approximately 15:06:04. The curl loop continued without a missed response: R4 rerouted through R1 and the client never saw a gap. At 15:06:29, R1's GigabitEthernet0/5 was also shut down, removing the cluster's last uplink, and the loop began printing FAIL immediately. The first event is the failover working; the second confirms the loop detects a genuine forwarding break rather than passing unconditionally.
+
+![Curl loop failure demonstrated](images/curl-loop-failure.png)
 
 Note that R3 alone cannot detect a failed R4 uplink due to the tiebreaker leaving its best path and next hop unchanged. Convergence is observable on R4, where `show ip bgp 172.16.10.10/32` shows the route source flip from the direct AS 65100 session to the R1 ring session, and on R2, where the two-hop path via R1 stays best throughout. This is also why `verify-k8s-routes.yml` asserts both MetalLB sessions Established directly rather than inferring health from downstream route state.
 
 The Ansible playbooks and `verify_bgp.py` automate the session-state and route-origination checks so validation does not depend on reading CLI output by hand.
-
-## Future Improvements
-
-- **CI for the containerlab variant** — wire `verify_bgp.py` into GitHub Actions so the FRR path is tested on every push (the headless design already supports it).
-- **Observability** — scrape the MetalLB speaker and FRR/IOSv with Prometheus and add a Grafana view of session state and advertised prefixes.
-- **Idempotent teardown** — a `destroy` stage that removes TAPs, routes, and the k3s install cleanly.
-- **Secrets hygiene** — replace the `admin`/`admin` lab credentials and world-readable kubeconfig with something closer to production practice (documented as a deliberate lab shortcut today).
 
 ## Screenshots
 
 Remaining captures that would strengthen the README:
 
 1. **`kubectl get svc` + MetalLB speaker logs** — the two services with their external IPs and the speaker announcing the /32s. Place under Deployment.
-2. **R4 during failover** — `show ip bgp 172.16.10.10/32` showing the route source flipped from the direct AS 65100 session to the R1 ring session, the router where convergence is actually visible.
-3. **Curl loop during failover** — timestamped responses from the client netns straight through the shut/no shut cycle, showing the measured convergence gap (if any).
 
 ---
 
