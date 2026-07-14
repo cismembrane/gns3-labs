@@ -2,7 +2,7 @@
 
 Rebuild notes for the GNS3 side of the k8s-metallb-bgp lab. The main README covers the Kubernetes side and the full workflow; this file covers only the topology.
 
-The topology is the same four-router IOSv eBGP ring used in `bgp-grafana-monitoring`, plus two extra links from R1 and R4 down to the k3s host. If you already have the ring built, add the two k3s links and the second/third cloud nodes and you're done.
+The topology is the same four-router IOSv eBGP ring used in `bgp-grafana-monitoring`, plus three extra links. Cloud2 (tap1) to R1, Cloud3 (tap2) to R4, and Cloud4 (tap3) to R3.
 
 ---
 
@@ -18,7 +18,7 @@ The topology is the same four-router IOSv eBGP ring used in `bgp-grafana-monitor
         R3 Gi0/5 <-> Cloud4 (tap3) <-> client netns (no BGP)
 ```
 
-The k3s node is the GNS3 host itself, attached through TAP interfaces. It holds one eBGP session to R1 and one to R4, both originated by MetalLB. The client is a network namespace on the same host, attached behind R3 via `tap3`/Cloud4 — it exists so data-plane tests originate outside the node (node-local curls are DNAT'd by kube-proxy before routing and never cross the ring).
+The k3s node is attached through the tap1 and tap2 interfaces. It holds one eBGP session to R1 and one to R4, both originated by MetalLB. The client is a network namespace on the same host, attached behind R3 via `tap3`/Cloud4. It exists so data-plane tests originate outside the node (node-local curls are DNAT'd by kube-proxy before routing and never cross the ring).
 
 ---
 
@@ -32,7 +32,7 @@ The k3s node is the GNS3 host itself, attached through TAP interfaces. It holds 
 | R4 to R1  | R4       | GigabitEthernet0/3 | 10.0.4.4/29 | R1              | GigabitEthernet0/3 | 10.0.4.1/29 | 10.0.4.0/29    |
 | R1 to k3s | R1       | GigabitEthernet0/5 | 10.0.5.1/29 | k3s host        | tap1               | 10.0.5.5/29 | 10.0.5.0/29    |
 | R4 to k3s | R4       | GigabitEthernet0/5 | 10.0.6.4/29 | k3s host        | tap2               | 10.0.6.5/29 | 10.0.6.0/29    |
-| R3 to client | R3    | GigabitEthernet0/5 | 10.0.7.3/29 | client netns    | tap3 (br-client)   | 10.0.7.2/29 | 10.0.7.0/29    |
+| R3 to client | R3    | GigabitEthernet0/5 | 10.0.7.3/29 | client netns    | tap3               | 10.0.7.2/29 | 10.0.7.0/29    |
 
 Management, same pattern as the other labs:
 
@@ -83,7 +83,7 @@ Management, same pattern as the other labs:
 
 ## Requirements
 
-- A Cisco IOSv qcow2 image registered as a GNS3 QEMU appliance. The project references it as `virtioa.qcow2`. IOSv is licensed Cisco software and is not in this repo; supply your own and register it before importing the project.
+- A Cisco IOSv qcow2 image registered as a GNS3 QEMU appliance. The project references it as `virtioa.qcow2`. IOSv is licensed Cisco software and is not in this repo. Supply your own and register it before importing the project.
 - Four IOSv router nodes named `R1` through `R4`, with at least six network adapters each (Gi0/0 through Gi0/5).
 - One GNS3 Ethernet Switch `SW1` for the management segment.
 - Four GNS3 Cloud nodes: `Cloud1` (tap0, management), `Cloud2` (tap1, R1 transit), `Cloud3` (tap2, R4 transit), `Cloud4` (tap3, R3 client segment).
