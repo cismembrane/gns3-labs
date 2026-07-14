@@ -199,6 +199,15 @@ docker exec clab-metallb-ring-client wget -qO- http://172.16.10.10
 
 ![R1 BGP summary with MetalLB peer established](images/show-ip-bgp-summary-r1.png)
 
+The same sessions from the cluster side, inside the speaker pod's FRR instance. Both uplink peers are Established with `PfxSnt` 2, confirming FRR is originating both service /32s. `PfxRcd` 0 is expected: MetalLB rejects all inbound routes by policy, since it announces services but never installs routes on the node.
+
+```bash
+POD=$(sudo k3s kubectl -n metallb-system get pod -l app.kubernetes.io/component=speaker -o name)
+sudo k3s kubectl -n metallb-system exec -it $POD -c frr -- vtysh -c "show bgp ipv4 unicast summary" -c "show bgp ipv4 unicast"
+```
+
+![show bgp ipv4 unicast summary inside the speaker pod](images/show-bgp-ipv4-unicast-summary-speaker.png)
+
 **Path selection.**  On R3, the cluster is visible from both directions at unequal distance: two AS hops via R4, three via R2 - R1. The shorter AS path wins:
 
 ```bash
@@ -250,12 +259,6 @@ In this capture, R4's GigabitEthernet0/5 was shut down at approximately 15:06:04
 R3's best path and next hop never change during the failure, so nothing on R3 signals it promptly; the only trace is the lengthened AS path, and only after the advertisement interval. Convergence is observable on R4, where show ip bgp 172.16.10.10/32 shows the route source flip from the direct AS 65100 session to the R1 ring session. R2 shows the complementary view: its two-hop best path via R1 never moves, so traffic entering at R2 is unaffected. This is also why verify-k8s-routes.yml asserts both MetalLB sessions Established directly rather than inferring health from downstream route state alone.
 
 The Ansible playbooks and `verify_bgp.py` automate the session-state and route-origination checks so validation does not depend on reading CLI output by hand.
-
-## Screenshots
-
-Remaining captures that would strengthen the README:
-
-1. **`kubectl get svc` + MetalLB speaker logs** — the two services with their external IPs and the speaker announcing the /32s. Place under Deployment.
 
 ---
 
