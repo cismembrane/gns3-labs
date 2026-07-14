@@ -41,15 +41,19 @@ graph TD
     R3 ---|10.0.7.0/29| CLIENT
 ```
 
-**Data flow.** The test client — a network namespace attached behind R3 (`10.0.7.2/29`, default route to R3) — sends traffic toward a service VIP (e.g. `172.16.10.10/32`). The client lives in its own namespace deliberately: curl run on the k3s node itself is DNAT'd to the pod by kube-proxy's nat `OUTPUT` rules before routing ever happens, so node-local traffic never touches the ring and proves nothing about BGP. Namespace traffic enters at R3 and forwards hop by hop like any external client's. Each router forwards along its BGP best path toward AS 65100. Inbound traffic enters the cluster through whichever edge router sits on the shortest AS path from its entry point: R1 for traffic arriving at R1 or R2, R4 for traffic arriving at R3 or R4. No routing policy prefers one uplink over the other for inbound traffic. On the node, kube-proxy DNATs the VIP to a backing pod. Return traffic follows static host routes that prefer the R1 uplink. That preference applies to replies only, and it covers host-side TAP loss rather than R1 failure, as noted in `scripts/setup-taps.sh`.
+**Data flow.** The test client (attached to tap3) sends traffic toward a service VIP. The client lives in its own namespace deliberately: curl run on the k3s node itself is DNAT'd to the pod by kube-proxy's nat `OUTPUT` rules before routing ever happens, so node-local traffic proves nothing. Namespace traffic enters at R3 and forwards normally, as the BGP best path. Inbound traffic enters the cluster through whichever edge router sits on the shortest AS path from its entry point: R1 for traffic arriving at R1 or R2, R4 for traffic arriving at R3 or R4. No routing policy prefers one uplink over the other for inbound traffic. On the node, kube-proxy DNATs the VIP to a backing pod. Return traffic follows static host routes that prefer the R1 uplink. That preference applies to replies only, and it covers host-side TAP loss rather than R1 failure, as noted in `scripts/setup-taps.sh`.
 
 **Path selection.** R3 hears the cluster from both sides of the ring at unequal distances: two AS hops via R4 (`65004 65100`) and three the long way around (`65002 65001 65100`). It selects the shorter path via R4 as best.
 
 ![show ip bgp on R3, baseline](images/show-ip-bgp-r3.png)
 
-**Failover.** Shutting R4's cluster-facing interface (GigabitEthernet0/5) tears down the direct MetalLB session and withdraws the routes R4 originated. R4 then learns the VIP from R1 around the ring and re-advertises it to R3 as `65004 65001 65100`. R3 now holds two three-hop paths: `65002 65001 65100` from R2, present in its table since before the failure, and the new `65004 65001 65100` from R4. With path lengths tied, the path-age tiebreaker keeps R3's best path on the R4 session: `65004 65001 65100`, next hop `10.0.3.4` unchanged. Traffic reaches the cluster through R4 and R1, entering via R1's uplink. Service traffic continues uninterrupted. Restoring the link re-establishes the MetalLB session, and R3's best path returns to `65004 65100`.
+**Failover.** Shutting R4's cluster-facing interface (GigabitEthernet0/5) tears down the direct MetalLB session and withdraws the routes R4 originated. R4 then learns the VIP from R1 around the ring and re-advertises it to R3 as `65004 65001 65100`. R3 now holds two three-hop paths: `65002 65001 65100` from R2, present in its table since before the failure, and the new `65004 65001 65100` from R4. With path lengths tied, the path-age tiebreaker keeps R3's best path on the R4 session: `65004 65001 65100`, next hop `10.0.3.4` unchanged. Traffic reaches the cluster through R4 and R1, entering via R1's uplink. Service traffic continues uninterrupted. 
 
 ![show ip bgp on R3 after shutting R4's cluster uplink](images/show-ip-bgp-r3-after-shutdown.png)
+
+Restoring the link re-establishes the MetalLB session, and R3's best path returns to `65004 65100`.
+
+![show ip bgp on R3 after shutting R4's cluster uplink](images/show-ip-bgp-r3-after-no-shutdown.png)
 
 ## Technologies Used
 
