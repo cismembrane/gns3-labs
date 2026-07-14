@@ -217,14 +217,16 @@ sudo ip netns exec client curl http://172.16.10.20
 To watch continuity through a failover test, run a monitoring loop that prints the responding pod hostname each second (it also demonstrates the pod alternation claim above):
 
 ```bash
-while :; do
-  if out=$(sudo ip netns exec client curl -sf --max-time 2 http://172.16.10.10); then
-    printf '%s  %s\n' "$(date +%T)" "$(awk '/Hostname/{print $2}' <<<"$out")"
-  else
-    printf '%s  FAIL\n' "$(date +%T)"
-  fi
-  sleep 1
-done
+sudo ip netns exec client bash -c '
+  while :; do
+    t=$(date +%T)
+    if out=$(curl -sf --max-time 2 http://172.16.10.10); then
+      printf "%s  %s\n" "$t" "$(awk "/Hostname/{print \$2}" <<< "$out")"
+    else
+      printf "%s  FAIL rc=%s\n" "$t" "$?"
+    fi
+    sleep 1
+  done'
 ```
 
 ![Script during execution, demostrates pod alternation](images/pod-hostname-alternates.png)
@@ -260,3 +262,6 @@ Remaining captures that would strengthen the README:
 ## containerlab vs. GNS3
 
 `containerlab/` is a headless FRR 9.1.0 counterpart with identical addressing and BGP design. The two cluster uplinks surface as host veth interfaces (`k3s-r1`, `k3s-r4`) instead of TAPs, so the same `k8s/metallb-config.yaml` is reused unchanged. `verify_bgp.py` reads `vtysh` JSON (`show bgp ipv4 unicast summary json`) inside each container to assert session state and route origination; `--ring-only` mirrors what `verify.yml` checks before the cluster is up. This path needs no GUI and is the one to target for CI.
+
+sudo k3s kubectl -n metallb-system logs -l app.kubernetes.io/component=speaker --tail=200 \
+  | grep -E '172\.16\.10\.(10|20)|sessionUp'
