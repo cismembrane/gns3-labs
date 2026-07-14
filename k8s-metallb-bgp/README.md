@@ -241,7 +241,7 @@ When the interface goes down, BGP fast external fallover drops the MetalLB sessi
 
 ![R3 during failover: both paths three hops, best held by oldest external](images/show-ip-bgp-r3-after-shutdown.png)
 
-In this capture, R4's GigabitEthernet0/5 was shut down at approximately 15:06:04. The curl loop continued without a missed response: R4 rerouted through R1 and the client never saw a gap. At 15:06:29, R1's GigabitEthernet0/5 was also shut down, removing the cluster's last uplink, and the loop began printing FAIL immediately. The first event is the failover working; the second confirms the loop detects a genuine forwarding break rather than passing unconditionally.
+In this capture, R4's GigabitEthernet0/5 was shut down at approximately 15:06:04. The curl loop continued without a missed response: R4 rerouted through R1 and the client never saw a gap at the loop's probe resolution (one probe per second, up to 3s between probes including request timeout). At approximately 15:06:29, R1's GigabitEthernet0/5 was also shut down, removing the cluster's last uplink, and the loop began printing FAIL. The first event is the failover working; the second confirms the loop detects a genuine forwarding break rather than passing unconditionally.
 
 ![Curl loop failure demonstrated](images/curl-loop-failure.png)
 
