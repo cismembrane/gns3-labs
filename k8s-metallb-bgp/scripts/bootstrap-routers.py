@@ -20,6 +20,7 @@ import re
 import socket
 import sys
 import time
+import urllib.error
 import urllib.request
 from urllib.parse import urlparse
 
@@ -77,12 +78,33 @@ class Console:
         self.sock.close()
 
 
+def is_v3_server(server):
+    """True if `server` answers on the GNS3 v3 API (GNS3 3.x)."""
+    try:
+        with urllib.request.urlopen(f"{server}/v3/version", timeout=5) as resp:
+            return resp.status == 200
+    except urllib.error.HTTPError as exc:
+        return exc.code in (401, 403)  # v3 endpoint exists but wants auth
+    except urllib.error.URLError:
+        return False
+
+
 def get_consoles(server):
     compute_host = urlparse(server).hostname or "127.0.0.1"
 
     def api(path):
-        with urllib.request.urlopen(f"{server}/v2{path}") as resp:
-            return json.loads(resp.read())
+        try:
+            with urllib.request.urlopen(f"{server}/v2{path}") as resp:
+                return json.loads(resp.read())
+        except urllib.error.HTTPError as exc:
+            if exc.code in (401, 404) and is_v3_server(server):
+                sys.exit(f"{server} is running GNS3 3.x, which serves the v3 API; "
+                         "this script uses the unauthenticated v2 API. "
+                         "Use GNS3 2.2.x (see README prerequisites).")
+            raise
+        except urllib.error.URLError as exc:
+            sys.exit(f"no GNS3 server reachable at {server} ({exc.reason}); "
+                     "start GNS3 and open the lab project, then rerun")
 
     # Only one project is open at a time, so select the open one (falling
     # back to the sole project). Avoids depending on the exact project name.
