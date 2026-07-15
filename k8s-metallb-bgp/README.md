@@ -110,12 +110,17 @@ k8s-metallb-bgp/
 │   ├── setup-taps.sh        # creates tap0/1/2 + return routes (GNS3)
 │   ├── setup-client-netns.sh # test client netns behind R3 (tap3/Cloud4)
 │   ├── install-k3s.sh       # k3s + Helm + MetalLB chart
-│   └── bootstrap-routers.py # console bootstrap via the GNS3 API
+│   ├── bootstrap-routers.py # console bootstrap via the GNS3 API
+│   └── failover.sh          # per-second VIP curl loop from the client netns
 ├── images/
 │   ├── gns3-topology.png            # topology canvas
 │   ├── show-ip-bgp-summary-r1.png   # R1 sessions incl. MetalLB peer
+│   ├── show-bgp-ipv4-unicast-summary-speaker.png  # same sessions from the speaker pod
 │   ├── show-ip-bgp-r3.png           # baseline best path via R4
-│   └── show-ip-bgp-r3-after-shutdown.png  # failover best path
+│   ├── show-ip-bgp-r3-after-shutdown.png   # failover best path
+│   ├── show-ip-bgp-r3-after-no-shutdown.png # best path restored
+│   ├── pod-hostname-alternates.png  # curl loop alternating pod hostnames
+│   └── curl-loop-failure.png        # loop failing with both uplinks down
 ├── containerlab/            # headless FRR 9.1.0 variant (same addressing)
 │   ├── metallb-ring.clab.yml  # ring + alpine test client behind r3
 │   ├── daemons              # FRR daemon toggles
