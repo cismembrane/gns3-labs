@@ -2,8 +2,7 @@
 
 Rebuild notes for the GNS3 side of the k8s-metallb-bgp lab. The main README covers the Kubernetes side and the full workflow; this file covers only the topology.
 
-The topology is the same four-router IOSv eBGP ring used in `bgp-grafana-monitoring`, plus three extra links. Cloud2 (tap1) to R1, Cloud3 (tap2) to R4, and Cloud4 (tap3) to R3.
-
+The topology is the same four-router IOSv eBGP ring used in `bgp-grafana-monitoring`, plus three extra links: Cloud2 (tap1, MetalLB) to R1, Cloud3 (tap2, MetalLB) to R4, and Cloud4 (tap3) to R3. Cloud1 (tap0) remains the management network.
 ---
 
 ## Topology
@@ -36,16 +35,15 @@ The k3s node is attached through the tap1 and tap2 interfaces. It holds one eBGP
 
 Management, same pattern as the other labs:
 
-| Link          | Interface          | Switch Interface |
-|---------------|--------------------|------------------|
-| R1 to SW1     | GigabitEthernet0/4 | Ethernet0        |
-| R2 to SW1     | GigabitEthernet0/4 | Ethernet1        |
-| R3 to SW1     | GigabitEthernet0/4 | Ethernet2        |
-| R4 to SW1     | GigabitEthernet0/4 | Ethernet3        |
-| Cloud1 to SW1 | tap0               | Ethernet4        |
-| Cloud2 to R1  | tap1               | Ethernet5        |
-| Cloud3 to R4  | tap2               | Ethernet6        |
-| Cloud4 to R3  | tap3               | (direct to R3 Gi0/5) |
+| Link              | Interface          | Switch Interface |
+|-------------------|--------------------|------------------|
+| R1 to Switch1     | GigabitEthernet0/4 | Ethernet0        |
+| R2 to Switch1     | GigabitEthernet0/4 | Ethernet1        |
+| R3 to Switch1     | GigabitEthernet0/4 | Ethernet2        |
+| R4 to Switch1     | GigabitEthernet0/4 | Ethernet3        |
+| Cloud1 to Switch1 | tap0               | Ethernet4        |
+
+The Cloud2/Cloud3/Cloud4 transit links connect directly to their routers, not through Switch1; see the Cloud Node Map under Host Connectivity.
 
 ## BGP Neighbor Map
 
@@ -83,15 +81,23 @@ Management, same pattern as the other labs:
 
 ## Requirements
 
+- GNS3 2.2.x. `../scripts/bootstrap-routers.py` discovers console ports over the v2 API and exits with an error on GNS3 3.x.
 - A Cisco IOSv qcow2 image registered as a GNS3 QEMU appliance. The project references it as `virtioa.qcow2`. IOSv is licensed Cisco software and is not in this repo. Supply your own and register it before importing the project.
 - Four IOSv router nodes named `R1` through `R4`, with at least six network adapters each (Gi0/0 through Gi0/5).
-- One GNS3 Ethernet Switch `SW1` for the management segment.
+- One GNS3 Ethernet Switch `Switch1` for the management segment.
 - Four GNS3 Cloud nodes: `Cloud1` (tap0, management), `Cloud2` (tap1, R1 transit), `Cloud3` (tap2, R4 transit), `Cloud4` (tap3, R3 client segment).
 - A Linux GNS3 host that will run k3s.
 
 ## Host Connectivity
 
-`../scripts/setup-taps.sh` creates the three k3s-side TAP interfaces, addresses them, and installs the return routes into the ring. `../scripts/setup-client-netns.sh` creates `tap3`, the `br-client` bridge, and the client namespace behind R3. Run both, then bind each TAP to its Cloud node in GNS3 and wire the links per the tables above.
+`../scripts/setup-taps.sh` creates the three TAP interfaces (tap0 management, tap1/tap2 k3s transit), addresses them, and installs the return routes into the ring. `../scripts/setup-client-netns.sh` creates `tap3`, the `br-client` bridge, and the client namespace behind R3. Run both, then bind each TAP to its Cloud node in GNS3 per the map below, and wire the links per the tables above.
+
+| Cloud Node | Host Interface | Connects To       | Purpose                        |
+|------------|----------------|-------------------|--------------------------------|
+| Cloud1     | tap0           | Switch1 Ethernet4 | management (192.168.0.0/24)    |
+| Cloud2     | tap1           | R1 Gi0/5          | k3s transit (10.0.5.0/29)      |
+| Cloud3     | tap2           | R4 Gi0/5          | k3s transit (10.0.6.0/29)      |
+| Cloud4     | tap3           | R3 Gi0/5          | client segment (10.0.7.0/29)   |
 
 TAPs and the client namespace do not survive a reboot. Rerun both scripts after restarting the host.
 
