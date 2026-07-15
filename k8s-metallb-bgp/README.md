@@ -75,10 +75,12 @@ Restoring the link re-establishes the MetalLB session, and R3's best path return
 
 ### GNS3 path
 
-- GNS3 with the four-router IOSv topology built (see [`gns3/README.md`](gns3/README.md))
-- Ansible with the `cisco.ios` collection
+- GNS3 2.2.x with the four-router IOSv topology built (see [`gns3/README.md`](gns3/README.md))
+- Ansible (full package) with the `cisco.ios` collection
 - Python 3
 - `curl` and `helm` on the Linux GNS3 host
+
+> Note: `bootstrap-routers.py` targets the GNS3 v2 API and does not work with GNS3 3.x. The full `ansible` package is required because `ansible.cfg` sets `stdout_callback = yaml`, a callback plugin that lives in the `community.general` collection. The full package bundles that collection; `ansible-core` does not, and without it every playbook run fails at startup with "Invalid callback for stdout specified: yaml".
 
 ### containerlab path
 
