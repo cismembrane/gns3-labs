@@ -9,3 +9,6 @@ __pycache__/
 
 # GNS3 runtime state — regenerated when the project runs
 gns3/*/project-files/
+
+# local working notes, not part of the lab
+notes/
