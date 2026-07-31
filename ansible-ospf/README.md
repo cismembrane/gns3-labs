@@ -347,4 +347,4 @@ OSPF validation:
 ### Notes
 
 This repo is data-driven enough to be easy to extend. Adding a new router mostly comes down to adding inventory and host vars, then defining its routed links and OSPF networks.
- 
+
