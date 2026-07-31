@@ -3,7 +3,6 @@
 Rebuild notes for the GNS3 side of the k8s-metallb-bgp lab. The main README covers the Kubernetes side and the full workflow; this file covers only the topology.
 
 The topology is the same four-router IOSv eBGP ring used in `bgp-grafana-monitoring`, plus three extra links: Cloud2 (tap1, MetalLB) to R1, Cloud3 (tap2, MetalLB) to R4, and Cloud4 (tap3) to R3. Cloud1 (tap0) remains the management network.
----
 
 ## Topology
 
@@ -18,8 +17,6 @@ The topology is the same four-router IOSv eBGP ring used in `bgp-grafana-monitor
 ```
 
 The k3s node is attached through the tap1 and tap2 interfaces. It holds one eBGP session to R1 and one to R4, both originated by MetalLB. The client is a network namespace on the same host, attached behind R3 via `tap3`/Cloud4. It exists so data-plane tests originate outside the node (node-local curls are DNAT'd by kube-proxy before routing and never cross the ring).
-
----
 
 ## Physical Link Map
 
