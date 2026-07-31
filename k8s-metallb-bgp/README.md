@@ -58,7 +58,7 @@ Restoring the link re-establishes the MetalLB session, and R3's best path return
 ## Technologies Used
 
 | Technology | Purpose |
-|---|---|
+| --- | --- |
 | k3s | Lightweight single-node Kubernetes cluster |
 | MetalLB (BGP mode, FRR) | Advertises `LoadBalancer` service IPs as BGP routes via the FRR speaker backend |
 | Cisco IOSv | Router OS for the GNS3 topology |
@@ -135,7 +135,7 @@ k8s-metallb-bgp/
 ## Addressing
 
 | Segment | Subnet | Endpoints |
-|---------|--------|-----------|
+| --------- | -------- | ----------- |
 | R1 ↔ R2 | 10.0.1.0/29 | R1 Gi0/0 = .1, R2 Gi0/0 = .2 |
 | R2 ↔ R3 | 10.0.2.0/29 | R2 Gi0/1 = .2, R3 Gi0/1 = .3 |
 | R3 ↔ R4 | 10.0.3.0/29 | R3 Gi0/2 = .3, R4 Gi0/2 = .4 |
