@@ -106,7 +106,7 @@ ansible-ospf/
 ├── screenshots/
 │   └── GNS3_Screenshot.png
 └── templates/
-└── ospf-router.j2
+    └── ospf-router.j2
 ```
 
 ## How the lab is structured

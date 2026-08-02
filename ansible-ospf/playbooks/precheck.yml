@@ -7,7 +7,6 @@
       cisco.ios.ios_command:
         commands:
           - show ip interface brief
-          - show version | include IOS
       register: precheck
 
     - name: Print precheck summary
@@ -15,4 +14,3 @@
         msg:
           - "Host: {{ inventory_hostname }}"
           - "{{ precheck.stdout[0] }}"
-          - "{{ precheck.stdout[1] }}"

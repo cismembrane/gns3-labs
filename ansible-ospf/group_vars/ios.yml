@@ -10,8 +10,6 @@ ospf_validation_commands:
 
 base_config:
   domain_name: test.com
-  dns_server: 1.1.1.1
-  ntp_server: 129.6.15.28
   ssh_modulus_bits: 1024
   mgmt_username: admin
   mgmt_password: admin
