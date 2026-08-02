@@ -1,12 +1,12 @@
 ===== R4 =====
 
---- show ip ospf neighbor ---
-Neighbor ID     Pri   State           Dead Time   Address         Interface
-3.3.3.3           1   2WAY/DROTHER    00:00:39    10.0.3.1        FastEthernet1/1
-2.2.2.2           1   2WAY/DROTHER    00:00:39    10.0.2.1        FastEthernet2/0
-1.1.1.1           1   2WAY/DROTHER    00:00:39    10.0.5.1        FastEthernet3/0
+R4#show ip ospf neighbor 
 
---- show ip route ospf ---
+Neighbor ID     Pri   State           Dead Time   Address         Interface
+3.3.3.3           1   FULL/BDR        00:00:38    10.0.3.1        GigabitEthernet0/2
+2.2.2.2           1   FULL/BDR        00:00:33    10.0.2.1        GigabitEthernet0/3
+1.1.1.1           1   FULL/BDR        00:00:36    10.0.5.1        GigabitEthernet0/4
+R4#show ip route ospf
 Codes: L - local, C - connected, S - static, R - RIP, M - mobile, B - BGP
        D - EIGRP, EX - EIGRP external, O - OSPF, IA - OSPF inter area 
        N1 - OSPF NSSA external type 1, N2 - OSPF NSSA external type 2
@@ -15,11 +15,23 @@ Codes: L - local, C - connected, S - static, R - RIP, M - mobile, B - BGP
        ia - IS-IS inter area, * - candidate default, U - per-user static route
        o - ODR, P - periodic downloaded static route, H - NHRP, l - LISP
        a - application route
-       + - replicated route, % - next hop override
+       + - replicated route, % - next hop override, p - overrides from PfR
 
 Gateway of last resort is not set
 
---- show ip protocols ---
+      1.0.0.0/32 is subnetted, 1 subnets
+O        1.1.1.1 [110/2] via 10.0.5.1, 00:07:41, GigabitEthernet0/4
+      2.0.0.0/32 is subnetted, 1 subnets
+O        2.2.2.2 [110/2] via 10.0.2.1, 00:13:07, GigabitEthernet0/3
+      3.0.0.0/32 is subnetted, 1 subnets
+O        3.3.3.3 [110/2] via 10.0.3.1, 00:13:07, GigabitEthernet0/2
+      10.0.0.0/8 is variably subnetted, 8 subnets, 2 masks
+O        10.0.1.0/30 [110/2] via 10.0.5.1, 00:08:05, GigabitEthernet0/4
+                     [110/2] via 10.0.2.1, 00:13:07, GigabitEthernet0/3
+O        10.0.4.0/30 [110/2] via 10.0.5.1, 00:07:55, GigabitEthernet0/4
+                     [110/2] via 10.0.3.1, 00:13:07, GigabitEthernet0/2
+R4#show ip pro
+R4#show ip protocols 
 *** IP Routing is NSF aware ***
 
 Routing Protocol is "application"
@@ -40,9 +52,16 @@ Routing Protocol is "ospf 1"
   Number of areas in this router is 1. 1 normal 0 stub 0 nssa
   Maximum path: 4
   Routing for Networks:
+    4.4.4.4 0.0.0.0 area 0
     10.0.2.0 0.0.0.3 area 0
     10.0.3.0 0.0.0.3 area 0
     10.0.5.0 0.0.0.3 area 0
   Routing Information Sources:
     Gateway         Distance      Last Update
+    1.1.1.1              110      00:07:45
+    2.2.2.2              110      00:08:09
+    3.3.3.3              110      00:07:59
   Distance: (default is 110)
+
+R4#
+
