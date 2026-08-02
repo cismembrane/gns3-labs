@@ -29,7 +29,7 @@
 
           --- show ip protocols ---
           {{ ospf_checks.stdout[2] }}
-        dest: "../outputs/{{ inventory_hostname }}-ospf-validation.txt"
+        dest: "{{ playbook_dir }}/../outputs/{{ inventory_hostname }}-ospf-validation.txt"
         mode: '0644'
 
     - name: Verify at least one neighbor is FULL
@@ -51,7 +51,7 @@
     - name: Verify OSPF routes are in the routing table
       ansible.builtin.assert:
         that:
-          - "'O ' in ospf_checks.stdout[1]"
+          - "ospf_checks.stdout_lines[1] | select('match', '^O') | list | length > 0"
         fail_msg: "No OSPF routes in the routing table on {{ inventory_hostname }}"
         success_msg: "OSPF routes present on {{ inventory_hostname }}"
 
