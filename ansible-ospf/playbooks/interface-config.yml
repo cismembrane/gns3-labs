@@ -50,3 +50,8 @@
           - "Host: {{ inventory_hostname }}"
           - "{{ post.stdout[0] }}"
           - "{{ post.stdout[1] }}"
+          
+    - name: save running-config to startup-config
+      cisco.ios.ios_config:
+        save_when: modified
+ 

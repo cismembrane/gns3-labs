@@ -17,3 +17,8 @@
         msg:
           - "Host: {{ inventory_hostname }}"
           - "Changed: {{ ospf_push.changed }}"
+          
+    - name: save running-config to startup-config
+      cisco.ios.ios_config:
+        save_when: modified
+
