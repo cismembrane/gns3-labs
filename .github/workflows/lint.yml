@@ -22,8 +22,8 @@ jobs:
           python-version: '3.12'
 
       - name: Install yamllint
-        # Pin matches .pre-commit-config.yaml rev: v1.35.1
-        run: pip install "yamllint==1.35.1"
+        # Pin matches .pre-commit-config.yaml rev: v1.37.1
+        run: pip install "yamllint==1.37.1"
 
       - name: Run yamllint
         run: yamllint -c .yamllint.yml --strict .
@@ -63,8 +63,8 @@ jobs:
           node-version: '24'
 
       - name: Install markdownlint-cli2
-        # Pin matches .pre-commit-config.yaml rev: v0.13.0
-        run: npm install -g "markdownlint-cli2@0.13.0"
+        # Pin matches .pre-commit-config.yaml rev: v0.23.2
+        run: npm install -g "markdownlint-cli2@0.23.2"
 
       - name: Run markdownlint
         # Reads .markdownlint.yaml automatically.

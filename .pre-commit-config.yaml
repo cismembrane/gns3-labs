@@ -19,11 +19,11 @@ repos:
         args: [--strict]
 
   - repo: https://github.com/ansible/ansible-lint
-    rev: v25.6.1
+    rev: v26.4.0
     hooks:
       - id: ansible-lint
         additional_dependencies:
-          - ansible-core>=2.19.0
+          - ansible-core>=2.16
 
   - repo: https://github.com/DavidAnson/markdownlint-cli2
     rev: v0.23.2

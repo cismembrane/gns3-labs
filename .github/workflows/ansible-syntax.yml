@@ -21,9 +21,9 @@ jobs:
 
       - name: Install ansible-core and required collections
         # ansible.netcommon is needed for network_cli; cisco.ios for IOS modules.
-        # Version range matches the ansible-lint job in lint.yml.
+        # Version floor matches the ansible-lint job in lint.yml.
         run: |
-          pip install "ansible-core>=2.15,<2.17"
+          pip install "ansible-core>=2.16"
           ansible-galaxy collection install ansible.netcommon cisco.ios
 
       # Each step runs from the project subdirectory so Ansible picks up
@@ -84,3 +84,15 @@ jobs:
         env:
           ANSIBLE_VAULT_PASSWORD_FILE: /tmp/vault_dummy
         run: ansible-playbook --syntax-check -i inventory.yml verify.yml
+
+      - name: k8s-metallb-bgp — deploy
+        working-directory: k8s-metallb-bgp
+        run: ansible-playbook --syntax-check -i inventory.yml deploy.yml
+
+      - name: k8s-metallb-bgp — verify
+        working-directory: k8s-metallb-bgp
+        run: ansible-playbook --syntax-check -i inventory.yml verify.yml
+
+      - name: k8s-metallb-bgp — verify-k8s-routes
+        working-directory: k8s-metallb-bgp
+        run: ansible-playbook --syntax-check -i inventory.yml verify-k8s-routes.yml
