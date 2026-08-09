@@ -10,7 +10,7 @@ routed_interfaces:
   - name: GigabitEthernet0/0
     ip: 10.0.1.1
     mask: 255.255.255.252
-    description: to_R2 
+    description: to_R2
     enabled: true
   - name: GigabitEthernet0/1
     ip: 10.0.4.1
@@ -26,7 +26,7 @@ routed_interfaces:
     ip: 1.1.1.1
     mask: 255.255.255.255
     description: R1_Loopback0
-    enabled: true  
+    enabled: true
 
 ospf_networks:
   - { network: "10.0.1.0", wildcard: "0.0.0.3", area: 0 }
