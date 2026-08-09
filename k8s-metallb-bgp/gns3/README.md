@@ -20,15 +20,15 @@ The k3s node is attached through the tap1 and tap2 interfaces. It holds one eBGP
 
 ## Physical Link Map
 
-| Link      | Router A | Interface          | IP Address  | Router B / Host | Interface          | IP Address  | Transit Subnet |
-|-----------|----------|--------------------|-------------|-----------------|--------------------|-------------|----------------|
-| R1 to R2  | R1       | GigabitEthernet0/0 | 10.0.1.1/29 | R2              | GigabitEthernet0/0 | 10.0.1.2/29 | 10.0.1.0/29    |
-| R2 to R3  | R2       | GigabitEthernet0/1 | 10.0.2.2/29 | R3              | GigabitEthernet0/1 | 10.0.2.3/29 | 10.0.2.0/29    |
-| R3 to R4  | R3       | GigabitEthernet0/2 | 10.0.3.3/29 | R4              | GigabitEthernet0/2 | 10.0.3.4/29 | 10.0.3.0/29    |
-| R4 to R1  | R4       | GigabitEthernet0/3 | 10.0.4.4/29 | R1              | GigabitEthernet0/3 | 10.0.4.1/29 | 10.0.4.0/29    |
-| R1 to k3s | R1       | GigabitEthernet0/5 | 10.0.5.1/29 | k3s host        | tap1               | 10.0.5.5/29 | 10.0.5.0/29    |
-| R4 to k3s | R4       | GigabitEthernet0/5 | 10.0.6.4/29 | k3s host        | tap2               | 10.0.6.5/29 | 10.0.6.0/29    |
-| R3 to client | R3    | GigabitEthernet0/5 | 10.0.7.3/29 | client netns    | tap3               | 10.0.7.2/29 | 10.0.7.0/29    |
+| Link         | Router A | Interface          | IP Address  | Router B / Host | Interface          | IP Address  | Transit Subnet |
+|--------------|----------|--------------------|-------------|-----------------|--------------------|-------------|----------------|
+| R1 to R2     | R1       | GigabitEthernet0/0 | 10.0.1.1/29 | R2              | GigabitEthernet0/0 | 10.0.1.2/29 | 10.0.1.0/29    |
+| R2 to R3     | R2       | GigabitEthernet0/1 | 10.0.2.2/29 | R3              | GigabitEthernet0/1 | 10.0.2.3/29 | 10.0.2.0/29    |
+| R3 to R4     | R3       | GigabitEthernet0/2 | 10.0.3.3/29 | R4              | GigabitEthernet0/2 | 10.0.3.4/29 | 10.0.3.0/29    |
+| R4 to R1     | R4       | GigabitEthernet0/3 | 10.0.4.4/29 | R1              | GigabitEthernet0/3 | 10.0.4.1/29 | 10.0.4.0/29    |
+| R1 to k3s    | R1       | GigabitEthernet0/5 | 10.0.5.1/29 | k3s host        | tap1               | 10.0.5.5/29 | 10.0.5.0/29    |
+| R4 to k3s    | R4       | GigabitEthernet0/5 | 10.0.6.4/29 | k3s host        | tap2               | 10.0.6.5/29 | 10.0.6.0/29    |
+| R3 to client | R3       | GigabitEthernet0/5 | 10.0.7.3/29 | client netns    | tap3               | 10.0.7.2/29 | 10.0.7.0/29    |
 
 Management, same pattern as the other labs:
 

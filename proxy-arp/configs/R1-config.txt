@@ -19,7 +19,7 @@ no ip icmp rate-limit unreachable
 !
 !
 !
-!         
+!
 !
 !
 no ip domain lookup
@@ -41,8 +41,8 @@ redundancy
 !
 !
 ip tcp synwait-time 5
-! 
-!         
+!
+!
 !
 !
 !
@@ -65,7 +65,7 @@ interface FastEthernet1/1
  shutdown
  duplex auto
  speed auto
-!         
+!
 interface FastEthernet2/0
  no ip address
  shutdown
@@ -111,7 +111,7 @@ mgcp behavior comedia-sdp-force disable
 !
 mgcp profile default
 !
-!         
+!
 !
 gatekeeper
  shutdown

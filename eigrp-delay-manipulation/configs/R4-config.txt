@@ -19,7 +19,7 @@ no ip icmp rate-limit unreachable
 !
 !
 !
-!         
+!
 !
 !
 no ip domain lookup
@@ -41,8 +41,8 @@ redundancy
 !
 !
 ip tcp synwait-time 5
-! 
-!         
+!
+!
 !
 !
 !
@@ -111,7 +111,7 @@ router eigrp 100
  network 10.1.14.0 0.0.0.7
  network 10.1.17.0 0.0.0.7
  eigrp router-id 4.4.4.4
-!         
+!
 ip forward-protocol nd
 no ip http server
 no ip http secure-server
@@ -154,4 +154,3 @@ line vty 0 4
 !
 !
 end
-

@@ -57,7 +57,7 @@ redirecting (type: action) cisco.ios.ios_command to cisco.ios.ios
 redirecting (type: action) cisco.ios.ios_command to cisco.ios.ios
 redirecting (type: action) cisco.ios.ios_command to cisco.ios.ios
 redirecting (type: action) cisco.ios.ios_command to cisco.ios.ios
-ok: [R1] => changed=false 
+ok: [R1] => changed=false
   invocation:
     module_args:
       commands:
@@ -77,7 +77,7 @@ ok: [R1] => changed=false
     rnnf2MFePBKWoWM45YmGvs62rtqxVRRy4dnjZZHiP1AaSD7v/P0iFyF0I5j8SLenxB17xLy2E0QUkjba
     cUKB/+GfP5uy6+vgwLlTHuNpgXcwr514v8O+g3o2uQmCv2iVJw==
   stdout_lines: <omitted>
-ok: [R2] => changed=false 
+ok: [R2] => changed=false
   invocation:
     module_args:
       commands:
@@ -97,7 +97,7 @@ ok: [R2] => changed=false
     7zICM37YP2SnED8OrA/lEn3JZDqlj7gX+Xeg4z9r6t9xyM0wroH2pUNNQIf0qvuk7Ti+DGjoQS3X5HY5
     M4wmXT2YLnjLEtuUCMw+sOdQVR6fkA9pr09ifBci72x202Ku9w==
   stdout_lines: <omitted>
-ok: [R4] => changed=false 
+ok: [R4] => changed=false
   invocation:
     module_args:
       commands:
@@ -117,7 +117,7 @@ ok: [R4] => changed=false
     f+BHm4nIFzwTZ5DQpkgSmj8GDr3nJlEZFlg5+uATWOhyTI0SJNFI7zhiuVK+fYQb+cKsg4fJCuWtmUdH
     BGublF9h4pFwf7zQI+xl7jTrjueIcwyKiqTOF57trc64wGdWRQ==
   stdout_lines: <omitted>
-ok: [R3] => changed=false 
+ok: [R3] => changed=false
   invocation:
     module_args:
       commands:
@@ -160,7 +160,7 @@ redirecting (type: action) cisco.ios.ios_config to cisco.ios.ios
 redirecting (type: action) cisco.ios.ios_config to cisco.ios.ios
 redirecting (type: action) cisco.ios.ios_config to cisco.ios.ios
 redirecting (type: action) cisco.ios.ios_config to cisco.ios.ios
-ok: [R3] => changed=false 
+ok: [R3] => changed=false
   invocation:
     module_args:
       after: null
@@ -180,7 +180,7 @@ ok: [R3] => changed=false
       running_config: null
       save_when: never
       src: null
-ok: [R2] => changed=false 
+ok: [R2] => changed=false
   invocation:
     module_args:
       after: null
@@ -200,7 +200,7 @@ ok: [R2] => changed=false
       running_config: null
       save_when: never
       src: null
-ok: [R1] => changed=false 
+ok: [R1] => changed=false
   invocation:
     module_args:
       after: null
@@ -221,7 +221,7 @@ ok: [R1] => changed=false
       save_when: never
       src: null
 [WARNING]: To ensure idempotency and correct diff the input configuration lines should be similar to how they appear if present in the running configuration on device
-changed: [R4] => changed=true 
+changed: [R4] => changed=true
   banners: {}
   commands:
   - hostname R4
@@ -269,7 +269,7 @@ redirecting (type: action) cisco.ios.ios_config to cisco.ios.ios
 redirecting (type: action) cisco.ios.ios_config to cisco.ios.ios
 redirecting (type: action) cisco.ios.ios_config to cisco.ios.ios
 redirecting (type: action) cisco.ios.ios_config to cisco.ios.ios
-changed: [R3] => changed=true 
+changed: [R3] => changed=true
   banners: {}
   commands:
   - no ip domain-lookup
@@ -320,7 +320,7 @@ changed: [R3] => changed=true
   - ip ssh version 2
   - ip ssh time-out 60
   - ip ssh authentication-retries 3
-changed: [R2] => changed=true 
+changed: [R2] => changed=true
   banners: {}
   commands:
   - no ip domain-lookup
@@ -371,7 +371,7 @@ changed: [R2] => changed=true
   - ip ssh version 2
   - ip ssh time-out 60
   - ip ssh authentication-retries 3
-changed: [R1] => changed=true 
+changed: [R1] => changed=true
   banners: {}
   commands:
   - no ip domain-lookup
@@ -422,7 +422,7 @@ changed: [R1] => changed=true
   - ip ssh version 2
   - ip ssh time-out 60
   - ip ssh authentication-retries 3
-changed: [R4] => changed=true 
+changed: [R4] => changed=true
   banners: {}
   commands:
   - no ip domain-lookup
@@ -480,16 +480,16 @@ task path: /home/cismembrane/ansible-ospf/playbooks/base-config.yml:44
 redirecting (type: action) cisco.ios.ios_config to cisco.ios.ios
 redirecting (type: action) cisco.ios.ios_config to cisco.ios.ios
 redirecting (type: action) cisco.ios.ios_config to cisco.ios.ios
-skipping: [R1] => changed=false 
+skipping: [R1] => changed=false
   false_condition: ssh_status is failed or ('%Please create RSA keys' in (ssh_status.stdout[0] | default(''))) or ('SSH Disabled' in (ssh_status.stdout[0] | default('')))
   skip_reason: Conditional result was False
-skipping: [R4] => changed=false 
+skipping: [R4] => changed=false
   false_condition: ssh_status is failed or ('%Please create RSA keys' in (ssh_status.stdout[0] | default(''))) or ('SSH Disabled' in (ssh_status.stdout[0] | default('')))
   skip_reason: Conditional result was False
-skipping: [R3] => changed=false 
+skipping: [R3] => changed=false
   false_condition: ssh_status is failed or ('%Please create RSA keys' in (ssh_status.stdout[0] | default(''))) or ('SSH Disabled' in (ssh_status.stdout[0] | default('')))
   skip_reason: Conditional result was False
-skipping: [R2] => changed=false 
+skipping: [R2] => changed=false
   false_condition: ssh_status is failed or ('%Please create RSA keys' in (ssh_status.stdout[0] | default(''))) or ('SSH Disabled' in (ssh_status.stdout[0] | default('')))
   skip_reason: Conditional result was False
 redirecting (type: action) cisco.ios.ios_config to cisco.ios.ios
@@ -515,7 +515,7 @@ redirecting (type: action) cisco.ios.ios_config to cisco.ios.ios
 redirecting (type: action) cisco.ios.ios_config to cisco.ios.ios
 redirecting (type: action) cisco.ios.ios_config to cisco.ios.ios
 redirecting (type: action) cisco.ios.ios_config to cisco.ios.ios
-changed: [R2] => changed=true 
+changed: [R2] => changed=true
   banners: {}
   commands:
   - line con 0
@@ -544,7 +544,7 @@ changed: [R2] => changed=true
   updates:
   - line con 0
   - exec-timeout 10 0
-changed: [R3] => changed=true 
+changed: [R3] => changed=true
   banners: {}
   commands:
   - line con 0
@@ -573,7 +573,7 @@ changed: [R3] => changed=true
   updates:
   - line con 0
   - exec-timeout 10 0
-changed: [R1] => changed=true 
+changed: [R1] => changed=true
   banners: {}
   commands:
   - line con 0
@@ -602,7 +602,7 @@ changed: [R1] => changed=true
   updates:
   - line con 0
   - exec-timeout 10 0
-changed: [R4] => changed=true 
+changed: [R4] => changed=true
   banners: {}
   commands:
   - line con 0
@@ -654,7 +654,7 @@ redirecting (type: action) cisco.ios.ios_config to cisco.ios.ios
 redirecting (type: action) cisco.ios.ios_config to cisco.ios.ios
 redirecting (type: action) cisco.ios.ios_config to cisco.ios.ios
 redirecting (type: action) cisco.ios.ios_config to cisco.ios.ios
-changed: [R2] => changed=true 
+changed: [R2] => changed=true
   banners: {}
   commands:
   - line vty 0 15
@@ -688,7 +688,7 @@ changed: [R2] => changed=true
   - login local
   - transport input ssh
   - exec-timeout 15 0
-changed: [R1] => changed=true 
+changed: [R1] => changed=true
   banners: {}
   commands:
   - line vty 0 15
@@ -722,7 +722,7 @@ changed: [R1] => changed=true
   - login local
   - transport input ssh
   - exec-timeout 15 0
-changed: [R3] => changed=true 
+changed: [R3] => changed=true
   banners: {}
   commands:
   - line vty 0 15
@@ -756,7 +756,7 @@ changed: [R3] => changed=true
   - login local
   - transport input ssh
   - exec-timeout 15 0
-changed: [R4] => changed=true 
+changed: [R4] => changed=true
   banners: {}
   commands:
   - line vty 0 15
@@ -813,7 +813,7 @@ redirecting (type: action) cisco.ios.ios_config to cisco.ios.ios
 redirecting (type: action) cisco.ios.ios_config to cisco.ios.ios
 redirecting (type: action) cisco.ios.ios_config to cisco.ios.ios
 redirecting (type: action) cisco.ios.ios_config to cisco.ios.ios
-changed: [R2] => changed=true 
+changed: [R2] => changed=true
   banners: {}
   commands:
   - no ip domain-lookup
@@ -838,7 +838,7 @@ changed: [R2] => changed=true
       src: null
   updates:
   - no ip domain-lookup
-changed: [R1] => changed=true 
+changed: [R1] => changed=true
   banners: {}
   commands:
   - no ip domain-lookup
@@ -863,7 +863,7 @@ changed: [R1] => changed=true
       src: null
   updates:
   - no ip domain-lookup
-changed: [R3] => changed=true 
+changed: [R3] => changed=true
   banners: {}
   commands:
   - no ip domain-lookup
@@ -888,7 +888,7 @@ changed: [R3] => changed=true
       src: null
   updates:
   - no ip domain-lookup
-changed: [R4] => changed=true 
+changed: [R4] => changed=true
   banners: {}
   commands:
   - no ip domain-lookup
@@ -936,7 +936,7 @@ redirecting (type: action) cisco.ios.ios_config to cisco.ios.ios
 redirecting (type: action) cisco.ios.ios_config to cisco.ios.ios
 redirecting (type: action) cisco.ios.ios_config to cisco.ios.ios
 redirecting (type: action) cisco.ios.ios_config to cisco.ios.ios
-changed: [R3] => changed=true 
+changed: [R3] => changed=true
   banners: {}
   commands:
   - ntp server 129.6.15.28
@@ -961,7 +961,7 @@ changed: [R3] => changed=true
       src: null
   updates:
   - ntp server 129.6.15.28
-changed: [R1] => changed=true 
+changed: [R1] => changed=true
   banners: {}
   commands:
   - ntp server 129.6.15.28
@@ -986,7 +986,7 @@ changed: [R1] => changed=true
       src: null
   updates:
   - ntp server 129.6.15.28
-changed: [R2] => changed=true 
+changed: [R2] => changed=true
   banners: {}
   commands:
   - ntp server 129.6.15.28
@@ -1011,7 +1011,7 @@ changed: [R2] => changed=true
       src: null
   updates:
   - ntp server 129.6.15.28
-changed: [R4] => changed=true 
+changed: [R4] => changed=true
   banners: {}
   commands:
   - ntp server 129.6.15.28
@@ -1041,22 +1041,22 @@ TASK [Report result] ***********************************************************
 task path: /home/cismembrane/ansible-ospf/playbooks/base-config.yml:84
 redirecting (type: become) ansible.builtin.enable to ansible.netcommon.enable
 redirecting (type: become) ansible.builtin.enable to ansible.netcommon.enable
-ok: [R1] => 
+ok: [R1] =>
   msg: Base config pushed on R1 (changed=True)
-ok: [R2] => 
+ok: [R2] =>
   msg: Base config pushed on R2 (changed=True)
 redirecting (type: become) ansible.builtin.enable to ansible.netcommon.enable
 redirecting (type: become) ansible.builtin.enable to ansible.netcommon.enable
-ok: [R3] => 
+ok: [R3] =>
   msg: Base config pushed on R3 (changed=True)
-ok: [R4] => 
+ok: [R4] =>
   msg: Base config pushed on R4 (changed=True)
 
 PLAY RECAP ***************************************************************************************************************************************************************************
-R1                         : ok=8    changed=5    unreachable=0    failed=0    skipped=1    rescued=0    ignored=0   
-R2                         : ok=8    changed=5    unreachable=0    failed=0    skipped=1    rescued=0    ignored=0   
-R3                         : ok=8    changed=5    unreachable=0    failed=0    skipped=1    rescued=0    ignored=0   
-R4                         : ok=8    changed=6    unreachable=0    failed=0    skipped=1    rescued=0    ignored=0   
+R1                         : ok=8    changed=5    unreachable=0    failed=0    skipped=1    rescued=0    ignored=0
+R2                         : ok=8    changed=5    unreachable=0    failed=0    skipped=1    rescued=0    ignored=0
+R3                         : ok=8    changed=5    unreachable=0    failed=0    skipped=1    rescued=0    ignored=0
+R4                         : ok=8    changed=6    unreachable=0    failed=0    skipped=1    rescued=0    ignored=0
 
 cismembrane@cismembrane-OptiPlex-9020M:~/ansible-ospf$ ansible-playbook playbooks/interface-config.yml -vvv --diff
 ansible-playbook [core 2.16.3]
@@ -1094,13 +1094,13 @@ redirecting (type: become) ansible.builtin.enable to ansible.netcommon.enable
 redirecting (type: become) ansible.builtin.enable to ansible.netcommon.enable
 redirecting (type: become) ansible.builtin.enable to ansible.netcommon.enable
 redirecting (type: become) ansible.builtin.enable to ansible.netcommon.enable
-ok: [R1] => changed=false 
+ok: [R1] => changed=false
   msg: All assertions passed
-ok: [R4] => changed=false 
+ok: [R4] => changed=false
   msg: All assertions passed
-ok: [R3] => changed=false 
+ok: [R3] => changed=false
   msg: All assertions passed
-ok: [R2] => changed=false 
+ok: [R2] => changed=false
   msg: All assertions passed
 redirecting (type: action) cisco.ios.ios_config to cisco.ios.ios
 
@@ -1127,7 +1127,7 @@ redirecting (type: action) cisco.ios.ios_config to cisco.ios.ios
 redirecting (type: action) cisco.ios.ios_config to cisco.ios.ios
 redirecting (type: action) cisco.ios.ios_config to cisco.ios.ios
 [WARNING]: To ensure idempotency and correct diff the input configuration lines should be similar to how they appear if present in the running configuration on device
-changed: [R2] => changed=true 
+changed: [R2] => changed=true
   banners: {}
   commands:
   - interface FastEthernet3/1
@@ -1159,7 +1159,7 @@ changed: [R2] => changed=true
   - interface FastEthernet3/1
   - description MGMT
   - no shutdown
-changed: [R1] => changed=true 
+changed: [R1] => changed=true
   banners: {}
   commands:
   - interface FastEthernet3/1
@@ -1191,7 +1191,7 @@ changed: [R1] => changed=true
   - interface FastEthernet3/1
   - description MGMT
   - no shutdown
-changed: [R4] => changed=true 
+changed: [R4] => changed=true
   banners: {}
   commands:
   - interface FastEthernet3/1
@@ -1223,7 +1223,7 @@ changed: [R4] => changed=true
   - interface FastEthernet3/1
   - description MGMT
   - no shutdown
-changed: [R3] => changed=true 
+changed: [R3] => changed=true
   banners: {}
   commands:
   - interface FastEthernet3/1
@@ -1278,7 +1278,7 @@ redirecting (type: action) cisco.ios.ios_config to cisco.ios.ios
 redirecting (type: action) cisco.ios.ios_config to cisco.ios.ios
 redirecting (type: action) cisco.ios.ios_config to cisco.ios.ios
 redirecting (type: action) cisco.ios.ios_config to cisco.ios.ios
-changed: [R1] => (item=FastEthernet0/0 10.0.1.1) => changed=true 
+changed: [R1] => (item=FastEthernet0/0 10.0.1.1) => changed=true
   ansible_loop_var: item
   banners: {}
   commands:
@@ -1324,7 +1324,7 @@ changed: [R1] => (item=FastEthernet0/0 10.0.1.1) => changed=true
 redirecting (type: become) ansible.builtin.enable to ansible.netcommon.enable
 redirecting (type: action) cisco.ios.ios_config to cisco.ios.ios
 redirecting (type: action) cisco.ios.ios_config to cisco.ios.ios
-changed: [R4] => (item=FastEthernet1/1 10.0.3.2) => changed=true 
+changed: [R4] => (item=FastEthernet1/1 10.0.3.2) => changed=true
   ansible_loop_var: item
   banners: {}
   commands:
@@ -1370,7 +1370,7 @@ changed: [R4] => (item=FastEthernet1/1 10.0.3.2) => changed=true
 redirecting (type: become) ansible.builtin.enable to ansible.netcommon.enable
 redirecting (type: action) cisco.ios.ios_config to cisco.ios.ios
 redirecting (type: action) cisco.ios.ios_config to cisco.ios.ios
-changed: [R2] => (item=FastEthernet0/0 10.0.1.2) => changed=true 
+changed: [R2] => (item=FastEthernet0/0 10.0.1.2) => changed=true
   ansible_loop_var: item
   banners: {}
   commands:
@@ -1414,7 +1414,7 @@ changed: [R2] => (item=FastEthernet0/0 10.0.1.2) => changed=true
   warnings:
   - To ensure idempotency and correct diff the input configuration lines should be similar to how they appear if present in the running configuration on device
 redirecting (type: become) ansible.builtin.enable to ansible.netcommon.enable
-changed: [R3] => (item=FastEthernet1/0 10.0.4.2) => changed=true 
+changed: [R3] => (item=FastEthernet1/0 10.0.4.2) => changed=true
   ansible_loop_var: item
   banners: {}
   commands:
@@ -1466,7 +1466,7 @@ redirecting (type: action) cisco.ios.ios_config to cisco.ios.ios
 redirecting (type: action) cisco.ios.ios_config to cisco.ios.ios
 redirecting (type: action) cisco.ios.ios_config to cisco.ios.ios
 redirecting (type: action) cisco.ios.ios_config to cisco.ios.ios
-changed: [R1] => (item=FastEthernet1/0 10.0.4.1) => changed=true 
+changed: [R1] => (item=FastEthernet1/0 10.0.4.1) => changed=true
   ansible_loop_var: item
   banners: {}
   commands:
@@ -1513,7 +1513,7 @@ changed: [R1] => (item=FastEthernet1/0 10.0.4.1) => changed=true
 redirecting (type: become) ansible.builtin.enable to ansible.netcommon.enable
 redirecting (type: action) cisco.ios.ios_config to cisco.ios.ios
 redirecting (type: action) cisco.ios.ios_config to cisco.ios.ios
-changed: [R4] => (item=FastEthernet2/0 10.0.2.2) => changed=true 
+changed: [R4] => (item=FastEthernet2/0 10.0.2.2) => changed=true
   ansible_loop_var: item
   banners: {}
   commands:
@@ -1560,7 +1560,7 @@ changed: [R4] => (item=FastEthernet2/0 10.0.2.2) => changed=true
 redirecting (type: become) ansible.builtin.enable to ansible.netcommon.enable
 redirecting (type: action) cisco.ios.ios_config to cisco.ios.ios
 redirecting (type: action) cisco.ios.ios_config to cisco.ios.ios
-changed: [R3] => (item=FastEthernet1/1 10.0.3.1) => changed=true 
+changed: [R3] => (item=FastEthernet1/1 10.0.3.1) => changed=true
   ansible_loop_var: item
   banners: {}
   commands:
@@ -1604,7 +1604,7 @@ changed: [R3] => (item=FastEthernet1/1 10.0.3.1) => changed=true
   warnings:
   - To ensure idempotency and correct diff the input configuration lines should be similar to how they appear if present in the running configuration on device
   - To ensure idempotency and correct diff the input configuration lines should be similar to how they appear if present in the running configuration on device
-changed: [R2] => (item=FastEthernet2/0 10.0.2.1) => changed=true 
+changed: [R2] => (item=FastEthernet2/0 10.0.2.1) => changed=true
   ansible_loop_var: item
   banners: {}
   commands:
@@ -1650,7 +1650,7 @@ changed: [R2] => (item=FastEthernet2/0 10.0.2.1) => changed=true
   - To ensure idempotency and correct diff the input configuration lines should be similar to how they appear if present in the running configuration on device
 redirecting (type: action) cisco.ios.ios_config to cisco.ios.ios
 redirecting (type: action) cisco.ios.ios_config to cisco.ios.ios
-changed: [R4] => (item=FastEthernet3/0 10.0.5.2) => changed=true 
+changed: [R4] => (item=FastEthernet3/0 10.0.5.2) => changed=true
   ansible_loop_var: item
   banners: {}
   commands:
@@ -1695,7 +1695,7 @@ changed: [R4] => (item=FastEthernet3/0 10.0.5.2) => changed=true
   - To ensure idempotency and correct diff the input configuration lines should be similar to how they appear if present in the running configuration on device
   - To ensure idempotency and correct diff the input configuration lines should be similar to how they appear if present in the running configuration on device
   - To ensure idempotency and correct diff the input configuration lines should be similar to how they appear if present in the running configuration on device
-changed: [R1] => (item=FastEthernet3/0 10.0.5.1) => changed=true 
+changed: [R1] => (item=FastEthernet3/0 10.0.5.1) => changed=true
   ansible_loop_var: item
   banners: {}
   commands:
@@ -1763,7 +1763,7 @@ redirecting (type: action) cisco.ios.ios_command to cisco.ios.ios
 redirecting (type: action) cisco.ios.ios_command to cisco.ios.ios
 redirecting (type: action) cisco.ios.ios_command to cisco.ios.ios
 redirecting (type: action) cisco.ios.ios_command to cisco.ios.ios
-ok: [R1] => changed=false 
+ok: [R1] => changed=false
   invocation:
     module_args:
       commands:
@@ -1793,9 +1793,9 @@ ok: [R1] => changed=false
            o - ODR, P - periodic downloaded static route, H - NHRP, l - LISP
            a - application route
            + - replicated route, % - next hop override
-  
+
     Gateway of last resort is not set
-  
+
           10.0.0.0/8 is variably subnetted, 4 subnets, 2 masks
     C        10.0.1.0/30 is directly connected, FastEthernet0/0
     L        10.0.1.1/32 is directly connected, FastEthernet0/0
@@ -1805,7 +1805,7 @@ ok: [R1] => changed=false
     C        172.16.99.0/24 is directly connected, FastEthernet3/1
     L        172.16.99.11/32 is directly connected, FastEthernet3/1
   stdout_lines: <omitted>
-ok: [R2] => changed=false 
+ok: [R2] => changed=false
   invocation:
     module_args:
       commands:
@@ -1835,9 +1835,9 @@ ok: [R2] => changed=false
            o - ODR, P - periodic downloaded static route, H - NHRP, l - LISP
            a - application route
            + - replicated route, % - next hop override
-  
+
     Gateway of last resort is not set
-  
+
           10.0.0.0/8 is variably subnetted, 4 subnets, 2 masks
     C        10.0.1.0/30 is directly connected, FastEthernet0/0
     L        10.0.1.2/32 is directly connected, FastEthernet0/0
@@ -1847,7 +1847,7 @@ ok: [R2] => changed=false
     C        172.16.99.0/24 is directly connected, FastEthernet3/1
     L        172.16.99.12/32 is directly connected, FastEthernet3/1
   stdout_lines: <omitted>
-ok: [R3] => changed=false 
+ok: [R3] => changed=false
   invocation:
     module_args:
       commands:
@@ -1877,9 +1877,9 @@ ok: [R3] => changed=false
            o - ODR, P - periodic downloaded static route, H - NHRP, l - LISP
            a - application route
            + - replicated route, % - next hop override
-  
+
     Gateway of last resort is not set
-  
+
           10.0.0.0/8 is variably subnetted, 4 subnets, 2 masks
     C        10.0.3.0/30 is directly connected, FastEthernet1/1
     L        10.0.3.1/32 is directly connected, FastEthernet1/1
@@ -1889,7 +1889,7 @@ ok: [R3] => changed=false
     C        172.16.99.0/24 is directly connected, FastEthernet3/1
     L        172.16.99.13/32 is directly connected, FastEthernet3/1
   stdout_lines: <omitted>
-ok: [R4] => changed=false 
+ok: [R4] => changed=false
   invocation:
     module_args:
       commands:
@@ -1919,9 +1919,9 @@ ok: [R4] => changed=false
            o - ODR, P - periodic downloaded static route, H - NHRP, l - LISP
            a - application route
            + - replicated route, % - next hop override
-  
+
     Gateway of last resort is not set
-  
+
           10.0.0.0/8 is variably subnetted, 4 subnets, 2 masks
     C        10.0.2.0/30 is directly connected, FastEthernet2/0
     L        10.0.2.2/32 is directly connected, FastEthernet2/0
@@ -1935,7 +1935,7 @@ ok: [R4] => changed=false
 TASK [Print summary] *****************************************************************************************************************************************************************
 task path: /home/cismembrane/ansible-ospf/playbooks/interface-config.yml:47
 redirecting (type: become) ansible.builtin.enable to ansible.netcommon.enable
-ok: [R1] => 
+ok: [R1] =>
   msg:
   - 'Host: R1'
   - |-
@@ -1957,9 +1957,9 @@ ok: [R1] =>
            o - ODR, P - periodic downloaded static route, H - NHRP, l - LISP
            a - application route
            + - replicated route, % - next hop override
-  
+
     Gateway of last resort is not set
-  
+
           10.0.0.0/8 is variably subnetted, 4 subnets, 2 masks
     C        10.0.1.0/30 is directly connected, FastEthernet0/0
     L        10.0.1.1/32 is directly connected, FastEthernet0/0
@@ -1969,7 +1969,7 @@ ok: [R1] =>
     C        172.16.99.0/24 is directly connected, FastEthernet3/1
     L        172.16.99.11/32 is directly connected, FastEthernet3/1
 redirecting (type: become) ansible.builtin.enable to ansible.netcommon.enable
-ok: [R2] => 
+ok: [R2] =>
   msg:
   - 'Host: R2'
   - |-
@@ -1991,9 +1991,9 @@ ok: [R2] =>
            o - ODR, P - periodic downloaded static route, H - NHRP, l - LISP
            a - application route
            + - replicated route, % - next hop override
-  
+
     Gateway of last resort is not set
-  
+
           10.0.0.0/8 is variably subnetted, 4 subnets, 2 masks
     C        10.0.1.0/30 is directly connected, FastEthernet0/0
     L        10.0.1.2/32 is directly connected, FastEthernet0/0
@@ -2004,7 +2004,7 @@ ok: [R2] =>
     L        172.16.99.12/32 is directly connected, FastEthernet3/1
 redirecting (type: become) ansible.builtin.enable to ansible.netcommon.enable
 redirecting (type: become) ansible.builtin.enable to ansible.netcommon.enable
-ok: [R4] => 
+ok: [R4] =>
   msg:
   - 'Host: R4'
   - |-
@@ -2026,9 +2026,9 @@ ok: [R4] =>
            o - ODR, P - periodic downloaded static route, H - NHRP, l - LISP
            a - application route
            + - replicated route, % - next hop override
-  
+
     Gateway of last resort is not set
-  
+
           10.0.0.0/8 is variably subnetted, 4 subnets, 2 masks
     C        10.0.2.0/30 is directly connected, FastEthernet2/0
     L        10.0.2.2/32 is directly connected, FastEthernet2/0
@@ -2037,7 +2037,7 @@ ok: [R4] =>
           172.16.0.0/16 is variably subnetted, 2 subnets, 2 masks
     C        172.16.99.0/24 is directly connected, FastEthernet3/1
     L        172.16.99.14/32 is directly connected, FastEthernet3/1
-ok: [R3] => 
+ok: [R3] =>
   msg:
   - 'Host: R3'
   - |-
@@ -2059,9 +2059,9 @@ ok: [R3] =>
            o - ODR, P - periodic downloaded static route, H - NHRP, l - LISP
            a - application route
            + - replicated route, % - next hop override
-  
+
     Gateway of last resort is not set
-  
+
           10.0.0.0/8 is variably subnetted, 4 subnets, 2 masks
     C        10.0.3.0/30 is directly connected, FastEthernet1/1
     L        10.0.3.1/32 is directly connected, FastEthernet1/1
@@ -2072,10 +2072,10 @@ ok: [R3] =>
     L        172.16.99.13/32 is directly connected, FastEthernet3/1
 
 PLAY RECAP ***************************************************************************************************************************************************************************
-R1                         : ok=5    changed=2    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   
-R2                         : ok=5    changed=2    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   
-R3                         : ok=5    changed=2    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   
-R4                         : ok=5    changed=2    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   
+R1                         : ok=5    changed=2    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
+R2                         : ok=5    changed=2    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
+R3                         : ok=5    changed=2    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
+R4                         : ok=5    changed=2    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
 
 cismembrane@cismembrane-OptiPlex-9020M:~/ansible-ospf$ ansible-playbook playbooks/precheck.yml -vvv
 ansible-playbook [core 2.16.3]
@@ -2128,7 +2128,7 @@ redirecting (type: action) cisco.ios.ios_command to cisco.ios.ios
 redirecting (type: action) cisco.ios.ios_command to cisco.ios.ios
 redirecting (type: action) cisco.ios.ios_command to cisco.ios.ios
 redirecting (type: action) cisco.ios.ios_command to cisco.ios.ios
-ok: [R1] => changed=false 
+ok: [R1] => changed=false
   invocation:
     module_args:
       commands:
@@ -2150,7 +2150,7 @@ ok: [R1] => changed=false
     FastEthernet3/1            172.16.99.11    YES manual up                    up
   - Cisco IOS Software, 7200 Software (C7200-ADVENTERPRISEK9-M), Version 15.3(3)XB12, RELEASE SOFTWARE (fc2)
   stdout_lines: <omitted>
-ok: [R3] => changed=false 
+ok: [R3] => changed=false
   invocation:
     module_args:
       commands:
@@ -2172,7 +2172,7 @@ ok: [R3] => changed=false
     FastEthernet3/1            172.16.99.13    YES manual up                    up
   - Cisco IOS Software, 7200 Software (C7200-ADVENTERPRISEK9-M), Version 15.3(3)XB12, RELEASE SOFTWARE (fc2)
   stdout_lines: <omitted>
-ok: [R4] => changed=false 
+ok: [R4] => changed=false
   invocation:
     module_args:
       commands:
@@ -2194,7 +2194,7 @@ ok: [R4] => changed=false
     FastEthernet3/1            172.16.99.14    YES manual up                    up
   - Cisco IOS Software, 7200 Software (C7200-ADVENTERPRISEK9-M), Version 15.3(3)XB12, RELEASE SOFTWARE (fc2)
   stdout_lines: <omitted>
-ok: [R2] => changed=false 
+ok: [R2] => changed=false
   invocation:
     module_args:
       commands:
@@ -2220,7 +2220,7 @@ ok: [R2] => changed=false
 TASK [Print precheck summary] ********************************************************************************************************************************************************
 task path: /home/cismembrane/ansible-ospf/playbooks/precheck.yml:13
 redirecting (type: become) ansible.builtin.enable to ansible.netcommon.enable
-ok: [R1] => 
+ok: [R1] =>
   msg:
   - 'Host: R1'
   - |-
@@ -2235,7 +2235,7 @@ ok: [R1] =>
   - Cisco IOS Software, 7200 Software (C7200-ADVENTERPRISEK9-M), Version 15.3(3)XB12, RELEASE SOFTWARE (fc2)
 redirecting (type: become) ansible.builtin.enable to ansible.netcommon.enable
 redirecting (type: become) ansible.builtin.enable to ansible.netcommon.enable
-ok: [R3] => 
+ok: [R3] =>
   msg:
   - 'Host: R3'
   - |-
@@ -2248,7 +2248,7 @@ ok: [R3] =>
     FastEthernet3/0            unassigned      YES unset  administratively down down
     FastEthernet3/1            172.16.99.13    YES manual up                    up
   - Cisco IOS Software, 7200 Software (C7200-ADVENTERPRISEK9-M), Version 15.3(3)XB12, RELEASE SOFTWARE (fc2)
-ok: [R2] => 
+ok: [R2] =>
   msg:
   - 'Host: R2'
   - |-
@@ -2262,7 +2262,7 @@ ok: [R2] =>
     FastEthernet3/1            172.16.99.12    YES manual up                    up
   - Cisco IOS Software, 7200 Software (C7200-ADVENTERPRISEK9-M), Version 15.3(3)XB12, RELEASE SOFTWARE (fc2)
 redirecting (type: become) ansible.builtin.enable to ansible.netcommon.enable
-ok: [R4] => 
+ok: [R4] =>
   msg:
   - 'Host: R4'
   - |-
@@ -2277,10 +2277,10 @@ ok: [R4] =>
   - Cisco IOS Software, 7200 Software (C7200-ADVENTERPRISEK9-M), Version 15.3(3)XB12, RELEASE SOFTWARE (fc2)
 
 PLAY RECAP ***************************************************************************************************************************************************************************
-R1                         : ok=2    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   
-R2                         : ok=2    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   
-R3                         : ok=2    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   
-R4                         : ok=2    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   
+R1                         : ok=2    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
+R2                         : ok=2    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
+R3                         : ok=2    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
+R4                         : ok=2    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
 
 cismembrane@cismembrane-OptiPlex-9020M:~/ansible-ospf$ ansible-playbook playbooks/ospf-deploy.yml -vvv --diff
 ansible-playbook [core 2.16.3]
@@ -2315,7 +2315,7 @@ task path: /home/cismembrane/ansible-ospf/playbooks/ospf-deploy.yml:6
 redirecting (type: become) ansible.builtin.enable to ansible.netcommon.enable
 redirecting (type: become) ansible.builtin.enable to ansible.netcommon.enable
 redirecting (type: become) ansible.builtin.enable to ansible.netcommon.enable
-ok: [R4] => changed=false 
+ok: [R4] => changed=false
   ansible_facts:
     ospf_rendered_config: |-
       router ospf 1
@@ -2323,14 +2323,14 @@ ok: [R4] => changed=false
        network 10.0.5.0 0.0.0.3 area 0
        network 10.0.2.0 0.0.0.3 area 0
        network 10.0.3.0 0.0.0.3 area 0
-ok: [R2] => changed=false 
+ok: [R2] => changed=false
   ansible_facts:
     ospf_rendered_config: |-
       router ospf 1
        router-id 2.2.2.2
        network 10.0.1.0 0.0.0.3 area 0
        network 10.0.2.0 0.0.0.3 area 0
-ok: [R1] => changed=false 
+ok: [R1] => changed=false
   ansible_facts:
     ospf_rendered_config: |-
       router ospf 1
@@ -2339,7 +2339,7 @@ ok: [R1] => changed=false
        network 10.0.4.0 0.0.0.3 area 0
        network 10.0.5.0 0.0.0.3 area 0
 redirecting (type: become) ansible.builtin.enable to ansible.netcommon.enable
-ok: [R3] => changed=false 
+ok: [R3] => changed=false
   ansible_facts:
     ospf_rendered_config: |-
       router ospf 1
@@ -2371,7 +2371,7 @@ redirecting (type: action) cisco.ios.ios_config to cisco.ios.ios
 redirecting (type: action) cisco.ios.ios_config to cisco.ios.ios
 redirecting (type: action) cisco.ios.ios_config to cisco.ios.ios
 [WARNING]: To ensure idempotency and correct diff the input configuration lines should be similar to how they appear if present in the running configuration on device
-changed: [R3] => changed=true 
+changed: [R3] => changed=true
   banners: {}
   commands:
   - router ospf 1
@@ -2405,7 +2405,7 @@ changed: [R3] => changed=true
   - router-id 3.3.3.3
   - network 10.0.4.0 0.0.0.3 area 0
   - network 10.0.3.0 0.0.0.3 area 0
-changed: [R2] => changed=true 
+changed: [R2] => changed=true
   banners: {}
   commands:
   - router ospf 1
@@ -2439,7 +2439,7 @@ changed: [R2] => changed=true
   - router-id 2.2.2.2
   - network 10.0.1.0 0.0.0.3 area 0
   - network 10.0.2.0 0.0.0.3 area 0
-changed: [R1] => changed=true 
+changed: [R1] => changed=true
   banners: {}
   commands:
   - router ospf 1
@@ -2476,7 +2476,7 @@ changed: [R1] => changed=true
   - network 10.0.1.0 0.0.0.3 area 0
   - network 10.0.4.0 0.0.0.3 area 0
   - network 10.0.5.0 0.0.0.3 area 0
-changed: [R4] => changed=true 
+changed: [R4] => changed=true
   banners: {}
   commands:
   - router ospf 1
@@ -2518,30 +2518,30 @@ TASK [Show change result] ******************************************************
 task path: /home/cismembrane/ansible-ospf/playbooks/ospf-deploy.yml:15
 redirecting (type: become) ansible.builtin.enable to ansible.netcommon.enable
 redirecting (type: become) ansible.builtin.enable to ansible.netcommon.enable
-ok: [R1] => 
+ok: [R1] =>
   msg:
   - 'Host: R1'
   - 'Changed: True'
-ok: [R2] => 
+ok: [R2] =>
   msg:
   - 'Host: R2'
   - 'Changed: True'
 redirecting (type: become) ansible.builtin.enable to ansible.netcommon.enable
 redirecting (type: become) ansible.builtin.enable to ansible.netcommon.enable
-ok: [R3] => 
+ok: [R3] =>
   msg:
   - 'Host: R3'
   - 'Changed: True'
-ok: [R4] => 
+ok: [R4] =>
   msg:
   - 'Host: R4'
   - 'Changed: True'
 
 PLAY RECAP ***************************************************************************************************************************************************************************
-R1                         : ok=3    changed=1    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   
-R2                         : ok=3    changed=1    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   
-R3                         : ok=3    changed=1    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   
-R4                         : ok=3    changed=1    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   
+R1                         : ok=3    changed=1    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
+R2                         : ok=3    changed=1    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
+R3                         : ok=3    changed=1    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
+R4                         : ok=3    changed=1    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
 
 cismembrane@cismembrane-OptiPlex-9020M:~/ansible-ospf$ ansible-playbook playbooks/ospf-validate.yml -vvv
 ansible-playbook [core 2.16.3]
@@ -2594,7 +2594,7 @@ redirecting (type: action) cisco.ios.ios_command to cisco.ios.ios
 redirecting (type: action) cisco.ios.ios_command to cisco.ios.ios
 redirecting (type: action) cisco.ios.ios_command to cisco.ios.ios
 redirecting (type: action) cisco.ios.ios_command to cisco.ios.ios
-ok: [R3] => changed=false 
+ok: [R3] => changed=false
   invocation:
     module_args:
       commands:
@@ -2620,11 +2620,11 @@ ok: [R3] => changed=false
            o - ODR, P - periodic downloaded static route, H - NHRP, l - LISP
            a - application route
            + - replicated route, % - next hop override
-  
+
     Gateway of last resort is not set
   - |-
     *** IP Routing is NSF aware ***
-  
+
     Routing Protocol is "application"
       Sending updates every 0 seconds
       Invalid after 0 seconds, hold down 0, flushed after 0
@@ -2635,7 +2635,7 @@ ok: [R3] => changed=false
       Routing Information Sources:
         Gateway         Distance      Last Update
       Distance: (default is 4)
-  
+
     Routing Protocol is "ospf 1"
       Outgoing update filter list for all interfaces is not set
       Incoming update filter list for all interfaces is not set
@@ -2649,7 +2649,7 @@ ok: [R3] => changed=false
         Gateway         Distance      Last Update
       Distance: (default is 110)
   stdout_lines: <omitted>
-ok: [R4] => changed=false 
+ok: [R4] => changed=false
   invocation:
     module_args:
       commands:
@@ -2676,11 +2676,11 @@ ok: [R4] => changed=false
            o - ODR, P - periodic downloaded static route, H - NHRP, l - LISP
            a - application route
            + - replicated route, % - next hop override
-  
+
     Gateway of last resort is not set
   - |-
     *** IP Routing is NSF aware ***
-  
+
     Routing Protocol is "application"
       Sending updates every 0 seconds
       Invalid after 0 seconds, hold down 0, flushed after 0
@@ -2691,7 +2691,7 @@ ok: [R4] => changed=false
       Routing Information Sources:
         Gateway         Distance      Last Update
       Distance: (default is 4)
-  
+
     Routing Protocol is "ospf 1"
       Outgoing update filter list for all interfaces is not set
       Incoming update filter list for all interfaces is not set
@@ -2706,7 +2706,7 @@ ok: [R4] => changed=false
         Gateway         Distance      Last Update
       Distance: (default is 110)
   stdout_lines: <omitted>
-ok: [R1] => changed=false 
+ok: [R1] => changed=false
   invocation:
     module_args:
       commands:
@@ -2733,11 +2733,11 @@ ok: [R1] => changed=false
            o - ODR, P - periodic downloaded static route, H - NHRP, l - LISP
            a - application route
            + - replicated route, % - next hop override
-  
+
     Gateway of last resort is not set
   - |-
     *** IP Routing is NSF aware ***
-  
+
     Routing Protocol is "application"
       Sending updates every 0 seconds
       Invalid after 0 seconds, hold down 0, flushed after 0
@@ -2748,7 +2748,7 @@ ok: [R1] => changed=false
       Routing Information Sources:
         Gateway         Distance      Last Update
       Distance: (default is 4)
-  
+
     Routing Protocol is "ospf 1"
       Outgoing update filter list for all interfaces is not set
       Incoming update filter list for all interfaces is not set
@@ -2763,7 +2763,7 @@ ok: [R1] => changed=false
         Gateway         Distance      Last Update
       Distance: (default is 110)
   stdout_lines: <omitted>
-ok: [R2] => changed=false 
+ok: [R2] => changed=false
   invocation:
     module_args:
       commands:
@@ -2789,11 +2789,11 @@ ok: [R2] => changed=false
            o - ODR, P - periodic downloaded static route, H - NHRP, l - LISP
            a - application route
            + - replicated route, % - next hop override
-  
+
     Gateway of last resort is not set
   - |-
     *** IP Routing is NSF aware ***
-  
+
     Routing Protocol is "application"
       Sending updates every 0 seconds
       Invalid after 0 seconds, hold down 0, flushed after 0
@@ -2804,7 +2804,7 @@ ok: [R2] => changed=false
       Routing Information Sources:
         Gateway         Distance      Last Update
       Distance: (default is 4)
-  
+
     Routing Protocol is "ospf 1"
       Outgoing update filter list for all interfaces is not set
       Incoming update filter list for all interfaces is not set
@@ -2822,7 +2822,7 @@ ok: [R2] => changed=false
 TASK [Print command outputs to console] **********************************************************************************************************************************************
 task path: /home/cismembrane/ansible-ospf/playbooks/ospf-validate.yml:11
 redirecting (type: become) ansible.builtin.enable to ansible.netcommon.enable
-ok: [R1] => 
+ok: [R1] =>
   msg:
   - ===== R1 =====
   - |-
@@ -2840,11 +2840,11 @@ ok: [R1] =>
            o - ODR, P - periodic downloaded static route, H - NHRP, l - LISP
            a - application route
            + - replicated route, % - next hop override
-  
+
     Gateway of last resort is not set
   - |-
     *** IP Routing is NSF aware ***
-  
+
     Routing Protocol is "application"
       Sending updates every 0 seconds
       Invalid after 0 seconds, hold down 0, flushed after 0
@@ -2855,7 +2855,7 @@ ok: [R1] =>
       Routing Information Sources:
         Gateway         Distance      Last Update
       Distance: (default is 4)
-  
+
     Routing Protocol is "ospf 1"
       Outgoing update filter list for all interfaces is not set
       Incoming update filter list for all interfaces is not set
@@ -2871,7 +2871,7 @@ ok: [R1] =>
       Distance: (default is 110)
 redirecting (type: become) ansible.builtin.enable to ansible.netcommon.enable
 redirecting (type: become) ansible.builtin.enable to ansible.netcommon.enable
-ok: [R2] => 
+ok: [R2] =>
   msg:
   - ===== R2 =====
   - |-
@@ -2888,11 +2888,11 @@ ok: [R2] =>
            o - ODR, P - periodic downloaded static route, H - NHRP, l - LISP
            a - application route
            + - replicated route, % - next hop override
-  
+
     Gateway of last resort is not set
   - |-
     *** IP Routing is NSF aware ***
-  
+
     Routing Protocol is "application"
       Sending updates every 0 seconds
       Invalid after 0 seconds, hold down 0, flushed after 0
@@ -2903,7 +2903,7 @@ ok: [R2] =>
       Routing Information Sources:
         Gateway         Distance      Last Update
       Distance: (default is 4)
-  
+
     Routing Protocol is "ospf 1"
       Outgoing update filter list for all interfaces is not set
       Incoming update filter list for all interfaces is not set
@@ -2916,7 +2916,7 @@ ok: [R2] =>
       Routing Information Sources:
         Gateway         Distance      Last Update
       Distance: (default is 110)
-ok: [R3] => 
+ok: [R3] =>
   msg:
   - ===== R3 =====
   - |-
@@ -2933,11 +2933,11 @@ ok: [R3] =>
            o - ODR, P - periodic downloaded static route, H - NHRP, l - LISP
            a - application route
            + - replicated route, % - next hop override
-  
+
     Gateway of last resort is not set
   - |-
     *** IP Routing is NSF aware ***
-  
+
     Routing Protocol is "application"
       Sending updates every 0 seconds
       Invalid after 0 seconds, hold down 0, flushed after 0
@@ -2948,7 +2948,7 @@ ok: [R3] =>
       Routing Information Sources:
         Gateway         Distance      Last Update
       Distance: (default is 4)
-  
+
     Routing Protocol is "ospf 1"
       Outgoing update filter list for all interfaces is not set
       Incoming update filter list for all interfaces is not set
@@ -2962,7 +2962,7 @@ ok: [R3] =>
         Gateway         Distance      Last Update
       Distance: (default is 110)
 redirecting (type: become) ansible.builtin.enable to ansible.netcommon.enable
-ok: [R4] => 
+ok: [R4] =>
   msg:
   - ===== R4 =====
   - |-
@@ -2980,11 +2980,11 @@ ok: [R4] =>
            o - ODR, P - periodic downloaded static route, H - NHRP, l - LISP
            a - application route
            + - replicated route, % - next hop override
-  
+
     Gateway of last resort is not set
   - |-
     *** IP Routing is NSF aware ***
-  
+
     Routing Protocol is "application"
       Sending updates every 0 seconds
       Invalid after 0 seconds, hold down 0, flushed after 0
@@ -2995,7 +2995,7 @@ ok: [R4] =>
       Routing Information Sources:
         Gateway         Distance      Last Update
       Distance: (default is 4)
-  
+
     Routing Protocol is "ospf 1"
       Outgoing update filter list for all interfaces is not set
       Incoming update filter list for all interfaces is not set
@@ -3068,7 +3068,7 @@ Using module file /usr/lib/python3/dist-packages/ansible/modules/copy.py
 <localhost> EXEC /bin/sh -c 'rm -f -r /home/cismembrane/.ansible/tmp/ansible-tmp-1772863739.5375423-166071-219107507559486/ > /dev/null 2>&1 && sleep 0'
 <localhost> EXEC /bin/sh -c 'rm -f -r /home/cismembrane/.ansible/tmp/ansible-tmp-1772863739.5377817-166069-167335948721177/ > /dev/null 2>&1 && sleep 0'
 <localhost> EXEC /bin/sh -c 'rm -f -r /home/cismembrane/.ansible/tmp/ansible-tmp-1772863739.537543-166072-89616638525531/ > /dev/null 2>&1 && sleep 0'
-changed: [R2 -> localhost] => changed=true 
+changed: [R2 -> localhost] => changed=true
   checksum: 69ebea7fedbb78967d784db9554c5d33a29bb5b4
   dest: ../outputs/R2-ospf-validation.txt
   diff: []
@@ -3104,7 +3104,7 @@ changed: [R2 -> localhost] => changed=true
   src: /home/cismembrane/.ansible/tmp/ansible-tmp-1772863739.5846117-166070-70538772655504/source
   state: file
   uid: 1000
-changed: [R3 -> localhost] => changed=true 
+changed: [R3 -> localhost] => changed=true
   checksum: 55eb806cdf91b16e5d543c1711949750858333fd
   dest: ../outputs/R3-ospf-validation.txt
   diff: []
@@ -3140,7 +3140,7 @@ changed: [R3 -> localhost] => changed=true
   src: /home/cismembrane/.ansible/tmp/ansible-tmp-1772863739.5375423-166071-219107507559486/source
   state: file
   uid: 1000
-changed: [R4 -> localhost] => changed=true 
+changed: [R4 -> localhost] => changed=true
   checksum: a5d0b99ac378d4ab42467192e326ceb471fcff07
   dest: ../outputs/R4-ospf-validation.txt
   diff: []
@@ -3176,7 +3176,7 @@ changed: [R4 -> localhost] => changed=true
   src: /home/cismembrane/.ansible/tmp/ansible-tmp-1772863739.537543-166072-89616638525531/source
   state: file
   uid: 1000
-changed: [R1 -> localhost] => changed=true 
+changed: [R1 -> localhost] => changed=true
   checksum: 14483fda23f30a803a310869c5d94ce7536a935d
   dest: ../outputs/R1-ospf-validation.txt
   diff: []
@@ -3214,9 +3214,9 @@ changed: [R1 -> localhost] => changed=true
   uid: 1000
 
 PLAY RECAP ***************************************************************************************************************************************************************************
-R1                         : ok=3    changed=1    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   
-R2                         : ok=3    changed=1    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   
-R3                         : ok=3    changed=1    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   
-R4                         : ok=3    changed=1    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   
+R1                         : ok=3    changed=1    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
+R2                         : ok=3    changed=1    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
+R3                         : ok=3    changed=1    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
+R4                         : ok=3    changed=1    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
 
 cismembrane@cismembrane-OptiPlex-9020M:~/ansible-ospf$

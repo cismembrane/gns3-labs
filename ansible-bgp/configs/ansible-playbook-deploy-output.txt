@@ -18,9 +18,9 @@ changed: [R2]
 changed: [R3]
 
 PLAY RECAP ******************************************************************************************
-R1                         : ok=2    changed=2    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   
-R2                         : ok=2    changed=2    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   
-R3                         : ok=2    changed=2    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   
-R4                         : ok=2    changed=2    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   
+R1                         : ok=2    changed=2    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
+R2                         : ok=2    changed=2    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
+R3                         : ok=2    changed=2    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
+R4                         : ok=2    changed=2    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
 
 cismembrane@cismembrane-OptiPlex-9020M:~/gns3-labs-audit/ansible-bgp$ ansible-playbook verify.yml

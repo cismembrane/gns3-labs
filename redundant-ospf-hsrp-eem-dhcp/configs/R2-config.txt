@@ -146,4 +146,3 @@ ntp source Loopback0
 ntp server 10.255.255.1 key 1
 !
 end
-

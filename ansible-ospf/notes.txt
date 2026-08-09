@@ -18,7 +18,7 @@ DTP flap observed on R1, port err-disabled:
 
 R1#show int status
 
-Port      Name               Status       Vlan       Duplex  Speed Type 
+Port      Name               Status       Vlan       Duplex  Speed Type
 Gi0/2                        notconnect   1            auto   auto unknown
 Gi0/3                        notconnect   1            auto   auto unknown
 Gi0/0                        connected    routed       auto   auto unknown
@@ -28,12 +28,12 @@ Gi1/1                        notconnect   1            auto   auto unknown
 R1#conf t
 Enter configuration commands, one per line.  End with CNTL/Z.
 R1(config)#
-R1(config)#end 
+R1(config)#end
 R1#
 R1#show int st
 *Mar  5 01:28:15.801: %SYS-5-CONFIG_I: Configured from console by console
 R1#show int status err
-R1#show int status err-disabled 
+R1#show int status err-disabled
 
 Port      Name               Status       Reason               Err-disabled Vlans
 Gi1/0                        err-disabled dtp-flap
@@ -88,9 +88,3 @@ Ubuntu REALLY doesn't like SSH on the c3660. I'm trying a 7200 router image now.
 I'm having good success with the c7200 images. I'm refactoring the current Ansible files to use physical interfaces as opposed to SVIs.
 
 Ansible files taken care of. I just tried ansible-playbook -i inventory-ios.ini playbooks/interface-config.yml -l R1 --diff and discovered that some of the interfaces are mislabeled. Changed.
-
-
-
-
-
-

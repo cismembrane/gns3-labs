@@ -32,7 +32,7 @@ def request(method, path, payload=None):
         verify=False,
         timeout=15,
     )
-    
+
     print(f"{method} {path} -> {r.status_code}")
     if r.text:
         try:
@@ -41,7 +41,7 @@ def request(method, path, payload=None):
             print(r.text)
     print()
     return r
-    
+
 put_payload = {
     "Cisco-IOS-XE-native:ip-route-interface-forwarding-list": [
         {

@@ -71,33 +71,33 @@ redundant-ospf-hsrp-eem-dhcp/
 
 ## Routing
 
-- OSPF process 1 on R2/R3/R4  
-- Area 0: R2–R3 (10.0.0.0/30), R2–R4 (10.0.1.0/30), and the ABRs’ loopbacks (R2/R3/R4 Lo0 in area 0)  
-- Area 10 (totally-stub): 192.168.10.0/24 behind R3/R4; access interfaces are passive  
-- Authentication: OSPF MD5 on area 0 links (message-digest configured end-to-end)  
-- Default: R2 has `ip route 0.0.0.0/0 203.0.113.1` and `default-information originate` toward Area 0  
+- OSPF process 1 on R2/R3/R4
+- Area 0: R2–R3 (10.0.0.0/30), R2–R4 (10.0.1.0/30), and the ABRs’ loopbacks (R2/R3/R4 Lo0 in area 0)
+- Area 10 (totally-stub): 192.168.10.0/24 behind R3/R4; access interfaces are passive
+- Authentication: OSPF MD5 on area 0 links (message-digest configured end-to-end)
+- Default: R2 has `ip route 0.0.0.0/0 203.0.113.1` and `default-information originate` toward Area 0
 - R1: static `ip route 0.0.0.0/0 203.0.113.2`; no OSPF
 
 ## DHCP
 
 - Server: Centralized on R2
-- Pool: `192.168.10.0/24` with exclusions `192.168.10.1–10`  
-- Default gateway: `192.168.10.1` (HSRP VIP)  
-- DNS server: `10.255.255.1` (R1)  
-- Domain: `test.com`  
+- Pool: `192.168.10.0/24` with exclusions `192.168.10.1–10`
+- Default gateway: `192.168.10.1` (HSRP VIP)
+- DNS server: `10.255.255.1` (R1)
+- Domain: `test.com`
 
 ### EEM-Gated Relay (R3/R4)
 
 - Goal: Only the HSRP Active node relays DHCP, keeping `giaddr` aligned to the active gateway and preventing duplicate offers.
 
-R3 (LAN = Fa0/1)  
+R3 (LAN = Fa0/1)
 
-- Applet enables `ip helper-address 10.0.0.2` when HSRP goes Active and removes it when it leaves Active.  
+- Applet enables `ip helper-address 10.0.0.2` when HSRP goes Active and removes it when it leaves Active.
 - Notes: Config initially contains the helper; EEM ensures convergence to the correct state on transitions.
 
-R4 (LAN = Fa0/0)  
+R4 (LAN = Fa0/0)
 
-- Applet removes/adds helper on Active transition (idempotent “no/add” pair), and removes on leaving Active.  
+- Applet removes/adds helper on Active transition (idempotent “no/add” pair), and removes on leaving Active.
 - Pattern is unanchored (works across platforms/IOS messages).
 
 ## Core Services
@@ -110,8 +110,8 @@ R4 (LAN = Fa0/0)
 
 ## Management & Hardening
 
-- SSH-only on VTY (`transport input ssh`) with `login local` (user `admin` defined on all devices)  
-- Config archive with `hidekeys`; logging buffered; `exec-timeout` applied on VTYs  
+- SSH-only on VTY (`transport input ssh`) with `login local` (user `admin` defined on all devices)
+- Config archive with `hidekeys`; logging buffered; `exec-timeout` applied on VTYs
 - Domain `test.com` on devices (R1 disables DNS lookup to avoid CLI hangs)
 
 ## Key Interface Notes
@@ -131,13 +131,13 @@ R4 (LAN = Fa0/0)
 
 ### OSPF
 
-- `show ip ospf neighbor` (R2/R3/R4) → FULL on /30 links (p2p).  
-- `show ip route` → R3/R4 learn only a default in Area 10.  
+- `show ip ospf neighbor` (R2/R3/R4) → FULL on /30 links (p2p).
+- `show ip route` → R3/R4 learn only a default in Area 10.
 - `show ip ospf interface` → message-digest enabled on Area 0 links.
 
 ### DHCP
 
-- Client on LAN receives IP in `192.168.10.0/24`, GW `192.168.10.1`, DNS `10.255.255.1`.  
+- Client on LAN receives IP in `192.168.10.0/24`, GW `192.168.10.1`, DNS `10.255.255.1`.
 - Force HSRP failover (e.g., lower R3 priority or shut/no shut). New Active should own the helper and leases still arrive from R2.
 
 ### NTP
@@ -150,13 +150,13 @@ R4 (LAN = Fa0/0)
 
 ## Design Notes
 
-- Totally-stub Area 10 keeps access simple; ABRs inject only a default toward the LAN.  
-- OSPF MD5 on the uplinks thwarts trivial neighbor spoofing in demos.  
+- Totally-stub Area 10 keeps access simple; ABRs inject only a default toward the LAN.
+- OSPF MD5 on the uplinks thwarts trivial neighbor spoofing in demos.
 - EEM-gated relay ensures DHCP `giaddr` matches the active gateway, avoiding duplicate offers and keeping state consistent across failovers.
 
 ## Reproduce Quickly
 
-Use GNS3 or EVE-NG with IOS 12.4 images.  
+Use GNS3 or EVE-NG with IOS 12.4 images.
 Wire links per the topology, paste the provided configs, and validate using the checklist above.
 
 ## To do

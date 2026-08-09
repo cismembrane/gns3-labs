@@ -42,11 +42,11 @@ multilink bundle-name authenticated
 !
 !
 username admin privilege 15 secret 5 $1$P/2.$BGKeBreMBYYSV2X26lvFO.
-!         
+!
 redundancy
 !
 !
-! 
+!
 !
 !
 !
@@ -65,7 +65,7 @@ interface GigabitEthernet0/0
  duplex auto
  speed auto
  media-type rj45
-!         
+!
 interface GigabitEthernet0/1
  no ip address
  shutdown
@@ -145,5 +145,3 @@ line vty 5 15
 no scheduler allocate
 !
 end
-
-

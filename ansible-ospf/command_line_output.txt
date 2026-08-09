@@ -5,7 +5,7 @@ PLAY [Bootstrap base config on Cisco IOS routers] ******************************
 
 TASK [Check SSH status] **************************************************************************************************************************************************************
 [WARNING]: ansible-pylibssh not installed, falling back to paramiko
-ok: [R4] => changed=false 
+ok: [R4] => changed=false
   stdout:
   - |-
     SSH Enabled - version 2.0
@@ -17,7 +17,7 @@ ok: [R4] => changed=false
     5chs2ZytH0D9ZGhcLqY81hdKLx4KuzFrJuYY9OPvGtWSkgIdRjiQ66YATocNRwzbeKFhpK0LLNWa/WGj
     IBbK/aZNlegLfEmCx5JnxgYTZ1iBwcZCksoFuztY2j92mQ94Bw==
   stdout_lines: <omitted>
-ok: [R3] => changed=false 
+ok: [R3] => changed=false
   stdout:
   - |-
     SSH Enabled - version 2.0
@@ -29,7 +29,7 @@ ok: [R3] => changed=false
     4S27tPM5R0NqtzQIzlWhUW1v+byOCAirEYl3gb/93w9ufrP5ELG+aNzigJDMJk6UTdVh4P+c8PI0xImd
     P1iIfvKs84HkaD0pmMCYDSYViMMeC7Yq+K5PKew6yLhtQtsvPw==
   stdout_lines: <omitted>
-ok: [R2] => changed=false 
+ok: [R2] => changed=false
   stdout:
   - |-
     SSH Enabled - version 2.0
@@ -41,7 +41,7 @@ ok: [R2] => changed=false
     HooK9qpdO8TVLqpK8/5vSANyB/RoCeLtp36QUn9h9Lth/BfyfDQaSTNlL+6Vme3VnuEBA+aFfAcarRGP
     7Cj01J/pcT/vzV7D0GvywTKjsYSjyWbjMLyneB2ZbZmjXjDL5Q==
   stdout_lines: <omitted>
-ok: [R1] => changed=false 
+ok: [R1] => changed=false
   stdout:
   - |-
     SSH Enabled - version 2.0
@@ -62,7 +62,7 @@ ok: [R1] => changed=false
 
 TASK [Apply base management config (without RSA key generation)] *********************************************************************************************************************
 [WARNING]: To ensure idempotency and correct diff the input configuration lines should be similar to how they appear if present in the running configuration on device
-changed: [R1] => changed=true 
+changed: [R1] => changed=true
   banners: {}
   commands:
   - no ip domain-lookup
@@ -76,7 +76,7 @@ changed: [R1] => changed=true
   - enable secret admin
   - username admin privilege 15 secret admin
   - ip ssh authentication-retries 3
-changed: [R4] => changed=true 
+changed: [R4] => changed=true
   banners: {}
   commands:
   - no ip domain-lookup
@@ -90,7 +90,7 @@ changed: [R4] => changed=true
   - enable secret admin
   - username admin privilege 15 secret admin
   - ip ssh authentication-retries 3
-changed: [R2] => changed=true 
+changed: [R2] => changed=true
   banners: {}
   commands:
   - no ip domain-lookup
@@ -104,7 +104,7 @@ changed: [R2] => changed=true
   - enable secret admin
   - username admin privilege 15 secret admin
   - ip ssh authentication-retries 3
-changed: [R3] => changed=true 
+changed: [R3] => changed=true
   banners: {}
   commands:
   - no ip domain-lookup
@@ -120,21 +120,21 @@ changed: [R3] => changed=true
   - ip ssh authentication-retries 3
 
 TASK [Generate RSA key only if SSH keys are not present] *****************************************************************************************************************************
-skipping: [R1] => changed=false 
+skipping: [R1] => changed=false
   false_condition: ssh_status is failed or ('%Please create RSA keys' in (ssh_status.stdout[0] | default(''))) or ('SSH Disabled' in (ssh_status.stdout[0] | default('')))
   skip_reason: Conditional result was False
-skipping: [R2] => changed=false 
+skipping: [R2] => changed=false
   false_condition: ssh_status is failed or ('%Please create RSA keys' in (ssh_status.stdout[0] | default(''))) or ('SSH Disabled' in (ssh_status.stdout[0] | default('')))
   skip_reason: Conditional result was False
-skipping: [R4] => changed=false 
+skipping: [R4] => changed=false
   false_condition: ssh_status is failed or ('%Please create RSA keys' in (ssh_status.stdout[0] | default(''))) or ('SSH Disabled' in (ssh_status.stdout[0] | default('')))
   skip_reason: Conditional result was False
-skipping: [R3] => changed=false 
+skipping: [R3] => changed=false
   false_condition: ssh_status is failed or ('%Please create RSA keys' in (ssh_status.stdout[0] | default(''))) or ('SSH Disabled' in (ssh_status.stdout[0] | default('')))
   skip_reason: Conditional result was False
 
 TASK [Configure console line] ********************************************************************************************************************************************************
-changed: [R4] => changed=true 
+changed: [R4] => changed=true
   banners: {}
   commands:
   - line con 0
@@ -142,7 +142,7 @@ changed: [R4] => changed=true
   updates:
   - line con 0
   - exec-timeout 10 0
-changed: [R2] => changed=true 
+changed: [R2] => changed=true
   banners: {}
   commands:
   - line con 0
@@ -150,7 +150,7 @@ changed: [R2] => changed=true
   updates:
   - line con 0
   - exec-timeout 10 0
-changed: [R1] => changed=true 
+changed: [R1] => changed=true
   banners: {}
   commands:
   - line con 0
@@ -158,7 +158,7 @@ changed: [R1] => changed=true
   updates:
   - line con 0
   - exec-timeout 10 0
-changed: [R3] => changed=true 
+changed: [R3] => changed=true
   banners: {}
   commands:
   - line con 0
@@ -168,7 +168,7 @@ changed: [R3] => changed=true
   - exec-timeout 10 0
 
 TASK [Configure vty 0 15 for SSH] ****************************************************************************************************************************************************
-changed: [R2] => changed=true 
+changed: [R2] => changed=true
   banners: {}
   commands:
   - line vty 0 15
@@ -180,7 +180,7 @@ changed: [R2] => changed=true
   - login local
   - transport input ssh
   - exec-timeout 15 0
-changed: [R3] => changed=true 
+changed: [R3] => changed=true
   banners: {}
   commands:
   - line vty 0 15
@@ -192,7 +192,7 @@ changed: [R3] => changed=true
   - login local
   - transport input ssh
   - exec-timeout 15 0
-changed: [R1] => changed=true 
+changed: [R1] => changed=true
   banners: {}
   commands:
   - line vty 0 15
@@ -204,7 +204,7 @@ changed: [R1] => changed=true
   - login local
   - transport input ssh
   - exec-timeout 15 0
-changed: [R4] => changed=true 
+changed: [R4] => changed=true
   banners: {}
   commands:
   - line vty 0 15
@@ -218,25 +218,25 @@ changed: [R4] => changed=true
   - exec-timeout 15 0
 
 TASK [Disable DNS lookup (prevents 'Translating ...' stalls)] ************************************************************************************************************************
-changed: [R3] => changed=true 
+changed: [R3] => changed=true
   banners: {}
   commands:
   - no ip domain-lookup
   updates:
   - no ip domain-lookup
-changed: [R2] => changed=true 
+changed: [R2] => changed=true
   banners: {}
   commands:
   - no ip domain-lookup
   updates:
   - no ip domain-lookup
-changed: [R1] => changed=true 
+changed: [R1] => changed=true
   banners: {}
   commands:
   - no ip domain-lookup
   updates:
   - no ip domain-lookup
-changed: [R4] => changed=true 
+changed: [R4] => changed=true
   banners: {}
   commands:
   - no ip domain-lookup
@@ -250,20 +250,20 @@ ok: [R2] => changed=false
 ok: [R4] => changed=false
 
 TASK [Report result] *****************************************************************************************************************************************************************
-ok: [R1] => 
+ok: [R1] =>
   msg: Base config pushed on R1 (changed=True)
-ok: [R2] => 
+ok: [R2] =>
   msg: Base config pushed on R2 (changed=True)
-ok: [R4] => 
+ok: [R4] =>
   msg: Base config pushed on R4 (changed=True)
-ok: [R3] => 
+ok: [R3] =>
   msg: Base config pushed on R3 (changed=True)
 
 PLAY RECAP ***************************************************************************************************************************************************************************
-R1                         : ok=8    changed=4    unreachable=0    failed=0    skipped=1    rescued=0    ignored=0   
-R2                         : ok=8    changed=4    unreachable=0    failed=0    skipped=1    rescued=0    ignored=0   
-R3                         : ok=8    changed=4    unreachable=0    failed=0    skipped=1    rescued=0    ignored=0   
-R4                         : ok=8    changed=4    unreachable=0    failed=0    skipped=1    rescued=0    ignored=0   
+R1                         : ok=8    changed=4    unreachable=0    failed=0    skipped=1    rescued=0    ignored=0
+R2                         : ok=8    changed=4    unreachable=0    failed=0    skipped=1    rescued=0    ignored=0
+R3                         : ok=8    changed=4    unreachable=0    failed=0    skipped=1    rescued=0    ignored=0
+R4                         : ok=8    changed=4    unreachable=0    failed=0    skipped=1    rescued=0    ignored=0
 
 cismembrane@cismembrane-OptiPlex-9020M:~/ansible-ospf$ ansible-playbook playbooks/interface-config.yml -v --diff
 Using /home/cismembrane/ansible-ospf/ansible.cfg as config file
@@ -271,19 +271,19 @@ Using /home/cismembrane/ansible-ospf/ansible.cfg as config file
 PLAY [Configure management and transit routed interfaces (c7600)] ********************************************************************************************************************
 
 TASK [Validate required host variables exist] ****************************************************************************************************************************************
-ok: [R1] => changed=false 
+ok: [R1] => changed=false
   msg: All assertions passed
-ok: [R2] => changed=false 
+ok: [R2] => changed=false
   msg: All assertions passed
-ok: [R4] => changed=false 
+ok: [R4] => changed=false
   msg: All assertions passed
-ok: [R3] => changed=false 
+ok: [R3] => changed=false
   msg: All assertions passed
 
 TASK [Configure management routed interface] *****************************************************************************************************************************************
 [WARNING]: ansible-pylibssh not installed, falling back to paramiko
 [WARNING]: To ensure idempotency and correct diff the input configuration lines should be similar to how they appear if present in the running configuration on device
-changed: [R4] => changed=true 
+changed: [R4] => changed=true
   banners: {}
   commands:
   - interface FastEthernet3/1
@@ -293,7 +293,7 @@ changed: [R4] => changed=true
   - interface FastEthernet3/1
   - description MGMT
   - no shutdown
-changed: [R3] => changed=true 
+changed: [R3] => changed=true
   banners: {}
   commands:
   - interface FastEthernet3/1
@@ -303,7 +303,7 @@ changed: [R3] => changed=true
   - interface FastEthernet3/1
   - description MGMT
   - no shutdown
-changed: [R1] => changed=true 
+changed: [R1] => changed=true
   banners: {}
   commands:
   - interface FastEthernet3/1
@@ -313,7 +313,7 @@ changed: [R1] => changed=true
   - interface FastEthernet3/1
   - description MGMT
   - no shutdown
-changed: [R2] => changed=true 
+changed: [R2] => changed=true
   banners: {}
   commands:
   - interface FastEthernet3/1
@@ -325,7 +325,7 @@ changed: [R2] => changed=true
   - no shutdown
 
 TASK [Configure transit routed interfaces (IP on physical ports)] ********************************************************************************************************************
-changed: [R3] => (item=FastEthernet1/0 10.0.4.2) => changed=true 
+changed: [R3] => (item=FastEthernet1/0 10.0.4.2) => changed=true
   ansible_loop_var: item
   banners: {}
   commands:
@@ -346,7 +346,7 @@ changed: [R3] => (item=FastEthernet1/0 10.0.4.2) => changed=true
   - no shutdown
   warnings:
   - To ensure idempotency and correct diff the input configuration lines should be similar to how they appear if present in the running configuration on device
-changed: [R2] => (item=FastEthernet0/0 10.0.1.2) => changed=true 
+changed: [R2] => (item=FastEthernet0/0 10.0.1.2) => changed=true
   ansible_loop_var: item
   banners: {}
   commands:
@@ -367,7 +367,7 @@ changed: [R2] => (item=FastEthernet0/0 10.0.1.2) => changed=true
   - no shutdown
   warnings:
   - To ensure idempotency and correct diff the input configuration lines should be similar to how they appear if present in the running configuration on device
-changed: [R1] => (item=FastEthernet0/0 10.0.1.1) => changed=true 
+changed: [R1] => (item=FastEthernet0/0 10.0.1.1) => changed=true
   ansible_loop_var: item
   banners: {}
   commands:
@@ -388,7 +388,7 @@ changed: [R1] => (item=FastEthernet0/0 10.0.1.1) => changed=true
   - no shutdown
   warnings:
   - To ensure idempotency and correct diff the input configuration lines should be similar to how they appear if present in the running configuration on device
-changed: [R4] => (item=FastEthernet1/1 10.0.3.2) => changed=true 
+changed: [R4] => (item=FastEthernet1/1 10.0.3.2) => changed=true
   ansible_loop_var: item
   banners: {}
   commands:
@@ -409,7 +409,7 @@ changed: [R4] => (item=FastEthernet1/1 10.0.3.2) => changed=true
   - no shutdown
   warnings:
   - To ensure idempotency and correct diff the input configuration lines should be similar to how they appear if present in the running configuration on device
-changed: [R2] => (item=FastEthernet2/0 10.0.2.1) => changed=true 
+changed: [R2] => (item=FastEthernet2/0 10.0.2.1) => changed=true
   ansible_loop_var: item
   banners: {}
   commands:
@@ -431,7 +431,7 @@ changed: [R2] => (item=FastEthernet2/0 10.0.2.1) => changed=true
   warnings:
   - To ensure idempotency and correct diff the input configuration lines should be similar to how they appear if present in the running configuration on device
   - To ensure idempotency and correct diff the input configuration lines should be similar to how they appear if present in the running configuration on device
-changed: [R1] => (item=FastEthernet1/0 10.0.4.1) => changed=true 
+changed: [R1] => (item=FastEthernet1/0 10.0.4.1) => changed=true
   ansible_loop_var: item
   banners: {}
   commands:
@@ -453,7 +453,7 @@ changed: [R1] => (item=FastEthernet1/0 10.0.4.1) => changed=true
   warnings:
   - To ensure idempotency and correct diff the input configuration lines should be similar to how they appear if present in the running configuration on device
   - To ensure idempotency and correct diff the input configuration lines should be similar to how they appear if present in the running configuration on device
-changed: [R3] => (item=FastEthernet1/1 10.0.3.1) => changed=true 
+changed: [R3] => (item=FastEthernet1/1 10.0.3.1) => changed=true
   ansible_loop_var: item
   banners: {}
   commands:
@@ -475,7 +475,7 @@ changed: [R3] => (item=FastEthernet1/1 10.0.3.1) => changed=true
   warnings:
   - To ensure idempotency and correct diff the input configuration lines should be similar to how they appear if present in the running configuration on device
   - To ensure idempotency and correct diff the input configuration lines should be similar to how they appear if present in the running configuration on device
-changed: [R4] => (item=FastEthernet2/0 10.0.2.2) => changed=true 
+changed: [R4] => (item=FastEthernet2/0 10.0.2.2) => changed=true
   ansible_loop_var: item
   banners: {}
   commands:
@@ -497,7 +497,7 @@ changed: [R4] => (item=FastEthernet2/0 10.0.2.2) => changed=true
   warnings:
   - To ensure idempotency and correct diff the input configuration lines should be similar to how they appear if present in the running configuration on device
   - To ensure idempotency and correct diff the input configuration lines should be similar to how they appear if present in the running configuration on device
-changed: [R4] => (item=FastEthernet3/0 10.0.5.2) => changed=true 
+changed: [R4] => (item=FastEthernet3/0 10.0.5.2) => changed=true
   ansible_loop_var: item
   banners: {}
   commands:
@@ -520,7 +520,7 @@ changed: [R4] => (item=FastEthernet3/0 10.0.5.2) => changed=true
   - To ensure idempotency and correct diff the input configuration lines should be similar to how they appear if present in the running configuration on device
   - To ensure idempotency and correct diff the input configuration lines should be similar to how they appear if present in the running configuration on device
   - To ensure idempotency and correct diff the input configuration lines should be similar to how they appear if present in the running configuration on device
-changed: [R1] => (item=FastEthernet3/0 10.0.5.1) => changed=true 
+changed: [R1] => (item=FastEthernet3/0 10.0.5.1) => changed=true
   ansible_loop_var: item
   banners: {}
   commands:
@@ -545,7 +545,7 @@ changed: [R1] => (item=FastEthernet3/0 10.0.5.1) => changed=true
   - To ensure idempotency and correct diff the input configuration lines should be similar to how they appear if present in the running configuration on device
 
 TASK [Sanity check (L3 oriented)] ****************************************************************************************************************************************************
-ok: [R1] => changed=false 
+ok: [R1] => changed=false
   stdout:
   - |-
     Interface                  IP-Address      OK? Method Status                Protocol
@@ -566,9 +566,9 @@ ok: [R1] => changed=false
            o - ODR, P - periodic downloaded static route, H - NHRP, l - LISP
            a - application route
            + - replicated route, % - next hop override
-  
+
     Gateway of last resort is not set
-  
+
           10.0.0.0/8 is variably subnetted, 4 subnets, 2 masks
     C        10.0.1.0/30 is directly connected, FastEthernet0/0
     L        10.0.1.1/32 is directly connected, FastEthernet0/0
@@ -578,7 +578,7 @@ ok: [R1] => changed=false
     C        172.16.99.0/24 is directly connected, FastEthernet3/1
     L        172.16.99.11/32 is directly connected, FastEthernet3/1
   stdout_lines: <omitted>
-ok: [R4] => changed=false 
+ok: [R4] => changed=false
   stdout:
   - |-
     Interface                  IP-Address      OK? Method Status                Protocol
@@ -599,9 +599,9 @@ ok: [R4] => changed=false
            o - ODR, P - periodic downloaded static route, H - NHRP, l - LISP
            a - application route
            + - replicated route, % - next hop override
-  
+
     Gateway of last resort is not set
-  
+
           10.0.0.0/8 is variably subnetted, 4 subnets, 2 masks
     C        10.0.2.0/30 is directly connected, FastEthernet2/0
     L        10.0.2.2/32 is directly connected, FastEthernet2/0
@@ -611,7 +611,7 @@ ok: [R4] => changed=false
     C        172.16.99.0/24 is directly connected, FastEthernet3/1
     L        172.16.99.14/32 is directly connected, FastEthernet3/1
   stdout_lines: <omitted>
-ok: [R3] => changed=false 
+ok: [R3] => changed=false
   stdout:
   - |-
     Interface                  IP-Address      OK? Method Status                Protocol
@@ -632,9 +632,9 @@ ok: [R3] => changed=false
            o - ODR, P - periodic downloaded static route, H - NHRP, l - LISP
            a - application route
            + - replicated route, % - next hop override
-  
+
     Gateway of last resort is not set
-  
+
           10.0.0.0/8 is variably subnetted, 4 subnets, 2 masks
     C        10.0.3.0/30 is directly connected, FastEthernet1/1
     L        10.0.3.1/32 is directly connected, FastEthernet1/1
@@ -644,7 +644,7 @@ ok: [R3] => changed=false
     C        172.16.99.0/24 is directly connected, FastEthernet3/1
     L        172.16.99.13/32 is directly connected, FastEthernet3/1
   stdout_lines: <omitted>
-ok: [R2] => changed=false 
+ok: [R2] => changed=false
   stdout:
   - |-
     Interface                  IP-Address      OK? Method Status                Protocol
@@ -665,9 +665,9 @@ ok: [R2] => changed=false
            o - ODR, P - periodic downloaded static route, H - NHRP, l - LISP
            a - application route
            + - replicated route, % - next hop override
-  
+
     Gateway of last resort is not set
-  
+
           10.0.0.0/8 is variably subnetted, 4 subnets, 2 masks
     C        10.0.1.0/30 is directly connected, FastEthernet0/0
     L        10.0.1.2/32 is directly connected, FastEthernet0/0
@@ -679,7 +679,7 @@ ok: [R2] => changed=false
   stdout_lines: <omitted>
 
 TASK [Print summary] *****************************************************************************************************************************************************************
-ok: [R1] => 
+ok: [R1] =>
   msg:
   - 'Host: R1'
   - |-
@@ -701,9 +701,9 @@ ok: [R1] =>
            o - ODR, P - periodic downloaded static route, H - NHRP, l - LISP
            a - application route
            + - replicated route, % - next hop override
-  
+
     Gateway of last resort is not set
-  
+
           10.0.0.0/8 is variably subnetted, 4 subnets, 2 masks
     C        10.0.1.0/30 is directly connected, FastEthernet0/0
     L        10.0.1.1/32 is directly connected, FastEthernet0/0
@@ -712,7 +712,7 @@ ok: [R1] =>
           172.16.0.0/16 is variably subnetted, 2 subnets, 2 masks
     C        172.16.99.0/24 is directly connected, FastEthernet3/1
     L        172.16.99.11/32 is directly connected, FastEthernet3/1
-ok: [R2] => 
+ok: [R2] =>
   msg:
   - 'Host: R2'
   - |-
@@ -734,9 +734,9 @@ ok: [R2] =>
            o - ODR, P - periodic downloaded static route, H - NHRP, l - LISP
            a - application route
            + - replicated route, % - next hop override
-  
+
     Gateway of last resort is not set
-  
+
           10.0.0.0/8 is variably subnetted, 4 subnets, 2 masks
     C        10.0.1.0/30 is directly connected, FastEthernet0/0
     L        10.0.1.2/32 is directly connected, FastEthernet0/0
@@ -745,7 +745,7 @@ ok: [R2] =>
           172.16.0.0/16 is variably subnetted, 2 subnets, 2 masks
     C        172.16.99.0/24 is directly connected, FastEthernet3/1
     L        172.16.99.12/32 is directly connected, FastEthernet3/1
-ok: [R3] => 
+ok: [R3] =>
   msg:
   - 'Host: R3'
   - |-
@@ -767,9 +767,9 @@ ok: [R3] =>
            o - ODR, P - periodic downloaded static route, H - NHRP, l - LISP
            a - application route
            + - replicated route, % - next hop override
-  
+
     Gateway of last resort is not set
-  
+
           10.0.0.0/8 is variably subnetted, 4 subnets, 2 masks
     C        10.0.3.0/30 is directly connected, FastEthernet1/1
     L        10.0.3.1/32 is directly connected, FastEthernet1/1
@@ -778,7 +778,7 @@ ok: [R3] =>
           172.16.0.0/16 is variably subnetted, 2 subnets, 2 masks
     C        172.16.99.0/24 is directly connected, FastEthernet3/1
     L        172.16.99.13/32 is directly connected, FastEthernet3/1
-ok: [R4] => 
+ok: [R4] =>
   msg:
   - 'Host: R4'
   - |-
@@ -800,9 +800,9 @@ ok: [R4] =>
            o - ODR, P - periodic downloaded static route, H - NHRP, l - LISP
            a - application route
            + - replicated route, % - next hop override
-  
+
     Gateway of last resort is not set
-  
+
           10.0.0.0/8 is variably subnetted, 4 subnets, 2 masks
     C        10.0.2.0/30 is directly connected, FastEthernet2/0
     L        10.0.2.2/32 is directly connected, FastEthernet2/0
@@ -813,10 +813,10 @@ ok: [R4] =>
     L        172.16.99.14/32 is directly connected, FastEthernet3/1
 
 PLAY RECAP ***************************************************************************************************************************************************************************
-R1                         : ok=5    changed=2    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   
-R2                         : ok=5    changed=2    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   
-R3                         : ok=5    changed=2    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   
-R4                         : ok=5    changed=2    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   
+R1                         : ok=5    changed=2    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
+R2                         : ok=5    changed=2    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
+R3                         : ok=5    changed=2    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
+R4                         : ok=5    changed=2    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
 
 cismembrane@cismembrane-OptiPlex-9020M:~/ansible-ospf$ ansible-playbook playbooks/precheck.yml -v
 Using /home/cismembrane/ansible-ospf/ansible.cfg as config file
@@ -825,7 +825,7 @@ PLAY [Precheck connectivity to Cisco IOS routers] ******************************
 
 TASK [Run basic show commands] *******************************************************************************************************************************************************
 [WARNING]: ansible-pylibssh not installed, falling back to paramiko
-ok: [R4] => changed=false 
+ok: [R4] => changed=false
   stdout:
   - |-
     Interface                  IP-Address      OK? Method Status                Protocol
@@ -838,7 +838,7 @@ ok: [R4] => changed=false
     FastEthernet3/1            172.16.99.14    YES manual up                    up
   - Cisco IOS Software, 7200 Software (C7200-ADVENTERPRISEK9-M), Version 15.3(3)XB12, RELEASE SOFTWARE (fc2)
   stdout_lines: <omitted>
-ok: [R2] => changed=false 
+ok: [R2] => changed=false
   stdout:
   - |-
     Interface                  IP-Address      OK? Method Status                Protocol
@@ -851,7 +851,7 @@ ok: [R2] => changed=false
     FastEthernet3/1            172.16.99.12    YES manual up                    up
   - Cisco IOS Software, 7200 Software (C7200-ADVENTERPRISEK9-M), Version 15.3(3)XB12, RELEASE SOFTWARE (fc2)
   stdout_lines: <omitted>
-ok: [R3] => changed=false 
+ok: [R3] => changed=false
   stdout:
   - |-
     Interface                  IP-Address      OK? Method Status                Protocol
@@ -864,7 +864,7 @@ ok: [R3] => changed=false
     FastEthernet3/1            172.16.99.13    YES manual up                    up
   - Cisco IOS Software, 7200 Software (C7200-ADVENTERPRISEK9-M), Version 15.3(3)XB12, RELEASE SOFTWARE (fc2)
   stdout_lines: <omitted>
-ok: [R1] => changed=false 
+ok: [R1] => changed=false
   stdout:
   - |-
     Interface                  IP-Address      OK? Method Status                Protocol
@@ -879,7 +879,7 @@ ok: [R1] => changed=false
   stdout_lines: <omitted>
 
 TASK [Print precheck summary] ********************************************************************************************************************************************************
-ok: [R1] => 
+ok: [R1] =>
   msg:
   - 'Host: R1'
   - |-
@@ -892,7 +892,7 @@ ok: [R1] =>
     FastEthernet3/0            10.0.5.1        YES manual up                    up
     FastEthernet3/1            172.16.99.11    YES manual up                    up
   - Cisco IOS Software, 7200 Software (C7200-ADVENTERPRISEK9-M), Version 15.3(3)XB12, RELEASE SOFTWARE (fc2)
-ok: [R2] => 
+ok: [R2] =>
   msg:
   - 'Host: R2'
   - |-
@@ -905,7 +905,7 @@ ok: [R2] =>
     FastEthernet3/0            unassigned      YES unset  administratively down down
     FastEthernet3/1            172.16.99.12    YES manual up                    up
   - Cisco IOS Software, 7200 Software (C7200-ADVENTERPRISEK9-M), Version 15.3(3)XB12, RELEASE SOFTWARE (fc2)
-ok: [R3] => 
+ok: [R3] =>
   msg:
   - 'Host: R3'
   - |-
@@ -918,7 +918,7 @@ ok: [R3] =>
     FastEthernet3/0            unassigned      YES unset  administratively down down
     FastEthernet3/1            172.16.99.13    YES manual up                    up
   - Cisco IOS Software, 7200 Software (C7200-ADVENTERPRISEK9-M), Version 15.3(3)XB12, RELEASE SOFTWARE (fc2)
-ok: [R4] => 
+ok: [R4] =>
   msg:
   - 'Host: R4'
   - |-
@@ -933,10 +933,10 @@ ok: [R4] =>
   - Cisco IOS Software, 7200 Software (C7200-ADVENTERPRISEK9-M), Version 15.3(3)XB12, RELEASE SOFTWARE (fc2)
 
 PLAY RECAP ***************************************************************************************************************************************************************************
-R1                         : ok=2    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   
-R2                         : ok=2    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   
-R3                         : ok=2    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   
-R4                         : ok=2    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   
+R1                         : ok=2    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
+R2                         : ok=2    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
+R3                         : ok=2    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
+R4                         : ok=2    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
 
 cismembrane@cismembrane-OptiPlex-9020M:~/ansible-ospf$ ansible-playbook playbooks/ospf-deploy.yml -v --diff
 Using /home/cismembrane/ansible-ospf/ansible.cfg as config file
@@ -944,7 +944,7 @@ Using /home/cismembrane/ansible-ospf/ansible.cfg as config file
 PLAY [Deploy OSPF on Cisco IOS routers] **********************************************************************************************************************************************
 
 TASK [Build OSPF config from template] ***********************************************************************************************************************************************
-ok: [R4] => changed=false 
+ok: [R4] => changed=false
   ansible_facts:
     ospf_rendered_config: |-
       router ospf 1
@@ -952,7 +952,7 @@ ok: [R4] => changed=false
        network 10.0.5.0 0.0.0.3 area 0
        network 10.0.2.0 0.0.0.3 area 0
        network 10.0.3.0 0.0.0.3 area 0
-ok: [R1] => changed=false 
+ok: [R1] => changed=false
   ansible_facts:
     ospf_rendered_config: |-
       router ospf 1
@@ -960,14 +960,14 @@ ok: [R1] => changed=false
        network 10.0.1.0 0.0.0.3 area 0
        network 10.0.4.0 0.0.0.3 area 0
        network 10.0.5.0 0.0.0.3 area 0
-ok: [R2] => changed=false 
+ok: [R2] => changed=false
   ansible_facts:
     ospf_rendered_config: |-
       router ospf 1
        router-id 2.2.2.2
        network 10.0.1.0 0.0.0.3 area 0
        network 10.0.2.0 0.0.0.3 area 0
-ok: [R3] => changed=false 
+ok: [R3] => changed=false
   ansible_facts:
     ospf_rendered_config: |-
       router ospf 1
@@ -978,7 +978,7 @@ ok: [R3] => changed=false
 TASK [Push OSPF configuration] *******************************************************************************************************************************************************
 [WARNING]: ansible-pylibssh not installed, falling back to paramiko
 [WARNING]: To ensure idempotency and correct diff the input configuration lines should be similar to how they appear if present in the running configuration on device
-changed: [R2] => changed=true 
+changed: [R2] => changed=true
   banners: {}
   commands:
   - router ospf 1
@@ -990,7 +990,7 @@ changed: [R2] => changed=true
   - router-id 2.2.2.2
   - network 10.0.1.0 0.0.0.3 area 0
   - network 10.0.2.0 0.0.0.3 area 0
-changed: [R1] => changed=true 
+changed: [R1] => changed=true
   banners: {}
   commands:
   - router ospf 1
@@ -1004,7 +1004,7 @@ changed: [R1] => changed=true
   - network 10.0.1.0 0.0.0.3 area 0
   - network 10.0.4.0 0.0.0.3 area 0
   - network 10.0.5.0 0.0.0.3 area 0
-changed: [R3] => changed=true 
+changed: [R3] => changed=true
   banners: {}
   commands:
   - router ospf 1
@@ -1016,7 +1016,7 @@ changed: [R3] => changed=true
   - router-id 3.3.3.3
   - network 10.0.4.0 0.0.0.3 area 0
   - network 10.0.3.0 0.0.0.3 area 0
-changed: [R4] => changed=true 
+changed: [R4] => changed=true
   banners: {}
   commands:
   - router ospf 1
@@ -1032,28 +1032,28 @@ changed: [R4] => changed=true
   - network 10.0.3.0 0.0.0.3 area 0
 
 TASK [Show change result] ************************************************************************************************************************************************************
-ok: [R1] => 
+ok: [R1] =>
   msg:
   - 'Host: R1'
   - 'Changed: True'
-ok: [R2] => 
+ok: [R2] =>
   msg:
   - 'Host: R2'
   - 'Changed: True'
-ok: [R3] => 
+ok: [R3] =>
   msg:
   - 'Host: R3'
   - 'Changed: True'
-ok: [R4] => 
+ok: [R4] =>
   msg:
   - 'Host: R4'
   - 'Changed: True'
 
 PLAY RECAP ***************************************************************************************************************************************************************************
-R1                         : ok=3    changed=1    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   
-R2                         : ok=3    changed=1    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   
-R3                         : ok=3    changed=1    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   
-R4                         : ok=3    changed=1    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   
+R1                         : ok=3    changed=1    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
+R2                         : ok=3    changed=1    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
+R3                         : ok=3    changed=1    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
+R4                         : ok=3    changed=1    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
 
 cismembrane@cismembrane-OptiPlex-9020M:~/ansible-ospf$ ansible-playbook playbooks/ospf-validate.yml -v
 Using /home/cismembrane/ansible-ospf/ansible.cfg as config file
@@ -1062,7 +1062,7 @@ PLAY [Validate OSPF neighbors and routes] **************************************
 
 TASK [Run OSPF validation commands] **************************************************************************************************************************************************
 [WARNING]: ansible-pylibssh not installed, falling back to paramiko
-ok: [R1] => changed=false 
+ok: [R1] => changed=false
   stdout:
   - |-
     Neighbor ID     Pri   State           Dead Time   Address         Interface
@@ -1079,11 +1079,11 @@ ok: [R1] => changed=false
            o - ODR, P - periodic downloaded static route, H - NHRP, l - LISP
            a - application route
            + - replicated route, % - next hop override
-  
+
     Gateway of last resort is not set
   - |-
     *** IP Routing is NSF aware ***
-  
+
     Routing Protocol is "application"
       Sending updates every 0 seconds
       Invalid after 0 seconds, hold down 0, flushed after 0
@@ -1094,7 +1094,7 @@ ok: [R1] => changed=false
       Routing Information Sources:
         Gateway         Distance      Last Update
       Distance: (default is 4)
-  
+
     Routing Protocol is "ospf 1"
       Outgoing update filter list for all interfaces is not set
       Incoming update filter list for all interfaces is not set
@@ -1109,7 +1109,7 @@ ok: [R1] => changed=false
         Gateway         Distance      Last Update
       Distance: (default is 110)
   stdout_lines: <omitted>
-ok: [R2] => changed=false 
+ok: [R2] => changed=false
   stdout:
   - |-
     Neighbor ID     Pri   State           Dead Time   Address         Interface
@@ -1125,11 +1125,11 @@ ok: [R2] => changed=false
            o - ODR, P - periodic downloaded static route, H - NHRP, l - LISP
            a - application route
            + - replicated route, % - next hop override
-  
+
     Gateway of last resort is not set
   - |-
     *** IP Routing is NSF aware ***
-  
+
     Routing Protocol is "application"
       Sending updates every 0 seconds
       Invalid after 0 seconds, hold down 0, flushed after 0
@@ -1140,7 +1140,7 @@ ok: [R2] => changed=false
       Routing Information Sources:
         Gateway         Distance      Last Update
       Distance: (default is 4)
-  
+
     Routing Protocol is "ospf 1"
       Outgoing update filter list for all interfaces is not set
       Incoming update filter list for all interfaces is not set
@@ -1154,7 +1154,7 @@ ok: [R2] => changed=false
         Gateway         Distance      Last Update
       Distance: (default is 110)
   stdout_lines: <omitted>
-ok: [R4] => changed=false 
+ok: [R4] => changed=false
   stdout:
   - |-
     Neighbor ID     Pri   State           Dead Time   Address         Interface
@@ -1171,11 +1171,11 @@ ok: [R4] => changed=false
            o - ODR, P - periodic downloaded static route, H - NHRP, l - LISP
            a - application route
            + - replicated route, % - next hop override
-  
+
     Gateway of last resort is not set
   - |-
     *** IP Routing is NSF aware ***
-  
+
     Routing Protocol is "application"
       Sending updates every 0 seconds
       Invalid after 0 seconds, hold down 0, flushed after 0
@@ -1186,7 +1186,7 @@ ok: [R4] => changed=false
       Routing Information Sources:
         Gateway         Distance      Last Update
       Distance: (default is 4)
-  
+
     Routing Protocol is "ospf 1"
       Outgoing update filter list for all interfaces is not set
       Incoming update filter list for all interfaces is not set
@@ -1201,7 +1201,7 @@ ok: [R4] => changed=false
         Gateway         Distance      Last Update
       Distance: (default is 110)
   stdout_lines: <omitted>
-ok: [R3] => changed=false 
+ok: [R3] => changed=false
   stdout:
   - |-
     Neighbor ID     Pri   State           Dead Time   Address         Interface
@@ -1217,11 +1217,11 @@ ok: [R3] => changed=false
            o - ODR, P - periodic downloaded static route, H - NHRP, l - LISP
            a - application route
            + - replicated route, % - next hop override
-  
+
     Gateway of last resort is not set
   - |-
     *** IP Routing is NSF aware ***
-  
+
     Routing Protocol is "application"
       Sending updates every 0 seconds
       Invalid after 0 seconds, hold down 0, flushed after 0
@@ -1232,7 +1232,7 @@ ok: [R3] => changed=false
       Routing Information Sources:
         Gateway         Distance      Last Update
       Distance: (default is 4)
-  
+
     Routing Protocol is "ospf 1"
       Outgoing update filter list for all interfaces is not set
       Incoming update filter list for all interfaces is not set
@@ -1248,7 +1248,7 @@ ok: [R3] => changed=false
   stdout_lines: <omitted>
 
 TASK [Print command outputs to console] **********************************************************************************************************************************************
-ok: [R1] => 
+ok: [R1] =>
   msg:
   - ===== R1 =====
   - |-
@@ -1266,11 +1266,11 @@ ok: [R1] =>
            o - ODR, P - periodic downloaded static route, H - NHRP, l - LISP
            a - application route
            + - replicated route, % - next hop override
-  
+
     Gateway of last resort is not set
   - |-
     *** IP Routing is NSF aware ***
-  
+
     Routing Protocol is "application"
       Sending updates every 0 seconds
       Invalid after 0 seconds, hold down 0, flushed after 0
@@ -1281,7 +1281,7 @@ ok: [R1] =>
       Routing Information Sources:
         Gateway         Distance      Last Update
       Distance: (default is 4)
-  
+
     Routing Protocol is "ospf 1"
       Outgoing update filter list for all interfaces is not set
       Incoming update filter list for all interfaces is not set
@@ -1295,7 +1295,7 @@ ok: [R1] =>
       Routing Information Sources:
         Gateway         Distance      Last Update
       Distance: (default is 110)
-ok: [R2] => 
+ok: [R2] =>
   msg:
   - ===== R2 =====
   - |-
@@ -1312,11 +1312,11 @@ ok: [R2] =>
            o - ODR, P - periodic downloaded static route, H - NHRP, l - LISP
            a - application route
            + - replicated route, % - next hop override
-  
+
     Gateway of last resort is not set
   - |-
     *** IP Routing is NSF aware ***
-  
+
     Routing Protocol is "application"
       Sending updates every 0 seconds
       Invalid after 0 seconds, hold down 0, flushed after 0
@@ -1327,7 +1327,7 @@ ok: [R2] =>
       Routing Information Sources:
         Gateway         Distance      Last Update
       Distance: (default is 4)
-  
+
     Routing Protocol is "ospf 1"
       Outgoing update filter list for all interfaces is not set
       Incoming update filter list for all interfaces is not set
@@ -1340,7 +1340,7 @@ ok: [R2] =>
       Routing Information Sources:
         Gateway         Distance      Last Update
       Distance: (default is 110)
-ok: [R4] => 
+ok: [R4] =>
   msg:
   - ===== R4 =====
   - |-
@@ -1358,11 +1358,11 @@ ok: [R4] =>
            o - ODR, P - periodic downloaded static route, H - NHRP, l - LISP
            a - application route
            + - replicated route, % - next hop override
-  
+
     Gateway of last resort is not set
   - |-
     *** IP Routing is NSF aware ***
-  
+
     Routing Protocol is "application"
       Sending updates every 0 seconds
       Invalid after 0 seconds, hold down 0, flushed after 0
@@ -1373,7 +1373,7 @@ ok: [R4] =>
       Routing Information Sources:
         Gateway         Distance      Last Update
       Distance: (default is 4)
-  
+
     Routing Protocol is "ospf 1"
       Outgoing update filter list for all interfaces is not set
       Incoming update filter list for all interfaces is not set
@@ -1387,7 +1387,7 @@ ok: [R4] =>
       Routing Information Sources:
         Gateway         Distance      Last Update
       Distance: (default is 110)
-ok: [R3] => 
+ok: [R3] =>
   msg:
   - ===== R3 =====
   - |-
@@ -1404,11 +1404,11 @@ ok: [R3] =>
            o - ODR, P - periodic downloaded static route, H - NHRP, l - LISP
            a - application route
            + - replicated route, % - next hop override
-  
+
     Gateway of last resort is not set
   - |-
     *** IP Routing is NSF aware ***
-  
+
     Routing Protocol is "application"
       Sending updates every 0 seconds
       Invalid after 0 seconds, hold down 0, flushed after 0
@@ -1419,7 +1419,7 @@ ok: [R3] =>
       Routing Information Sources:
         Gateway         Distance      Last Update
       Distance: (default is 4)
-  
+
     Routing Protocol is "ospf 1"
       Outgoing update filter list for all interfaces is not set
       Incoming update filter list for all interfaces is not set
@@ -1434,7 +1434,7 @@ ok: [R3] =>
       Distance: (default is 110)
 
 TASK [Save validation output locally] ************************************************************************************************************************************************
-changed: [R3 -> localhost] => changed=true 
+changed: [R3 -> localhost] => changed=true
   checksum: 145bcf181aa8fe3fcd8f3e2d0ddaae7cc1cfee13
   dest: ../outputs/R3-ospf-validation.txt
   gid: 1000
@@ -1446,7 +1446,7 @@ changed: [R3 -> localhost] => changed=true
   src: /home/cismembrane/.ansible/tmp/ansible-tmp-1773000860.181189-272226-89904497329797/source
   state: file
   uid: 1000
-changed: [R1 -> localhost] => changed=true 
+changed: [R1 -> localhost] => changed=true
   checksum: 7bdd80dbe353f1c84ec5580e26d6686435a4a91f
   dest: ../outputs/R1-ospf-validation.txt
   gid: 1000
@@ -1458,7 +1458,7 @@ changed: [R1 -> localhost] => changed=true
   src: /home/cismembrane/.ansible/tmp/ansible-tmp-1773000860.1807466-272224-110111721716845/source
   state: file
   uid: 1000
-changed: [R2 -> localhost] => changed=true 
+changed: [R2 -> localhost] => changed=true
   checksum: 5757e02d197f17c9d4f70994ee73fcb2215ed620
   dest: ../outputs/R2-ospf-validation.txt
   gid: 1000
@@ -1470,7 +1470,7 @@ changed: [R2 -> localhost] => changed=true
   src: /home/cismembrane/.ansible/tmp/ansible-tmp-1773000860.1806617-272225-267939563520518/source
   state: file
   uid: 1000
-changed: [R4 -> localhost] => changed=true 
+changed: [R4 -> localhost] => changed=true
   checksum: 15bd8574e36b34efaab9134b01476d5714d749c2
   dest: ../outputs/R4-ospf-validation.txt
   gid: 1000
@@ -1484,9 +1484,9 @@ changed: [R4 -> localhost] => changed=true
   uid: 1000
 
 PLAY RECAP ***************************************************************************************************************************************************************************
-R1                         : ok=3    changed=1    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   
-R2                         : ok=3    changed=1    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   
-R3                         : ok=3    changed=1    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   
-R4                         : ok=3    changed=1    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   
+R1                         : ok=3    changed=1    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
+R2                         : ok=3    changed=1    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
+R3                         : ok=3    changed=1    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
+R4                         : ok=3    changed=1    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
 
-cismembrane@cismembrane-OptiPlex-9020M:~/ansible-ospf$ 
+cismembrane@cismembrane-OptiPlex-9020M:~/ansible-ospf$

@@ -73,7 +73,7 @@ with manager.connect(
     device_params={"name": "iosxe"},
 ) as m:
     # all operations happen inside this block
-    
+
     # step 1 operations
     # Create static route with edit_config
     print("=" * 60)
@@ -115,7 +115,7 @@ with manager.connect(
         print(response)
     except RPCError as e:
         print(f"STEP 3 FAILED: {e}")
-        
+
     # step 4 operations
     # Delete route with edit-config
     print("=" * 60)
@@ -129,7 +129,7 @@ with manager.connect(
         print(response)
     except RPCError as e:
         print(f"STEP 4 FAILED: {e}")
-        
+
     # step 5 operations
     # Confirm route deletion
     print("=" * 60)

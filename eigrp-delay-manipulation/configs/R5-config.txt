@@ -19,7 +19,7 @@ no ip icmp rate-limit unreachable
 !
 !
 !
-!         
+!
 !
 !
 no ip domain lookup
@@ -41,8 +41,8 @@ redundancy
 !
 !
 ip tcp synwait-time 5
-! 
-!         
+!
+!
 !
 !
 !
@@ -88,7 +88,7 @@ interface FastEthernet3/0
 !
 interface FastEthernet3/1
  no ip address
- shutdown 
+ shutdown
  duplex auto
  speed auto
 !
@@ -111,7 +111,7 @@ no cdp log mismatch duplex
 !
 !
 control-plane
-!         
+!
 !
 mgcp behavior rsip-range tgcp-only
 mgcp behavior comedia-role none
@@ -142,4 +142,3 @@ line vty 0 4
 !
 !
 end
-
