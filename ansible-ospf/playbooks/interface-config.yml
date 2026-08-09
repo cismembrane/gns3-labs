@@ -44,14 +44,13 @@
           - show ip route connected
       register: post
 
-    - name: Print summary
+     - name: Print summary
       ansible.builtin.debug:
         msg:
           - "Host: {{ inventory_hostname }}"
           - "{{ post.stdout[0] }}"
           - "{{ post.stdout[1] }}"
-          
-    - name: save running-config to startup-config
+    - name: Save running-config to startup-config
       cisco.ios.ios_config:
         save_when: modified
  
