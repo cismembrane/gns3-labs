@@ -6,7 +6,7 @@ This is a hub-and-spoke DMVPN Phase 3 deployment with IPsec encryption over a si
 
 This maps directly to CCNP ENCOR objectives under VPN technologies. The IPsec component also crosses into security territory, since understanding encrypted tunnel behavior matters for traffic analysis and incident response.
 
-**Video walkthrough:** [DMVPN Phase 3 with IPsec on YouTube](https://www.youtube.com/watch?v=68Raa0FWNkg)
+**Video walkthrough:** [DMVPN Phase 3 with IPsec on YouTube](https://www.youtube.com/watch?v=CdZ0fmA12-E)
 
 ## Topology
 
