@@ -4,7 +4,6 @@
 
   vars:
     lab_domain_name: test.com
-    lab_ntp_server: 129.6.15.28
     mgmt_username: admin
     mgmt_password: admin
     enable_secret: admin
@@ -63,13 +62,6 @@
           - login local
           - transport input ssh
           - exec-timeout 15 0
-        match: line
-        replace: line
-
-    - name: Disable DNS lookup (prevents 'Translating ...' stalls)
-      cisco.ios.ios_config:
-        lines:
-          - no ip domain-lookup
         match: line
         replace: line
 
