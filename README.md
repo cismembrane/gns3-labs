@@ -25,9 +25,16 @@ Hands-on network engineering labs built in GNS3, covering CCNP ENCOR routing, sw
 
 ## How to Use These Labs
 
-Each lab directory contains a `README.md` with the full topology, IP addressing, configuration walkthrough, and verification steps. Router configs are in the `configs/` directory. GNS3 project files are included where applicable, built against Cisco c7200 `adventerprisek9` images running on Dynamips, with IOSvL2 images used in some labs for Layer 2 switching.
+Each lab directory contains a `README.md` with the full topology, IP addressing, configuration walkthrough, and verification steps. Most labs keep captured router configs in `configs/`. GNS3 project files are included where applicable.
 
-To import a lab, open the `.gns3` project file in GNS3 and remap the IOS image to your local copy if the filename differs.
+Platforms differ by lab. The newer builds run IOSv and IOSvL2. The Dynamips labs are earlier work.
+
+| Platform | Image | Labs |
+| --- | --- | --- |
+| Cisco IOSv (QEMU) | `virtioa.qcow2` | `k8s-metallb-bgp`, `bgp-grafana-monitoring` |
+| Cisco IOSvL2 (QEMU) | `vios-l2.qcow2` | `ansible-lab` |
+| Cisco c7200 (Dynamips) | `c7200-adventerprisek9-mz.153-3.XB12.image` | `ansible-bgp`, `ansible-ospf`, `dmvpn-phase3-ipsec` |
+| Cisco c3660 (Dynamips) | `c3660-a3jk9s-mz.124-15.T14.image` | `eigrp-delay-manipulation`, `glbp-basic`, `proxy-arp`, `redundant-ospf-hsrp-eem-dhcp` |
 
 ## Automation and Validation
 
