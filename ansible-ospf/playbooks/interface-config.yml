@@ -44,7 +44,7 @@
           - show ip route connected
       register: post
 
-     - name: Print summary
+    - name: Print summary
       ansible.builtin.debug:
         msg:
           - "Host: {{ inventory_hostname }}"
