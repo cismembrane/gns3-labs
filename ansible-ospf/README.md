@@ -1,4 +1,4 @@
-# Ansible OSPF Deployment on Cisco 7200 Routers in GNS3
+# Ansible OSPF Deployment on Cisco IOSv Routers in GNS3
 
 ## Walkthrough
 
@@ -314,4 +314,4 @@ OSPF validation:
 
 ### Notes
 
-This repo was originally written using Cisco c7200 routers. This was later changed to Cisco IOSv routers, requiring the interfaces to be renumbered. In addition, the playbooks were substantially changed to improve the deployment. Portions that were not necessary were removed from several playbooks. The deployment sequence remains the same for the updated IOSv version.
+This repo was originally written using Cisco c7200 routers. This was later changed to Cisco IOSv routers, requiring renumbering the interfaces. In addition, the playbooks were substantially changed to improve the deployment. Portions that were not necessary were removed from several playbooks, and other minor changes were added to the playbooks. The deployment sequence remains the same for the updated IOSv version.
