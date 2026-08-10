@@ -1,29 +1,8 @@
-- name: Configure management and transit routed interfaces (c7600)
+- name: Configure management and transit routed interfaces
   hosts: ios
   gather_facts: false
 
   tasks:
-    - name: Validate required host variables exist
-      ansible.builtin.assert:
-        that:
-          - mgmt is defined
-          - mgmt.interface is defined
-          - mgmt.ip is defined
-          - mgmt.mask is defined
-          - routed_interfaces is defined
-          - routed_interfaces | length > 0
-        fail_msg: "Missing mgmt or routed_interfaces variables in host_vars for {{ inventory_hostname }}"
-
-    - name: Configure management routed interface
-      cisco.ios.ios_config:
-        parents: "interface {{ mgmt.interface }}"
-        lines:
-          - "{% if mgmt.description is defined and mgmt.description | length > 0 %}description {{ mgmt.description }}{% endif %}"
-          - "ip address {{ mgmt.ip }} {{ mgmt.mask }}"
-          - no shutdown
-        match: line
-        replace: line
-
     - name: Configure transit routed interfaces (IP on physical ports)
       cisco.ios.ios_config:
         parents: "interface {{ item.name }}"
