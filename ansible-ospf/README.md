@@ -315,3 +315,22 @@ OSPF validation:
 ### Notes
 
 This repo was originally written using Cisco c7200 routers. This was later changed to Cisco IOSv routers, requiring renumbering the interfaces. In addition, the playbooks were substantially changed to improve the deployment. Portions that were not necessary were removed from several playbooks, and other minor changes were added to the playbooks. The deployment sequence remains the same for the updated IOSv version.
+
+The playbook changes include:
+
+Base-config removals:
+
+- NTP baseline. Nothing to sync against, and failed_when: false hid it.
+- RSA key generation, VTY login local, admin user creation. Ansible had
+  already logged in over ssh as that user, so all three existed before
+  the play ran. the user task was creating its own account.
+- Enable secret. Login user is privilege 15 and become never uses it.
+- Domain name. Only crypto key generate rsa needed it.
+- Console exec-timeout and the duplicate no ip domain-lookup task.
+
+Added save_when: modified. Fixed the debug line, which reported
+base_push alone and missed changes from the other tasks.
+
+Interface-config: Dropped the host_vars assert block and the management
+interface task. Both re-applied state that had to exist for ansible to
+reach the device.
