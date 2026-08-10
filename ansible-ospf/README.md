@@ -6,9 +6,9 @@ YouTube walkthrough: https://youtu.be/7IEfZew-7wQ
 
 ## Overview
 
-This lab uses Ansible to build a four-router OSPF topology in GNS3 on Cisco 7200 images. The workflow starts by pushing a base management baseline, then moves the routed links onto physical interfaces, runs a precheck to confirm interface state and platform reachability, deploys OSPF from a Jinja template, and validates neighbor formation and protocol state from all four routers.
+This lab uses Ansible to build a four-router OSPF topology in GNS3 on Cisco IOSv. The workflow starts by pushing a base management baseline, then moves the routed links onto physical interfaces, runs a precheck to confirm interface state and platform reachability, deploys OSPF from a Jinja template, and validates neighbor formation and protocol state from all four routers.
 
-This one is really about taking a small routed lab and making the build repeatable. Instead of hand-configuring interfaces and OSPF on each box, the playbooks pull from inventory, group vars, and per-router host vars and push the right config to the right place.
+The goal of this is to take a GNS3 topology, apply a basic configuration to allow Ansible to connect, and then push interface and OSPF configuration.
 
 ## What this lab does
 
@@ -18,8 +18,6 @@ This lab demonstrates a few things working together:
 - Routed point-to-point links placed on physical interfaces
 - A clean deployment flow: base config, interface config, precheck, OSPF deploy, OSPF validation
 - Local capture of validation output for each router
-
-The interface descriptions also make it clear this lab was refactored from earlier VLAN-based transit links.
 
 ## Topology
 
@@ -71,7 +69,7 @@ Management addressing is:
 - Ansible Core 2.16.3
 - Ubuntu
 - GNS3
-- Cisco IOS 7200 image `C7200-ADVENTERPRISEK9-M Version 15.3(3)XB12`
+- Cisco IOSv`
 - Jinja2 template rendering
 
 ## Project Structure
@@ -115,11 +113,10 @@ ansible-ospf/
 
 `inventory-ios.ini` defines the four routers and sets the connection model for Cisco IOS.
 
-`group_vars/ios.yml` holds shared OSPF settings and validation commands, plus the base management values like domain name, credentials, SSH modulus size, DNS server, and NTP server (not used in this lab).
+`group_vars/ios.yml` holds shared OSPF settings and validation commands.
 
 Each router has its own `host_vars` file. That is where per-device intent lives:
 
-- management interface and address
 - OSPF router ID
 - routed transit interfaces
 - OSPF network statements
@@ -138,24 +135,19 @@ The OSPF template is simple on purpose. It builds `router ospf {{ ospf_process_i
 
 The lab was deployed in this order:
 
-- `ansible-playbook playbooks/base-config.yml -v --diff`
-- `ansible-playbook playbooks/interface-config.yml -v --diff`
-- `ansible-playbook playbooks/precheck.yml -v`
-- `ansible-playbook playbooks/ospf-deploy.yml -v --diff`
-- `ansible-playbook playbooks/ospf-validate.yml -v`
+- `ansible-playbook playbooks/base-config.yml`
+- `ansible-playbook playbooks/interface-config.yml`
+- `ansible-playbook playbooks/precheck.yml`
+- `ansible-playbook playbooks/ospf-deploy.yml`
+- `ansible-playbook playbooks/ospf-validate.yml`
 
 ### 1. Base config
 
 The base playbook does the initial cleanup and management prep across all four routers.
 
-It checks existing SSH status first with `show ip ssh`. In this run, SSH was already enabled on every router and RSA keys already existed, so the conditional RSA key generation step was skipped everywhere.
-
 The base config then applies:
 
 - `no ip domain-lookup`
-- `ip domain-name test.com`
-- `enable secret admin` (already applied manually)
-- `username admin privilege 15 secret admin` (already applied manually)
 - `ip ssh authentication-retries 3`
 
 The actual playbook also includes service timestamps, login success/failure logging, ip ssh version 2, and ip ssh time-out 60.
@@ -163,74 +155,52 @@ The actual playbook also includes service timestamps, login success/failure logg
 Console and VTY access are standardized:
 
 - console timeout set to 10 minutes
-- VTY login set to local authentication
 - VTY transport locked to SSH
 - VTY timeout set to 15 minutes
-
-NTP was attempted as an optional baseline and returned ok with no change. (NTP server not used in this lab)
 
 ### 2. Interface config
 
 The interface playbook first asserts that each router has the required management and routed interface data in host_vars. All assertions passed.
 
-It then configures the management interface on FastEthernet3/1 for each router and brings it up. The management interfaces have IP addresses assigned and are brought up as part of the manual config done before the Ansible deployment.
-
-After that it pushes all transit links as routed physical interfaces. This lab initially used IOSvL2 images. These images displayed instability during the use of the `no switchport` command and were switched to IOSv images. These proved too too resource-intensive for the machine they were being used on.
-
-C3600 router images were then used, but SSH complained about outdated SSH encryption algorithms.
-
-C7200 router images were then used, to the same effect with SSH algorithms.
-
-The errors were finally overridden with client-side SSH command-line options and the C7200 router images were chosen despite this drawback. The interfaces are no longer living on SVIs or VLAN interfaces. The descriptions still preserve that history:
-
-- TRANSIT (was Vlan10)
-- TRANSIT (was Vlan20)
-- TRANSIT (was Vlan30)
-- TRANSIT (was Vlan40)
-- TRANSIT (was Vlan50)
+After that it pushes all transit links as routed physical interfaces. This lab initially used IOSvL2 images.
 
 The resulting interface layout was:
 
 R1
 
-- FastEthernet0/0  10.0.1.1/30
-- FastEthernet1/0  10.0.4.1/30
-- FastEthernet3/0  10.0.5.1/30
-- FastEthernet3/1  172.16.99.11/24
+- GigabitEthernet0/0  10.0.1.1/30
+- GigabitEthernet0/1  10.0.4.1/30
+- GigabitEthernet0/4  10.0.5.1/30
+- GigabitEthernet0/5  172.16.99.11/24
 
 R2
 
-- FastEthernet0/0  10.0.1.2/30
-- FastEthernet2/0  10.0.2.1/30
-- FastEthernet3/1  172.16.99.12/24
+- GigabitEthernet0/0  10.0.1.2/30
+- GigabitEthernet0/3  10.0.2.1/30
+- GigabitEthernet0/5  172.16.99.12/24
 
 R3
 
-- FastEthernet1/0  10.0.4.2/30
-- FastEthernet1/1  10.0.3.1/30
-- FastEthernet3/1  172.16.99.13/24
+- GigabitEthernet0/1  10.0.4.2/30
+- GigabitEthernet0/2  10.0.3.1/30
+- GigabitEthernet0/5  172.16.99.13/24
 
 R4
 
-- FastEthernet1/1  10.0.3.2/30
-- FastEthernet2/0  10.0.2.2/30
-- FastEthernet3/0  10.0.5.2/30
-- FastEthernet3/1  172.16.99.14/24
+- GigabitEthernet0/2  10.0.3.2/30
+- GigabitEthernet0/3  10.0.2.2/30
+- GigabitEthernet0/4  10.0.5.2/30
+- GigabitEthernet0/5  172.16.99.14/24
 
 The sanity check after interface deployment confirmed that the interfaces were up/up and that each router had the expected connected routes for its local /30 links plus the management subnet.
 
 ### 3. Precheck
 
-The precheck playbook runs two commands:
+The precheck playbook runs the command:
 
 - `show ip interface brief`
-- `show version | include IOS`
 
-This confirms two useful things before routing goes on:
-
-- the interface state is where it should be after interface deployment
-
-- all targets are Cisco IOS 7200 devices running 15.3(3)XB12
+This confirms that the interface state is where is should be after interface deployment.
 
 At this point, the network is built at Layer 3 but OSPF is not yet deployed.
 
@@ -320,18 +290,16 @@ Base config:
 - all four routers updated
 - no unreachable hosts
 - no failed tasks
-- RSA generation correctly skipped because SSH was already enabled
 
 Interface config:
 
 - all required host variables present
-- management and transit interfaces configured successfully
+- transit interfaces configured successfully
 - connected route sanity check matched the intended per-router links
 
 Precheck:
 
 - all four routers responded
-- all four identified as Cisco 7200 IOS devices
 
 OSPF deploy:
 
@@ -346,4 +314,4 @@ OSPF validation:
 
 ### Notes
 
-This repo is data-driven enough to be easy to extend. Adding a new router mostly comes down to adding inventory and host vars, then defining its routed links and OSPF networks.
+This repo was originally written using Cisco c7200 routers. This was later changed to Cisco IOSv routers, requiring the interfaces to be renumbered. In addition, the playbooks were substantially changed to improve the deployment. Portions that were not necessary were removed from several playbooks. The deployment sequence remains the same for the updated IOSv version.
