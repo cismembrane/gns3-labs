@@ -1,0 +1,29 @@
+# Environment variables with secrets
+.env
+.env.local
+
+# Ansible vault password
+.vault_pass
+
+# Editor
+*.swp
+*.swo
+*~
+.vscode/
+.idea/
+
+# Backup files
+*.bak
+*.orig
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+
+# Ansible
+*.retry
+
+# Drift reports are per-run output, not committed artifacts. The rendered configs
+# in rendered/ are the committed ones.
+drift-reports/
