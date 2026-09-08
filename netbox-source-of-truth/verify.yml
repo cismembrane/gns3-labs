@@ -1,0 +1,64 @@
+---
+# Phase 5. Checks the ring converged, using NetBox data as the expectation.
+#
+# Follows the per-neighbour pattern from k8s-metallb-bgp rather than the substring
+# pattern in ansible-bgp: every peer NetBox says should exist is looked up by
+# address and asserted Established individually, so a neighbour that NetBox knows
+# about but the router never formed is a failure rather than an absence nobody
+# checked for.
+
+- name: Verify the eBGP ring against NetBox intent
+  hosts: routers
+  gather_facts: false
+
+  tasks:
+    - name: Collect BGP summary
+      cisco.ios.ios_command:
+        commands:
+          - show ip bgp summary
+      register: bgp_summary
+
+    - name: Display BGP summary
+      ansible.builtin.debug:
+        var: bgp_summary.stdout_lines
+
+    - name: Collect session state for each neighbour NetBox defines
+      cisco.ios.ios_command:
+        commands:
+          - "show ip bgp neighbors {{ item.neighbor }} | include BGP state"
+      register: neighbor_state
+      loop: "{{ bgp_neighbors }}"
+      loop_control:
+        label: "{{ item.neighbor }} ({{ item.description }})"
+
+    - name: Every neighbour NetBox defines is Established
+      ansible.builtin.assert:
+        that:
+          - "'Established' in item.stdout[0]"
+        fail_msg: >-
+          {{ inventory_hostname }}: neighbour {{ item.item.neighbor }}
+          ({{ item.item.description }}, AS {{ item.item.remote_as }}) is not Established
+        success_msg: "{{ inventory_hostname }}: neighbour {{ item.item.neighbor }} is Established"
+      loop: "{{ neighbor_state.results }}"
+      loop_control:
+        label: "{{ item.item.neighbor }}"
+
+    - name: Collect the BGP table
+      cisco.ios.ios_command:
+        commands:
+          - show ip bgp
+      register: bgp_table
+
+    - name: Display the BGP table
+      ansible.builtin.debug:
+        var: bgp_table.stdout_lines
+
+    - name: Every other router's loopback is in the BGP table
+      ansible.builtin.assert:
+        that:
+          - hostvars[item].router_id in bgp_table.stdout[0]
+        fail_msg: >-
+          {{ inventory_hostname }} has not learned {{ item }}'s loopback
+          ({{ hostvars[item].router_id }}). The ring has not fully converged.
+        success_msg: "{{ inventory_hostname }} has learned {{ item }}'s loopback"
+      loop: "{{ groups['routers'] | reject('equalto', inventory_hostname) | list }}"

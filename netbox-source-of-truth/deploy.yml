@@ -1,0 +1,40 @@
+---
+# Phase 5. Pushes the committed rendered configs to the routers.
+#
+# The source is rendered/<host>.cfg, not the templates. Deploying the reviewed
+# artifact rather than re-rendering at push time means the config that reached the
+# device is the one in the diff, and a NetBox change that nobody rendered and
+# committed cannot reach a router by accident.
+#
+# Run render.yml first if NetBox has changed.
+
+- name: Deploy rendered configuration to routers
+  hosts: routers
+  gather_facts: false
+
+  tasks:
+    - name: Fail early if the rendered configuration is missing
+      ansible.builtin.stat:
+        path: "{{ playbook_dir }}/rendered/{{ inventory_hostname }}.cfg"
+      register: rendered_config
+      delegate_to: localhost
+
+    - name: Assert the rendered configuration exists
+      ansible.builtin.assert:
+        that:
+          - rendered_config.stat.exists
+        fail_msg: >-
+          rendered/{{ inventory_hostname }}.cfg is missing.
+          Run: ansible-playbook render.yml
+        success_msg: "rendered/{{ inventory_hostname }}.cfg found"
+
+    - name: Push the rendered configuration
+      cisco.ios.ios_config:
+        src: "{{ playbook_dir }}/rendered/{{ inventory_hostname }}.cfg"
+        save_when: modified
+      register: push_result
+
+    - name: Report what changed
+      ansible.builtin.debug:
+        var: push_result.updates
+      when: push_result.updates is defined

@@ -1,0 +1,33 @@
+---
+# Phase 4. Renders NetBox data into the committed intended configs.
+#
+# Touches no devices at all -- every task delegates to localhost. Safe to run from
+# a laptop with no route to the lab, and safe to run in CI:
+#   ansible-playbook -i inventory/netbox-export.yml render.yml
+#
+# Commit the resulting rendered/*.cfg with the change that caused them. That diff
+# is the review artifact for a NetBox edit.
+
+- name: Render intended configuration from NetBox
+  hosts: routers
+  gather_facts: false
+
+  tasks:
+    - name: Ensure the rendered output directory exists
+      ansible.builtin.file:
+        path: "{{ playbook_dir }}/rendered"
+        state: directory
+        mode: "0755"
+      delegate_to: localhost
+      run_once: true
+
+    - name: Render the intended configuration
+      ansible.builtin.template:
+        src: device.cfg.j2
+        dest: "{{ playbook_dir }}/rendered/{{ inventory_hostname }}.cfg"
+        mode: "0644"
+      delegate_to: localhost
+
+    - name: Report where the configuration was written
+      ansible.builtin.debug:
+        msg: "rendered/{{ inventory_hostname }}.cfg written from NetBox data"
