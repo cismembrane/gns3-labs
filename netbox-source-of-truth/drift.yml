@@ -1,0 +1,91 @@
+---
+# Phase 6. Reports where a router no longer matches what NetBox says it should be.
+#
+# Section-level comparison, not `diff_against: intended`. The templates render
+# only interfaces and BGP, and IOS's intended diff wants a complete
+# running-config to compare against.
+#
+# Each managed section is fetched with `show running-config | section` and
+# compared against the matching section of the committed rendered config. Managed
+# sections are the top-level `interface` and `router bgp` headings in that file,
+# so the check covers exactly what the templates emitted. The management
+# interface is not rendered and so is not checked; anything else is out of scope
+# by design.
+#
+# Reports land in drift-reports/<host>.json (gitignored, per-run output).
+#
+#   ansible-playbook drift.yml
+
+- name: Detect configuration drift against NetBox intent
+  hosts: routers
+  gather_facts: false
+
+  vars:
+    drift_report_dir: "{{ playbook_dir }}/drift-reports"
+    # Read off the rendered config rather than rebuilt from NetBox, so this
+    # cannot disagree with what the templates emitted. Evaluated lazily, after
+    # the first task sets rendered_lines.
+    managed_sections: >-
+      {{ rendered_lines | select('match', '^(interface |router bgp )') | list }}
+
+  tasks:
+    - name: Read the committed rendered configuration
+      ansible.builtin.set_fact:
+        rendered_lines: >-
+          {{ lookup('ansible.builtin.file',
+                    playbook_dir ~ '/rendered/' ~ inventory_hostname ~ '.cfg').splitlines() }}
+      delegate_to: localhost
+
+    - name: Capture the running configuration for each managed section
+      cisco.ios.ios_command:
+        commands:
+          - "show running-config | section ^{{ item }}$"
+      register: running_sections
+      loop: "{{ managed_sections }}"
+
+    - name: Compare NetBox intent against the running configuration
+      ansible.builtin.set_fact:
+        drift_report: "{{ lookup('ansible.builtin.template', 'drift-report.json.j2') | from_json }}"
+      delegate_to: localhost
+
+    - name: Ensure the drift report directory exists
+      ansible.builtin.file:
+        path: "{{ drift_report_dir }}"
+        state: directory
+        mode: "0755"
+      delegate_to: localhost
+      run_once: true
+
+    - name: Write the drift report
+      ansible.builtin.copy:
+        content: "{{ drift_report | to_nice_json }}\n"
+        dest: "{{ drift_report_dir }}/{{ inventory_hostname }}.json"
+        mode: "0644"
+      delegate_to: localhost
+
+    - name: Show each drifted section
+      ansible.builtin.debug:
+        msg:
+          - "section: {{ item.section }}"
+          - "missing from device: {{ item.missing | default([]) }}"
+          - "unexpected on device: {{ item.unexpected | default([]) }}"
+      loop: "{{ drift_report.drifted }}"
+      loop_control:
+        label: "{{ item.section }}"
+
+    # Written before this runs, so the report survives the failure that a drifted
+    # router is supposed to cause.
+    - name: No drift in any managed section
+      ansible.builtin.assert:
+        that:
+          - drift_report.missing_total == 0
+          - drift_report.unexpected_total == 0
+        fail_msg: >-
+          {{ inventory_hostname }} has drifted from NetBox:
+          {{ drift_report.missing_total }} missing and
+          {{ drift_report.unexpected_total }} unexpected line(s) across
+          {{ drift_report.drifted | map(attribute='section') | join(', ') }}.
+          Full report: drift-reports/{{ inventory_hostname }}.json
+        success_msg: >-
+          {{ inventory_hostname }} matches NetBox intent across
+          {{ drift_report.sections_checked }} managed section(s)
