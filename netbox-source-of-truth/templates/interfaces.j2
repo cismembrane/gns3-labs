@@ -1,0 +1,31 @@
+{#
+  Interfaces rendered from NetBox. `interfaces` is the nb_inventory host var
+  added by `interfaces: true`; the committed fixture mirrors its shape, so this
+  renders identically from either source.
+
+  Sorted by name: the rendered configs are committed and diffed, and unstable
+  ordering would make every run look like a change.
+
+  Skipped: interfaces with no IP address, and the management interface. Mgmt is
+  the one carrying ansible_host, which nb_inventory sets from primary_ip4, so no
+  separate marker is needed. Rendering it would put the address Ansible connects
+  over into the file deploy.yml pushes.
+#}
+hostname {{ inventory_hostname }}
+!
+{% for iface in interfaces | sort(attribute='name') %}
+{% if iface.ip_addresses %}
+{% set address = (iface.ip_addresses | first).address %}
+{% if address | ansible.utils.ipaddr('address') != ansible_host %}
+interface {{ iface.name }}
+ description {{ iface.description }}
+ ip address {{ address | ansible.utils.ipaddr('address') }} {{ address | ansible.utils.ipaddr('netmask') }}
+{% if iface.enabled %}
+ no shutdown
+{% else %}
+ shutdown
+{% endif %}
+!
+{% endif %}
+{% endif %}
+{% endfor %}

@@ -1,0 +1,10 @@
+{#
+  The full intended configuration for one device, written to rendered/<host>.cfg.
+  Committed, and what deploy.yml pushes, so the diff is what reaches the router.
+
+  No generated-by header on purpose: IOS accepts a leading `!` comment and then
+  never stores it, so ios_config would see it missing and report the device
+  changed on every run. Provenance lives in the README.
+#}
+{% include 'interfaces.j2' %}
+{% include 'bgp.j2' %}
