@@ -1,5 +1,20 @@
 # Python dependencies for the control node.
-# Install with: pip install -r requirements.txt
+#
+# Install into the repo virtualenv, not system Python:
+#   python3 -m venv .venv
+#   source .venv/bin/activate
+#   pip install -r requirements.txt
+#
+# Order matters against requirements.yml: ansible-core is installed here, so this
+# file goes first and `ansible-galaxy collection install -r requirements.yml`
+# second. A distro-packaged /usr/bin/ansible runs on the system interpreter and
+# cannot see anything installed below.
+
+# Ansible itself. Floor set by cisco.ios, whose meta/runtime.yml declares
+# requires_ansible ">=2.16.0". Left unbounded above: requirements.yml is where
+# the collection versions are pinned, and each collection carries its own
+# ansible-core constraint.
+ansible-core>=2.16
 
 # NetBox API client, used by scripts/populate-netbox.py and scripts/export-netbox.py.
 pynetbox>=7.4
@@ -9,3 +24,12 @@ netaddr>=1.3.0
 
 # Used by scripts/export-netbox.py to write inventory/netbox-export.yml.
 PyYAML>=6.0
+
+# Imported by netbox.netbox.nb_inventory. Not pulled in transitively by
+# ansible-core or pynetbox, and the inventory plugin fails at import without it.
+pytz
+
+# SSH transport for cisco.ios. Pinned below 3.0 for IOSv 15.8, which offers only
+# SHA-1 key exchange and host key algorithms that paramiko 3.x will not negotiate.
+# Revisit if ansible-pylibssh replaces paramiko as the network_cli transport.
+paramiko>=3.4.1,<4
