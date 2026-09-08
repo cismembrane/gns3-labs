@@ -1,0 +1,59 @@
+---
+# Everything in this file is deliberately NOT in NetBox.
+#
+# The Phase 2 scope guardrail for this lab: NetBox models interfaces, IP addresses,
+# and BGP peering. Connection credentials and drift-comparison tuning are operational
+# concerns that do not belong in a source-of-truth database, so they stay here.
+# Per-router data (AS, router ID, addressing, neighbors) has no business in this file
+# and there is no host_vars/ directory in this lab at all -- see the README.
+
+ansible_network_os: cisco.ios.ios
+ansible_connection: ansible.netcommon.network_cli
+
+# Lab credentials, same as the other IOSv labs in this repo. To move them into
+# ansible-vault the way bgp-grafana-monitoring does:
+#   ansible-vault encrypt_string --stdin-name ansible_password
+#   ansible-vault encrypt_string --stdin-name ansible_become_password
+# then add `vault_password_file = .vault_pass` to ansible.cfg.
+ansible_user: admin
+ansible_password: admin
+ansible_become: true
+ansible_become_method: enable
+ansible_become_password: admin
+
+# --- Drift comparison tuning --------------------------------------------------
+
+# drift.yml compares the rendered config fragment against `show run | section <x>`.
+# IOS adds interface defaults that no template emits and that carry no intent, so
+# they are filtered out of the running-config side before comparison.
+#
+# Expect to extend this list on the first live run against your own IOSv build.
+# Anything genuinely operator-added that is NOT listed here gets reported as
+# unexpected drift, which is the behaviour you want -- add entries only after
+# confirming the line is an IOS default rather than someone's change.
+drift_ignore_patterns:
+  - '^!$'
+  - '^end$'
+  - '^Building configuration'
+  - '^Current configuration'
+  - '^duplex '
+  - '^speed '
+  - '^negotiation auto$'
+  - '^media-type '
+  - '^ip redirects$'
+  - '^no ip redirects$'
+  - '^ip unreachables$'
+  - '^no ip unreachables$'
+  - '^ip proxy-arp$'
+  - '^no ip proxy-arp$'
+  - '^load-interval '
+  - '^keepalive '
+  - '^arp timeout '
+  - '^cdp enable$'
+
+# Lines the templates emit that never appear in `show running-config`, so they
+# cannot be matched and must be dropped from the intended side before comparison.
+# `no shutdown` is the big one: IOS records the shutdown state by printing
+# `shutdown` when an interface is down and printing nothing when it is up.
+drift_intended_drop_patterns:
+  - '^no shutdown$'
