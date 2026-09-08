@@ -7,6 +7,15 @@
 # committed cannot reach a router by accident.
 #
 # Run render.yml first if NetBox has changed.
+#
+# One field does not travel in that artifact: bringing an interface up. IOS prints
+# `shutdown` when an interface is down and prints nothing when it is up, so a
+# `no shutdown` line in the rendered config could never match the running config
+# and ios_config would re-send it on every run, reporting `changed` on a converged
+# ring. templates/interfaces.j2 therefore renders only the printable half, and the
+# ios_interfaces task below reads the same NetBox `enabled` field to enforce the
+# rest. That module compares against the device's current state, so it is silent
+# once the ring is up.
 
 - name: Deploy rendered configuration to routers
   hosts: routers
@@ -38,3 +47,50 @@
       ansible.builtin.debug:
         var: push_result.updates
       when: push_result.updates is defined
+
+    # Same two exclusions interfaces.j2 applies, and deliberately so. An interface
+    # with no address is not modelled here, and the management interface is the one
+    # carrying ansible_host: enabling ios_interfaces on it would let an `enabled:
+    # false` in NetBox shut the port Ansible is connected over, mid-play.
+    #
+    # Only `name` and `enabled` are passed. Description is rendered config text and
+    # is already owned by the push above; handing it to this module as well would
+    # put one field under two mechanisms.
+    - name: Build the interface list NetBox manages
+      ansible.builtin.set_fact:
+        managed_interfaces: >-
+          {{ managed_interfaces | default([])
+             + [{'name': item.name, 'enabled': item.enabled}] }}
+      loop: "{{ interfaces | sort(attribute='name') }}"
+      loop_control:
+        label: "{{ item.name }}"
+      when:
+        - item.ip_addresses | length > 0
+        - (item.ip_addresses | first).address | ansible.utils.ipaddr('address') != ansible_host
+
+    # Runs after the push so an interface that only just appeared in the rendered
+    # config is brought up in the same run. `merged` touches only the attributes
+    # supplied, so nothing else on the interface is disturbed.
+    #
+    # Notifies the save handler rather than gating a later task on `is changed`,
+    # which is what handlers are for and what ansible-lint's no-handler rule asks
+    # for. ios_interfaces has no save of its own, and the push task's `save_when:
+    # modified` fires only when ios_config itself changed something, so without the
+    # handler an admin state change would live in running-config and never reach
+    # startup.
+    - name: Enforce interface admin state from NetBox
+      cisco.ios.ios_interfaces:
+        config: "{{ managed_interfaces | default([]) }}"
+        state: merged
+      register: admin_state_result
+      notify: Save the running configuration
+
+    - name: Report admin state changes
+      ansible.builtin.debug:
+        var: admin_state_result.commands
+      when: admin_state_result.commands | default([]) | length > 0
+
+  handlers:
+    - name: Save the running configuration
+      cisco.ios.ios_config:
+        save_when: always

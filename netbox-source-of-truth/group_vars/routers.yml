@@ -53,7 +53,16 @@ drift_ignore_patterns:
 
 # Lines the templates emit that never appear in `show running-config`, so they
 # cannot be matched and must be dropped from the intended side before comparison.
-# `no shutdown` is the big one: IOS records the shutdown state by printing
-# `shutdown` when an interface is down and printing nothing when it is up.
-drift_intended_drop_patterns:
-  - '^no shutdown$'
+#
+# Empty, and it should stay that way. This list held '^no shutdown$' until the
+# templates stopped emitting it: IOS records interface state by printing
+# `shutdown` when an interface is down and printing nothing when it is up, so
+# `no shutdown` was unmatchable by construction. Rather than drop it here and
+# leave deploy.yml re-pushing it on every run, interfaces.j2 now renders only the
+# printable half and cisco.ios.ios_interfaces enforces the rest from NetBox
+# `enabled`. Both sides of the comparison now agree in both directions.
+#
+# A line needing an entry here is a signal to check whether it belongs in the
+# rendered config at all: anything IOS will not print back cannot be deployed
+# idempotently by ios_config either.
+drift_intended_drop_patterns: []

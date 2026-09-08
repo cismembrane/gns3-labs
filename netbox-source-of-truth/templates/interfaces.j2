@@ -10,6 +10,20 @@
   the one carrying ansible_host, which nb_inventory sets from primary_ip4, so no
   separate marker is needed. Rendering it would put the address Ansible connects
   over into the file deploy.yml pushes.
+
+  Admin state is deliberately asymmetric, because IOS is. `show running-config`
+  prints `shutdown` for an interface that is down and prints nothing for one that
+  is up, so a `no shutdown` line here could never match the running config and
+  ios_config would re-send it on every deploy. Only the printable half is
+  rendered: `shutdown` when NetBox marks the interface disabled, nothing when it
+  does not. Bringing an interface up is handled by cisco.ios.ios_interfaces in
+  deploy.yml, which reads the same NetBox `enabled` field and can compare against
+  the device's current state instead of against config text.
+
+  Drift comparison is unaffected in either direction and needs no drop pattern:
+  an interface NetBox marks enabled but that is administratively down shows up as
+  an unexpected `shutdown` on the device, and one NetBox marks disabled but that
+  is up shows up as a missing `shutdown`.
 #}
 hostname {{ inventory_hostname }}
 !
@@ -20,9 +34,7 @@ hostname {{ inventory_hostname }}
 interface {{ iface.name }}
  description {{ iface.description }}
  ip address {{ address | ansible.utils.ipaddr('address') }} {{ address | ansible.utils.ipaddr('netmask') }}
-{% if iface.enabled %}
- no shutdown
-{% else %}
+{% if not iface.enabled %}
  shutdown
 {% endif %}
 !
