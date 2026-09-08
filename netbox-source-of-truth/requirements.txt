@@ -1,0 +1,11 @@
+# Python dependencies for the control node.
+# Install with: pip install -r requirements.txt
+
+# NetBox API client, used by scripts/populate-netbox.py and scripts/export-netbox.py.
+pynetbox>=7.4
+
+# Required by the ansible.utils.ipaddr filter in templates/interfaces.j2.
+netaddr>=1.3.0
+
+# Used by scripts/export-netbox.py to write inventory/netbox-export.yml.
+PyYAML>=6.0
