@@ -1,0 +1,76 @@
+{#-
+  One host's drift report as JSON. Consumed by drift.yml via
+  lookup('template', ...) | from_json.
+
+  Inputs from the play: rendered_lines, running_sections.results,
+  drift_ignore_patterns (IOS defaults dropped from the device side) and
+  drift_intended_drop_patterns (template lines IOS never prints back).
+
+  Per section, order-insensitive:
+    missing     intended by the rendered config, absent on the device
+    unexpected  on the device, not intended, not a known IOS default
+  Both fail the run. Tune the ignore list in group_vars/routers.yml.
+
+  Every tag uses {%- -%} so the only output is the JSON, whatever trim_blocks
+  the caller happens to set.
+-#}
+{%- set intended = {} -%}
+{%- set walk = namespace(section=none) -%}
+{%- for line in rendered_lines -%}
+{%-   if line and not line.startswith(' ') and line.strip() != '!' -%}
+{%-     set walk.section = line.strip() -%}
+{%-     set _ = intended.update({walk.section: []}) -%}
+{%-   elif walk.section and line.startswith(' ') -%}
+{%-     set child = line.strip() -%}
+{%-     set drop = namespace(hit=false) -%}
+{%-     for pattern in drift_intended_drop_patterns -%}
+{%-       if child is search(pattern) -%}
+{%-         set drop.hit = true -%}
+{%-       endif -%}
+{%-     endfor -%}
+{%-     if child and not drop.hit -%}
+{%-       set _ = intended[walk.section].append(child) -%}
+{%-     endif -%}
+{%-   endif -%}
+{%- endfor -%}
+{%- set report = namespace(sections=[], drifted=[], missing=0, unexpected=0) -%}
+{%- for result in running_sections.results -%}
+{%-   set section = result.item -%}
+{%-   set actual = [] -%}
+{%-   for raw in (result.stdout | first).splitlines() -%}
+{%-     set child = raw.strip() -%}
+{%-     set ignore = namespace(hit=false) -%}
+{%-     for pattern in drift_ignore_patterns -%}
+{%-       if child is search(pattern) -%}
+{%-         set ignore.hit = true -%}
+{%-       endif -%}
+{%-     endfor -%}
+{%-     if child and not ignore.hit and child != section -%}
+{%-       set _ = actual.append(child) -%}
+{%-     endif -%}
+{%-   endfor -%}
+{%-   set want = intended.get(section, []) -%}
+{%-   set missing = want | reject('in', actual) | list -%}
+{%-   set unexpected = actual | reject('in', want) | list -%}
+{%-   set entry = {
+        'section': section,
+        'missing': missing,
+        'unexpected': unexpected,
+      } -%}
+{%-   set _ = report.sections.append(entry) -%}
+{%-   set report.missing = report.missing + (missing | length) -%}
+{%-   set report.unexpected = report.unexpected + (unexpected | length) -%}
+{%-   if missing or unexpected -%}
+{%-     set _ = report.drifted.append(entry) -%}
+{%-   endif -%}
+{%- endfor -%}
+{{
+  {
+    'host': inventory_hostname,
+    'sections_checked': report.sections | length,
+    'missing_total': report.missing,
+    'unexpected_total': report.unexpected,
+    'drifted': report.drifted,
+    'sections': report.sections,
+  } | to_json
+}}
