@@ -29,3 +29,14 @@ repos:
     rev: v0.23.2
     hooks:
       - id: markdownlint-cli2
+
+  # Scoped to the NetBox lab's scripts. The older restconf-netconf-scripts predate
+  # this hook and are not formatted to ruff's defaults; widening the scope means
+  # reformatting them in the same commit, which is a separate change.
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.16.3
+    hooks:
+      - id: ruff-check
+        files: '^netbox-source-of-truth/scripts/.*\.py$'
+      - id: ruff-format
+        files: '^netbox-source-of-truth/scripts/.*\.py$'
