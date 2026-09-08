@@ -1,0 +1,150 @@
+# NetBox stack for the source-of-truth lab.
+#
+# Trimmed from netbox-community/netbox-docker 5.0.2. The upstream project mounts a
+# ./configuration directory, but the image already ships those defaults at
+# /etc/netbox/config (Dockerfile: COPY configuration/ /etc/netbox/config/), so this
+# stack runs self-contained with no vendored Python config.
+#
+# Versions are pinned deliberately. NetBox renames API fields between minor releases
+# and nb_inventory tracks those renames, so "latest" would silently break the
+# inventory contract this lab depends on. Bump both together and re-run render.yml.
+#
+#   NetBox 4.6.8 / netbox-docker 5.0.2 / netbox.netbox collection 3.21.0
+#
+# Copy .env.example to .env before the first start. SECRET_KEY, API_TOKEN_PEPPER_1
+# and the superuser API token all come from there.
+
+# Settings shared by the netbox and netbox-worker services. Kept in a top-level
+# x- extension field rather than anchored on the netbox service itself, so neither
+# service redefines a key the other already merged in.
+x-netbox-common: &netbox-common
+  image: docker.io/netboxcommunity/netbox:v4.6.8-5.0.2
+  restart: unless-stopped
+  user: "netbox:root"
+  volumes:
+    - netbox-media-files:/opt/netbox/netbox/media:rw
+  environment:
+    DB_HOST: postgres
+    DB_NAME: netbox
+    DB_USER: netbox
+    DB_PASSWORD: ${POSTGRES_PASSWORD:-netbox}
+    REDIS_HOST: redis
+    REDIS_DATABASE: 0
+    REDIS_PASSWORD: ${REDIS_PASSWORD:-netbox}
+    REDIS_SSL: "false"
+    REDIS_CACHE_HOST: redis-cache
+    REDIS_CACHE_DATABASE: 1
+    REDIS_CACHE_PASSWORD: ${REDIS_CACHE_PASSWORD:-netbox}
+    REDIS_CACHE_SSL: "false"
+    SECRET_KEY: ${NETBOX_SECRET_KEY:?set NETBOX_SECRET_KEY in .env}
+    API_TOKEN_PEPPER_1: ${NETBOX_API_TOKEN_PEPPER:?set NETBOX_API_TOKEN_PEPPER in .env}
+    ALLOWED_HOSTS: "*"
+    # Superuser only. NetBox 4.5+ issues v2 API tokens whose plaintext is
+    # generated server-side, so no token can be seeded from here. Provision one
+    # after first boot via /api/users/tokens/provision/ (see .env.example) and
+    # give it to the control node as NETBOX_TOKEN.
+    SKIP_SUPERUSER: "false"
+    SUPERUSER_NAME: ${NETBOX_SUPERUSER_NAME:-admin}
+    SUPERUSER_EMAIL: ${NETBOX_SUPERUSER_EMAIL:-admin@lab.local}
+    SUPERUSER_PASSWORD: ${NETBOX_SUPERUSER_PASSWORD:?set NETBOX_SUPERUSER_PASSWORD in .env}
+    RELEASE_CHECK_URL: ""
+    METRICS_ENABLED: "false"
+
+services:
+  netbox:
+    <<: *netbox-common
+    container_name: netbox
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      redis-cache:
+        condition: service_healthy
+    healthcheck:
+      test: curl -f http://localhost:8080/login/ || exit 1
+      # First boot runs migrations and creates the superuser on an empty database.
+      start_period: 120s
+      timeout: 3s
+      interval: 15s
+    ports:
+      - "${NETBOX_PORT:-8000}:8080"
+
+  # Background job queue. Not needed to read or write IPAM objects over the API,
+  # but without it the NetBox UI reports a stalled worker on every page load.
+  netbox-worker:
+    <<: *netbox-common
+    container_name: netbox-worker
+    depends_on:
+      netbox:
+        condition: service_healthy
+    command:
+      - /opt/netbox/venv/bin/python
+      - /opt/netbox/netbox/manage.py
+      - rqworker
+    healthcheck:
+      test: ps -aux | grep -v grep | grep -q rqworker || exit 1
+      start_period: 20s
+      timeout: 3s
+      interval: 15s
+
+  postgres:
+    image: docker.io/postgres:18-alpine
+    container_name: netbox-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: netbox
+      POSTGRES_USER: netbox
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-netbox}
+    healthcheck:
+      test: pg_isready -q -t 2 -d $$POSTGRES_DB -U $$POSTGRES_USER
+      start_period: 20s
+      timeout: 30s
+      interval: 10s
+      retries: 5
+    # Mounted at /var/lib/postgresql, not /var/lib/postgresql/data. Postgres 18
+    # moved PGDATA to /var/lib/postgresql/<major>/docker and declared the volume
+    # one level up. Using the old /data path on 18 makes Docker put the database
+    # in an anonymous volume and leave this named one empty, with no error.
+    volumes:
+      - netbox-postgres:/var/lib/postgresql
+
+  redis:
+    image: docker.io/valkey/valkey:9.1-alpine
+    container_name: netbox-redis
+    restart: unless-stopped
+    command:
+      - sh
+      - -c
+      # $$ escapes the variable so compose leaves it for the shell in the container.
+      - valkey-server --appendonly yes --requirepass $$REDIS_PASSWORD
+    environment:
+      REDIS_PASSWORD: ${REDIS_PASSWORD:-netbox}
+    healthcheck: &redis-healthcheck
+      test: '[ $$(valkey-cli --pass "$${REDIS_PASSWORD}" ping) = ''PONG'' ]'
+      start_period: 5s
+      timeout: 3s
+      interval: 1s
+      retries: 5
+    volumes:
+      - netbox-redis-data:/data
+
+  redis-cache:
+    image: docker.io/valkey/valkey:9.1-alpine
+    container_name: netbox-redis-cache
+    restart: unless-stopped
+    command:
+      - sh
+      - -c
+      - valkey-server --requirepass $$REDIS_PASSWORD
+    environment:
+      REDIS_PASSWORD: ${REDIS_CACHE_PASSWORD:-netbox}
+    healthcheck: *redis-healthcheck
+
+volumes:
+  netbox-media-files:
+    driver: local
+  netbox-postgres:
+    driver: local
+  netbox-redis-data:
+    driver: local
