@@ -70,6 +70,26 @@ jobs:
         # Reads .markdownlint.yaml automatically.
         run: markdownlint-cli2 "**/*.md" "#node_modules"
 
+  ruff:
+    name: Python lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+
+      - name: Install ruff
+        # Pin matches .pre-commit-config.yaml rev: v0.16.3
+        run: pip install "ruff==0.16.3"
+
+      - name: Run ruff
+        # Scoped to the NetBox lab's scripts, matching the pre-commit hook.
+        run: |
+          ruff check netbox-source-of-truth/scripts/
+          ruff format --check netbox-source-of-truth/scripts/
+
   links:
     name: Check links
     runs-on: ubuntu-latest

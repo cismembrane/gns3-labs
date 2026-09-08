@@ -96,3 +96,23 @@ jobs:
       - name: k8s-metallb-bgp — verify-k8s-routes
         working-directory: k8s-metallb-bgp
         run: ansible-playbook --syntax-check -i inventory.yml verify-k8s-routes.yml
+
+      # netbox-source-of-truth sets inventory = inventory/netbox.yml in ansible.cfg,
+      # which is the live NetBox dynamic inventory and needs NETBOX_API/NETBOX_TOKEN.
+      # -i overrides it with the committed export fixture, so no NetBox is required.
+
+      - name: netbox-source-of-truth — render
+        working-directory: netbox-source-of-truth
+        run: ansible-playbook --syntax-check -i inventory/netbox-export.yml render.yml
+
+      - name: netbox-source-of-truth — deploy
+        working-directory: netbox-source-of-truth
+        run: ansible-playbook --syntax-check -i inventory/netbox-export.yml deploy.yml
+
+      - name: netbox-source-of-truth — verify
+        working-directory: netbox-source-of-truth
+        run: ansible-playbook --syntax-check -i inventory/netbox-export.yml verify.yml
+
+      - name: netbox-source-of-truth — drift
+        working-directory: netbox-source-of-truth
+        run: ansible-playbook --syntax-check -i inventory/netbox-export.yml drift.yml

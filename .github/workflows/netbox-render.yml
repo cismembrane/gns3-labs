@@ -1,0 +1,58 @@
+name: NetBox Render
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+
+  render:
+    name: Render intended configs from the NetBox export
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+
+      - name: Install ansible-core and template dependencies
+        # netaddr backs the ansible.utils.ipaddr filter that interfaces.j2 uses to
+        # turn a NetBox CIDR into the dotted-quad mask IOS wants. Collections are
+        # installed from the lab's own requirements.yml so CI honours the version
+        # pins there rather than resolving to whatever is newest that day.
+        run: |
+          pip install "ansible-core>=2.16" "netaddr>=1.3.0"
+          ansible-galaxy collection install -r netbox-source-of-truth/requirements.yml
+
+      # The runner never reaches NetBox. inventory/netbox-export.yml is the
+      # committed snapshot of what NetBox holds, produced by
+      # scripts/export-netbox.py, and it carries the same host var shapes
+      # nb_inventory produces. No secrets are needed for any of this.
+      - name: Parse the committed NetBox export as an inventory
+        working-directory: netbox-source-of-truth
+        run: ansible-inventory -i inventory/netbox-export.yml --list > /dev/null
+
+      - name: Render intended configuration
+        working-directory: netbox-source-of-truth
+        run: ansible-playbook -i inventory/netbox-export.yml render.yml
+
+      # Catches a NetBox export committed without re-rendering, and any template
+      # change whose output nobody regenerated. The rendered configs are the
+      # review artifact; they have to match what the templates actually produce.
+      #
+      # git status --porcelain, not git diff: a device added to NetBox and
+      # exported without rendering produces a new untracked file, which git diff
+      # would not report.
+      - name: Rendered configs match the committed output
+        working-directory: netbox-source-of-truth
+        run: |
+          if [ -n "$(git status --porcelain -- rendered/)" ]; then
+            git status --porcelain -- rendered/
+            git diff -- rendered/
+            echo "::error::rendered/ is out of date. Run 'ansible-playbook -i inventory/netbox-export.yml render.yml' and commit the result."
+            exit 1
+          fi
