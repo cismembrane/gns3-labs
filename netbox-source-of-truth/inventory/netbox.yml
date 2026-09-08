@@ -49,14 +49,35 @@ group_by:
   - platform
 
 # The plays target `routers`, matching the static inventories in the other Ansible
-# labs in this repo. Expressions here are evaluated against the raw NetBox device
-# object, so this reads platform.slug rather than the extracted host var.
+# labs in this repo.
+#
+# The plugin passes the raw NetBox device object into this expression, but
+# Ansible's Constructable helper merges the host vars it has already set over the
+# top of it -- combine_vars(raw_object, host_vars), host vars win. `platform`
+# therefore resolves to the extracted host var, which with plurals: false is the
+# slug string rather than the nested NetBox object. Reading platform.slug here
+# gives Undefined, the conditional is silently false (strict defaults to false),
+# and the group is never created at all, so plays fail with "Could not match
+# supplied host pattern, ignoring: routers".
 groups:
-  routers: "platform.slug | default('') == 'ios'"
+  routers: "platform | default('') == 'ios'"
+
+# nb_inventory emits `serial` and `tags` host vars, both of which collide with
+# Ansible play keywords and produce "Found variable using reserved name" on every
+# run. Nothing in templates/ reads either one, so they are renamed out of the way.
+# Patterns are anchored because the plugin applies them with re.match, and the
+# first match wins.
+rename_variables:
+  - pattern: "^serial$"
+    repl: "netbox_serial"
+  - pattern: "^tags$"
+    repl: "netbox_tags"
 
 # Lift the BGP data out of the config context into the variable names bgp.j2 uses,
 # so the templates stay readable and stay close to the host_vars-driven versions in
-# ansible-bgp and k8s-metallb-bgp. Same evaluation context as `groups` above.
+# ansible-bgp and k8s-metallb-bgp. Same evaluation context as `groups` above, and
+# the same host-vars-win merge, which is harmless here: `config_context` holds the
+# same dict whether it comes from the raw object or the host var.
 compose:
   asn: config_context.bgp.asn
   router_id: config_context.bgp.router_id
