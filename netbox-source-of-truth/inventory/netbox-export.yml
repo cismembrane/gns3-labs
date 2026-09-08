@@ -1,0 +1,183 @@
+---
+# GENERATED FILE -- DO NOT EDIT BY HAND.
+#
+# Regenerate with:  python3 scripts/export-netbox.py
+#
+# NetBox is the source of truth for everything below. Editing this file changes
+# what CI renders but not what the routers get from a live run, so the two drift
+# apart silently. Change the data in NetBox and re-run the export instead.
+#
+# Host var shapes mirror netbox.netbox.nb_inventory as configured in
+# inventory/netbox.yml. Connection credentials live in group_vars/routers.yml.
+all:
+  children:
+    routers:
+      hosts:
+        R1:
+          ansible_host: 192.168.0.1
+          site: gns3-lab
+          role: router
+          platform: ios
+          asn: 65001
+          router_id: 1.1.1.1
+          bgp_neighbors:
+          - neighbor: 10.0.1.2
+            remote_as: 65002
+            description: bgp_to_r2
+          - neighbor: 10.0.4.4
+            remote_as: 65004
+            description: bgp_to_r4
+          bgp_networks:
+          - prefix: 1.1.1.1
+            mask: 255.255.255.255
+          - prefix: 10.0.1.0
+            mask: 255.255.255.248
+          - prefix: 10.0.4.0
+            mask: 255.255.255.248
+          interfaces:
+          - name: GigabitEthernet0/0
+            description: to_r2
+            enabled: true
+            ip_addresses:
+            - address: 10.0.1.1/29
+          - name: GigabitEthernet0/3
+            description: to_r4
+            enabled: true
+            ip_addresses:
+            - address: 10.0.4.1/29
+          - name: GigabitEthernet0/4
+            description: mgmt
+            enabled: true
+            ip_addresses:
+            - address: 192.168.0.1/24
+          - name: Loopback0
+            description: router_id
+            enabled: true
+            ip_addresses:
+            - address: 1.1.1.1/32
+        R2:
+          ansible_host: 192.168.0.2
+          site: gns3-lab
+          role: router
+          platform: ios
+          asn: 65002
+          router_id: 2.2.2.2
+          bgp_neighbors:
+          - neighbor: 10.0.1.1
+            remote_as: 65001
+            description: bgp_to_r1
+          - neighbor: 10.0.2.3
+            remote_as: 65003
+            description: bgp_to_r3
+          bgp_networks:
+          - prefix: 2.2.2.2
+            mask: 255.255.255.255
+          - prefix: 10.0.1.0
+            mask: 255.255.255.248
+          - prefix: 10.0.2.0
+            mask: 255.255.255.248
+          interfaces:
+          - name: GigabitEthernet0/0
+            description: to_r1
+            enabled: true
+            ip_addresses:
+            - address: 10.0.1.2/29
+          - name: GigabitEthernet0/1
+            description: to_r3
+            enabled: true
+            ip_addresses:
+            - address: 10.0.2.2/29
+          - name: GigabitEthernet0/4
+            description: mgmt
+            enabled: true
+            ip_addresses:
+            - address: 192.168.0.2/24
+          - name: Loopback0
+            description: router_id
+            enabled: true
+            ip_addresses:
+            - address: 2.2.2.2/32
+        R3:
+          ansible_host: 192.168.0.3
+          site: gns3-lab
+          role: router
+          platform: ios
+          asn: 65003
+          router_id: 3.3.3.3
+          bgp_neighbors:
+          - neighbor: 10.0.2.2
+            remote_as: 65002
+            description: bgp_to_r2
+          - neighbor: 10.0.3.4
+            remote_as: 65004
+            description: bgp_to_r4
+          bgp_networks:
+          - prefix: 3.3.3.3
+            mask: 255.255.255.255
+          - prefix: 10.0.2.0
+            mask: 255.255.255.248
+          - prefix: 10.0.3.0
+            mask: 255.255.255.248
+          interfaces:
+          - name: GigabitEthernet0/1
+            description: to_r2
+            enabled: true
+            ip_addresses:
+            - address: 10.0.2.3/29
+          - name: GigabitEthernet0/2
+            description: to_r4
+            enabled: true
+            ip_addresses:
+            - address: 10.0.3.3/29
+          - name: GigabitEthernet0/4
+            description: mgmt
+            enabled: true
+            ip_addresses:
+            - address: 192.168.0.3/24
+          - name: Loopback0
+            description: router_id
+            enabled: true
+            ip_addresses:
+            - address: 3.3.3.3/32
+        R4:
+          ansible_host: 192.168.0.4
+          site: gns3-lab
+          role: router
+          platform: ios
+          asn: 65004
+          router_id: 4.4.4.4
+          bgp_neighbors:
+          - neighbor: 10.0.3.3
+            remote_as: 65003
+            description: bgp_to_r3
+          - neighbor: 10.0.4.1
+            remote_as: 65001
+            description: bgp_to_r1
+          bgp_networks:
+          - prefix: 4.4.4.4
+            mask: 255.255.255.255
+          - prefix: 10.0.3.0
+            mask: 255.255.255.248
+          - prefix: 10.0.4.0
+            mask: 255.255.255.248
+          interfaces:
+          - name: GigabitEthernet0/2
+            description: to_r3
+            enabled: true
+            ip_addresses:
+            - address: 10.0.3.4/29
+          - name: GigabitEthernet0/3
+            description: to_r1
+            enabled: true
+            ip_addresses:
+            - address: 10.0.4.4/29
+          - name: GigabitEthernet0/4
+            description: mgmt
+            enabled: true
+            ip_addresses:
+            - address: 192.168.0.4/24
+          - name: Loopback0
+            description: router_id
+            enabled: true
+            ip_addresses:
+            - address: 4.4.4.4/32
