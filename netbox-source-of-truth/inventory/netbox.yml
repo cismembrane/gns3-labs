@@ -1,0 +1,64 @@
+---
+# Live dynamic inventory. NetBox is the source of truth; there is no host_vars/
+# directory in this lab.
+#
+# Credentials come from the environment, which is what the plugin documents:
+#   export NETBOX_API=http://netbox-host:8000
+#   export NETBOX_TOKEN=nbt_<key>.<plaintext>   # see .env.example
+#
+# The token is not vaulted because inventory sources are parsed before play vars
+# are available, so a vaulted group_var could not supply it. Router credentials
+# are a different matter and live in group_vars/routers.yml.
+#
+# Check what this produces with:
+#   ansible-inventory -i inventory/netbox.yml --list
+#   ansible-inventory -i inventory/netbox.yml --graph
+
+plugin: netbox.netbox.nb_inventory
+
+validate_certs: false
+
+# Load-bearing. The plugin defaults to plurals: true, which wraps every host var
+# in a single-element list for backwards compatibility -- asn would arrive as
+# [65001] and every template would need a `| first`. It also switches group_by to
+# plural spellings.
+plurals: false
+
+# Pulls the per-device BGP data that populate-netbox.py wrote as local context.
+# NetBox merges local context data into the rendered config_context, so this
+# arrives as the `config_context` host var without any global ConfigContext object.
+config_context: true
+
+# Adds the `interfaces` host var: NetBox interface objects with their assigned IP
+# addresses attached under `ip_addresses`. templates/interfaces.j2 reads it directly.
+interfaces: true
+
+# Devices are also matched on has_primary_ip because nb_inventory derives
+# ansible_host from primary_ip4. A device without one would appear in the
+# inventory with no usable address.
+device_query_filters:
+  - site: gns3-lab
+  - role: router
+  - has_primary_ip: 'true'
+
+# Descriptive groups for `ansible-inventory --graph`: site_gns3_lab, role_router,
+# platform_ios. Singular spellings because plurals is false.
+group_by:
+  - site
+  - role
+  - platform
+
+# The plays target `routers`, matching the static inventories in the other Ansible
+# labs in this repo. Expressions here are evaluated against the raw NetBox device
+# object, so this reads platform.slug rather than the extracted host var.
+groups:
+  routers: "platform.slug | default('') == 'ios'"
+
+# Lift the BGP data out of the config context into the variable names bgp.j2 uses,
+# so the templates stay readable and stay close to the host_vars-driven versions in
+# ansible-bgp and k8s-metallb-bgp. Same evaluation context as `groups` above.
+compose:
+  asn: config_context.bgp.asn
+  router_id: config_context.bgp.router_id
+  bgp_neighbors: config_context.bgp.neighbors
+  bgp_networks: config_context.bgp.networks
