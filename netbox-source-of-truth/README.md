@@ -168,6 +168,78 @@ pip install -r requirements.txt
 ansible-galaxy collection install -r requirements.yml
 ```
 
+### Provision the management interfaces
+
+Load the GNS3 project file and start the routers. Provision the management interfaces and issue the appropriate commands for SSH access.
+
+R1:
+
+```bash
+enable
+configure terminal
+interface gigabitethernet0/4
+ip address 192.168.0.1 255.255.255.0
+no shutdown
+username admin privilege 15 secret admin
+hostname R1
+ip domain-name lab
+line vty 0 15
+transport input ssh
+login local
+crypto key generate rsa modulus 1024
+```
+
+R2:
+
+```bash
+enable
+configure terminal
+interface gigabitethernet0/4
+ip address 192.168.0.2 255.255.255.0
+no shutdown
+username admin privilege 15 secret admin
+hostname R2
+ip domain-name lab
+line vty 0 15
+transport input ssh
+login local
+crypto key generate rsa modulus 1024
+```
+
+R3:
+
+```bash
+enable
+configure terminal
+interface gigabitethernet0/4
+ip address 192.168.0.3 255.255.255.0
+no shutdown
+username admin privilege 15 secret admin
+hostname R3
+ip domain-name lab
+line vty 0 15
+transport input ssh
+login local
+crypto key generate rsa modulus 1024
+```
+
+R4:
+
+```bash
+enable
+configure terminal
+interface gigabitethernet0/4
+ip address 192.168.0.4 255.255.255.0
+no shutdown
+username admin privilege 15 secret admin
+hostname R4
+ip domain-name lab
+line vty 0 15
+transport input ssh
+login local
+crypto key generate rsa modulus 1024
+```
+
 ### 3. Populate the ring
 
 ```bash
@@ -190,6 +262,14 @@ ansible-playbook render.yml
 ```
 
 ### 6. Deploy and verify
+
+Before the next step, we are going to create the tap nodes with a script:
+
+```bash
+scripts/setup-taps.sh
+```
+
+Then wire Cloud1 in GNS3 to the tap0 interface and to any interface on Switch1.
 
 ```bash
 ansible-playbook deploy.yml
