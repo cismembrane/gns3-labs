@@ -1,0 +1,22 @@
+---
+# Guard imported by render, deploy, verify, and drift.
+
+- name: Assert the inventory produced routers
+  hosts: localhost
+  gather_facts: false
+  connection: local
+
+  tasks:
+    - name: The routers group is populated
+      ansible.builtin.assert:
+        that:
+          - router_hosts | length > 0
+        fail_msg: >-
+          The `routers` group is empty, so every play in this lab would no-op and
+          exit zero. Check what the inventory actually produced:
+          ansible-inventory --graph
+        success_msg: >-
+          {{ router_hosts | length }} router(s) in inventory:
+          {{ router_hosts | join(', ') }}
+      vars:
+        router_hosts: "{{ groups['routers'] | default([]) }}"
